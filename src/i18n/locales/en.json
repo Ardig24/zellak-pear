@@ -1,0 +1,65 @@
+{
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to your account",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "products": {
+    "categories": "Menu Categories",
+    "backToCategories": "Back to Categories",
+    "orderSummary": "Order Summary",
+    "items": "items",
+    "emptyOrder": "Your order is empty",
+    "total": "Total",
+    "sendOrder": "Send Order",
+    "orderSuccess": "Order sent successfully!",
+    "orderError": "Failed to send order. Please try again.",
+    "quantity": "Quantity",
+    "size": "Size",
+    "price": "Price"
+  },
+  "categories": {
+    "categoryA": "Category A",
+    "categoryB": "Category B",
+    "categoryC": "Category C"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "manageUsers": "Manage Users",
+    "manageProducts": "Manage Products",
+    "manageCategories": "Manage Categories",
+    "welcome": "Welcome to the Admin Panel",
+    "selectSection": "Select a section from the sidebar to get started",
+    "addNewProduct": "Add New Product",
+    "addNewUser": "Add New User",
+    "addNewCategory": "Add New Category",
+    "productName": "Product Name",
+    "category": "Category",
+    "selectCategory": "Select category",
+    "productImage": "Product Image",
+    "variants": "Variants",
+    "addVariant": "Add Variant",
+    "updateProduct": "Update Product",
+    "companyDetails": "Company Details",
+    "companyName": "Company Name",
+    "address": "Address",
+    "contactNumber": "Contact Number",
+    "email": "Email",
+    "userCategory": "User Category",
+    "actions": "Actions",
+    "updateUser": "Update User"
+  },
+  "common": {
+    "logout": "Logout",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "remove": "Remove",
+    "back": "Back"
+  }
+}

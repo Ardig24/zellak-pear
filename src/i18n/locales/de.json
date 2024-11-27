@@ -1,0 +1,65 @@
+{
+  "login": {
+    "title": "Willkommen zurück",
+    "subtitle": "Melden Sie sich bei Ihrem Konto an",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "invalidCredentials": "Ungültige Anmeldedaten"
+  },
+  "products": {
+    "categories": "Menü-Kategorien",
+    "backToCategories": "Zurück zu den Kategorien",
+    "orderSummary": "Bestellübersicht",
+    "items": "Artikel",
+    "emptyOrder": "Ihre Bestellung ist leer",
+    "total": "Gesamt",
+    "sendOrder": "Bestellung senden",
+    "orderSuccess": "Bestellung erfolgreich gesendet!",
+    "orderError": "Fehler beim Senden der Bestellung. Bitte versuchen Sie es erneut.",
+    "quantity": "Menge",
+    "size": "Größe",
+    "price": "Preis"
+  },
+  "categories": {
+    "categoryA": "Kategorie A",
+    "categoryB": "Kategorie B",
+    "categoryC": "Kategorie C"
+  },
+  "admin": {
+    "title": "Admin-Panel",
+    "manageUsers": "Benutzer verwalten",
+    "manageProducts": "Produkte verwalten",
+    "manageCategories": "Kategorien verwalten",
+    "welcome": "Willkommen im Admin-Panel",
+    "selectSection": "Wählen Sie einen Bereich aus der Seitenleiste aus",
+    "addNewProduct": "Neues Produkt hinzufügen",
+    "addNewUser": "Neuen Benutzer hinzufügen",
+    "addNewCategory": "Neue Kategorie hinzufügen",
+    "productName": "Produktname",
+    "category": "Kategorie",
+    "selectCategory": "Kategorie auswählen",
+    "productImage": "Produktbild",
+    "variants": "Varianten",
+    "addVariant": "Variante hinzufügen",
+    "updateProduct": "Produkt aktualisieren",
+    "companyDetails": "Firmendetails",
+    "companyName": "Firmenname",
+    "address": "Adresse",
+    "contactNumber": "Telefonnummer",
+    "email": "E-Mail",
+    "userCategory": "Benutzerkategorie",
+    "actions": "Aktionen",
+    "updateUser": "Benutzer aktualisieren"
+  },
+  "common": {
+    "logout": "Abmelden",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "back": "Zurück"
+  }
+}

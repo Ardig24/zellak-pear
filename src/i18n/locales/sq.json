@@ -1,0 +1,65 @@
+{
+  "login": {
+    "title": "Mirë se erdhët",
+    "subtitle": "Identifikohuni në llogarinë tuaj",
+    "email": "Email",
+    "password": "Fjalëkalimi",
+    "signIn": "Identifikohu",
+    "invalidCredentials": "Të dhëna të pasakta"
+  },
+  "products": {
+    "categories": "Kategoritë e Menusë",
+    "backToCategories": "Kthehu te Kategoritë",
+    "orderSummary": "Përmbledhja e Porosisë",
+    "items": "artikuj",
+    "emptyOrder": "Porosia juaj është bosh",
+    "total": "Totali",
+    "sendOrder": "Dërgo Porosinë",
+    "orderSuccess": "Porosia u dërgua me sukses!",
+    "orderError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
+    "quantity": "Sasia",
+    "size": "Madhësia",
+    "price": "Çmimi"
+  },
+  "categories": {
+    "categoryA": "Kategoria A",
+    "categoryB": "Kategoria B",
+    "categoryC": "Kategoria C"
+  },
+  "admin": {
+    "title": "Paneli i Administratorit",
+    "manageUsers": "Menaxho Përdoruesit",
+    "manageProducts": "Menaxho Produktet",
+    "manageCategories": "Menaxho Kategoritë",
+    "welcome": "Mirë se vini në Panelin e Administratorit",
+    "selectSection": "Zgjidhni një seksion nga menuja anësore",
+    "addNewProduct": "Shto Produkt të Ri",
+    "addNewUser": "Shto Përdorues të Ri",
+    "addNewCategory": "Shto Kategori të Re",
+    "productName": "Emri i Produktit",
+    "category": "Kategoria",
+    "selectCategory": "Zgjidhni kategorinë",
+    "productImage": "Foto e Produktit",
+    "variants": "Variantet",
+    "addVariant": "Shto Variant",
+    "updateProduct": "Përditëso Produktin",
+    "companyDetails": "Të dhënat e Kompanisë",
+    "companyName": "Emri i Kompanisë",
+    "address": "Adresa",
+    "contactNumber": "Numri i Kontaktit",
+    "email": "Email-i",
+    "userCategory": "Kategoria e Përdoruesit",
+    "actions": "Veprimet",
+    "updateUser": "Përditëso Përdoruesin"
+  },
+  "common": {
+    "logout": "Dil",
+    "cancel": "Anulo",
+    "save": "Ruaj",
+    "edit": "Ndrysho",
+    "delete": "Fshi",
+    "add": "Shto",
+    "remove": "Hiq",
+    "back": "Kthehu"
+  }
+}
