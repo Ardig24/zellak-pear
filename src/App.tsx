@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import AdminLayout from './layouts/AdminLayout';
-import UserLayout from './layouts/UserLayout';
+import Products from './pages/Products';
+import AdminPanel from './pages/AdminPanel';
 import { useAuth } from './contexts/AuthContext';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
@@ -16,14 +16,14 @@ function ProtectedRoute({ children, adminOnly = false }: { children: React.React
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
+    <div className="min-h-screen bg-orange-50">
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
           path="/products"
           element={
             <ProtectedRoute>
-              <UserLayout />
+              <Products />
             </ProtectedRoute>
           }
         />
@@ -31,7 +31,7 @@ function App() {
           path="/admin/*"
           element={
             <ProtectedRoute adminOnly>
-              <AdminLayout />
+              <AdminPanel />
             </ProtectedRoute>
           }
         />

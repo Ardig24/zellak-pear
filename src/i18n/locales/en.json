@@ -62,6 +62,7 @@
     "delete": "Delete",
     "add": "Add",
     "remove": "Remove",
-    "back": "Back"
+    "back": "Back",
+    "reports": "Reports"
   }
 }
