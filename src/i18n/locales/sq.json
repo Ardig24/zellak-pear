@@ -52,7 +52,8 @@
     "email": "Email-i",
     "userCategory": "Kategoria e Përdoruesit",
     "actions": "Veprimet",
-    "updateUser": "Përditëso Përdoruesin"
+    "updateUser": "Përditëso Përdoruesin",
+    "reports": "Raportet"
   },
   "common": {
     "logout": "Dil",
@@ -64,5 +65,21 @@
     "remove": "Hiq",
     "back": "Kthehu",
     "reports": "Reports"
+  },
+  "reports": {
+    "dashboard": "Raportet",
+    "userReport": "Raporti i Përdoruesit",
+    "productReport": "Raporti i Produktit",
+    "generateReport": "Krijo Raport",
+    "totalOrders": "Porositë Totale",
+    "totalSpent": "Shuma Totale",
+    "orderHistory": "Historia e Porosive",
+    "date": "Data",
+    "amount": "Shuma",
+    "items": "Artikuj",
+    "totalUnitsSold": "Njësitë Totale të Shitura",
+    "totalRevenue": "Të Ardhurat Totale",
+    "selectUser": "Zgjidhni Përdoruesin",
+    "selectProduct": "Zgjidhni Produktin"
   }
 }

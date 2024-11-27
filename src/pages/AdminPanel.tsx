@@ -1,64 +1,95 @@
-// src/pages/AdminPanel.tsx
 import React from 'react';
-import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import ManageProducts from './admin/ManageProducts';
-import ManageUsers from './admin/ManageUsers';
-import Reports from '../components/Reports';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Users, Coffee, LogOut, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ManageUsers from './admin/ManageUsers';
+import ManageProducts from './admin/ManageProducts';
+import Reports from '../components/Reports';
+import LanguageSelector from '../components/LanguageSelector';
+import { useAuth } from '../contexts/AuthContext';
 
-function AdminPanel() {
-  const location = useLocation();
+export default function AdminPanel() {
+  const { logout } = useAuth();
   const { t } = useTranslation();
+  const location = useLocation();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
-    <div className="flex">
-      {/* Left Sidebar Navigation */}
-      <div className="w-64 min-h-screen bg-white shadow-md">
-        <nav className="mt-8">
-          <Link
-            to="/admin/products"
-            className={`block px-4 py-2 mb-2 ${
-              location.pathname.includes('/products')
-                ? 'bg-orange-100 text-orange-600'
-                : 'text-gray-600 hover:bg-orange-50'
-            }`}
-          >
-            {t('manageProducts')}
-          </Link>
+    <div className="min-h-screen bg-orange-50 flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-lg">
+        <div className="p-4">
+          <h1 className="text-xl font-bold text-gray-800">{t('admin.title')}</h1>
+          <div className="mt-2">
+            <LanguageSelector />
+          </div>
+        </div>
+        <nav className="mt-4">
           <Link
             to="/admin/users"
-            className={`block px-4 py-2 mb-2 ${
-              location.pathname.includes('/users')
-                ? 'bg-orange-100 text-orange-600'
-                : 'text-gray-600 hover:bg-orange-50'
+            className={`flex items-center px-4 py-2 ${
+              location.pathname.includes('/users') ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-orange-100'
             }`}
           >
-            {t('manageUsers')}
+            <Users className="w-5 h-5 mr-2" />
+            {t('admin.manageUsers')}
+          </Link>
+          <Link
+            to="/admin/products"
+            className={`flex items-center px-4 py-2 ${
+              location.pathname.includes('/products') ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-orange-100'
+            }`}
+          >
+            <Coffee className="w-5 h-5 mr-2" />
+            {t('admin.manageProducts')}
           </Link>
           <Link
             to="/admin/reports"
-            className={`block px-4 py-2 mb-2 ${
-              location.pathname.includes('/reports')
-                ? 'bg-orange-100 text-orange-600'
-                : 'text-gray-600 hover:bg-orange-50'
+            className={`flex items-center px-4 py-2 ${
+              location.pathname.includes('/reports') ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-orange-100'
             }`}
           >
-            {t('reports')}
+            <FileText className="w-5 h-5 mr-2" />
+            {t('admin.reports')}
           </Link>
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50"
+          >
+            <LogOut className="w-5 h-5 mr-2" />
+            {t('common.logout')}
+          </button>
         </nav>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 p-8">
         <Routes>
-          <Route path="products" element={<ManageProducts />} />
           <Route path="users" element={<ManageUsers />} />
+          <Route path="products" element={<ManageProducts />} />
           <Route path="reports" element={<Reports />} />
-          <Route path="*" element={<Navigate to="products" />} />
+          <Route
+            path="/"
+            element={
+              <div className="text-center mt-20">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  {t('admin.welcome')}
+                </h2>
+                <p className="text-gray-600 mt-2">
+                  {t('admin.selectSection')}
+                </p>
+              </div>
+            }
+          />
         </Routes>
       </div>
     </div>
   );
 }
-
-export default AdminPanel;

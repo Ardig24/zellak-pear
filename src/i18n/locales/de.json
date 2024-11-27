@@ -32,7 +32,7 @@
     "title": "Admin-Panel",
     "manageUsers": "Benutzer verwalten",
     "manageProducts": "Produkte verwalten",
-    "manageCategories": "Kategorien verwalten",
+    "reports": "Rapporte",
     "welcome": "Willkommen im Admin-Panel",
     "selectSection": "Wählen Sie einen Bereich aus der Seitenleiste aus",
     "addNewProduct": "Neues Produkt hinzufügen",
@@ -64,5 +64,21 @@
     "remove": "Entfernen",
     "back": "Zurück",
     "reports": "Berichte"
+  },
+  "reports": {
+    "dashboard": "Berichtsdashboard",
+    "userReport": "Benutzerbericht",
+    "productReport": "Produktbericht",
+    "generateReport": "Bericht erstellen",
+    "totalOrders": "Gesamtbestellungen",
+    "totalSpent": "Insgesamt ausgegeben",
+    "orderHistory": "Bestellverlauf",
+    "date": "Datum",
+    "amount": "Betrag",
+    "items": "Artikel",
+    "totalUnitsSold": "Gesamtverkaufte Einheiten",
+    "totalRevenue": "Gesamtumsatz",
+    "selectUser": "Benutzer auswählen",
+    "selectProduct": "Produkt auswählen"
   }
 }

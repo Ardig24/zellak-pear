@@ -32,7 +32,7 @@
     "title": "Admin Panel",
     "manageUsers": "Manage Users",
     "manageProducts": "Manage Products",
-    "manageCategories": "Manage Categories",
+    "reports": "Reports",
     "welcome": "Welcome to the Admin Panel",
     "selectSection": "Select a section from the sidebar to get started",
     "addNewProduct": "Add New Product",
@@ -64,5 +64,21 @@
     "remove": "Remove",
     "back": "Back",
     "reports": "Reports"
+  },
+  "reports": {
+    "dashboard": "Reports Dashboard",
+    "userReport": "User Report",
+    "productReport": "Product Report",
+    "generateReport": "Generate Report",
+    "totalOrders": "Total Orders",
+    "totalSpent": "Total Spent",
+    "orderHistory": "Order History",
+    "date": "Date",
+    "amount": "Amount",
+    "items": "Items",
+    "totalUnitsSold": "Total Units Sold",
+    "totalRevenue": "Total Revenue",
+    "selectUser": "Select User",
+    "selectProduct": "Select Product"
   }
 }

@@ -5,8 +5,10 @@ import { db } from '../config/firebase';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import { User, Product } from '../types';
+import { useTranslation } from 'react-i18next';
 
 export default function Reports() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -113,7 +115,7 @@ export default function Reports() {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-6">Reports Dashboard</h2>
+      <h2 className="text-2xl font-bold mb-6">{t('reports.dashboard')}</h2>
       
       {/* Report Type Selection */}
       <div className="mb-6">
@@ -126,7 +128,7 @@ export default function Reports() {
             }`}
             onClick={() => handleReportTypeChange('user')}
           >
-            User Report
+            {t('reports.userReport')}
           </button>
           <button
             className={`px-4 py-2 rounded ${
@@ -136,7 +138,7 @@ export default function Reports() {
             }`}
             onClick={() => handleReportTypeChange('product')}
           >
-            Product Report
+            {t('reports.productReport')}
           </button>
         </div>
 
@@ -147,7 +149,7 @@ export default function Reports() {
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
           >
-            <option value="">Select a user</option>
+            <option value="">{t('reports.selectUser')}</option>
             {users.map(user => (
               <option key={user.id} value={user.id}>
                 {user.username} - {user.companyName}
@@ -160,7 +162,7 @@ export default function Reports() {
             value={selectedProduct}
             onChange={(e) => setSelectedProduct(e.target.value)}
           >
-            <option value="">Select a product</option>
+            <option value="">{t('reports.selectProduct')}</option>
             {products.map(product => (
               <option key={product.id} value={product.id}>
                 {product.name}
@@ -174,7 +176,7 @@ export default function Reports() {
           onClick={handleGenerateReport}
           disabled={!(selectedUser || selectedProduct)}
         >
-          Generate Report
+          {t('reports.generateReport')}
         </button>
       </div>
 
@@ -187,17 +189,17 @@ export default function Reports() {
         <div className="bg-white rounded-lg shadow p-6">
           {reportType === 'user' ? (
             <div>
-              <h3 className="text-xl font-semibold mb-4">User Report</h3>
-              <p>Total Orders: {reportData.totalOrders}</p>
-              <p>Total Spent: €{reportData.totalSpent.toFixed(2)}</p>
-              <h4 className="font-semibold mt-4 mb-2">Order History</h4>
+              <h3 className="text-xl font-semibold mb-4">{t('reports.userReport')}</h3>
+              <p>{t('reports.totalOrders')}: {reportData.totalOrders}</p>
+              <p>{t('reports.totalSpent')}: €{reportData.totalSpent.toFixed(2)}</p>
+              <h4 className="font-semibold mt-4 mb-2">{t('reports.orderHistory')}</h4>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead>
                     <tr>
-                      <th className="px-4 py-2">Date</th>
-                      <th className="px-4 py-2">Amount</th>
-                      <th className="px-4 py-2">Items</th>
+                      <th className="px-4 py-2">{t('reports.date')}</th>
+                      <th className="px-4 py-2">{t('reports.amount')}</th>
+                      <th className="px-4 py-2">{t('reports.items')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -210,7 +212,7 @@ export default function Reports() {
                           €{order.amount.toFixed(2)}
                         </td>
                         <td className="border px-4 py-2">
-                          {order.items.length} items
+                          {order.items.length} {t('reports.items')}
                         </td>
                       </tr>
                     ))}
@@ -220,17 +222,17 @@ export default function Reports() {
             </div>
           ) : (
             <div>
-              <h3 className="text-xl font-semibold mb-4">Product Report</h3>
-              <p>Total Units Sold: {reportData.totalSold}</p>
-              <p>Total Revenue: €{reportData.revenue.toFixed(2)}</p>
-              <h4 className="font-semibold mt-4 mb-2">Order History</h4>
+              <h3 className="text-xl font-semibold mb-4">{t('reports.productReport')}</h3>
+              <p>{t('reports.totalUnitsSold')}: {reportData.totalSold}</p>
+              <p>{t('reports.totalRevenue')}: €{reportData.revenue.toFixed(2)}</p>
+              <h4 className="font-semibold mt-4 mb-2">{t('reports.orderHistory')}</h4>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead>
                     <tr>
-                      <th className="px-4 py-2">Date</th>
-                      <th className="px-4 py-2">Quantity</th>
-                      <th className="px-4 py-2">Price</th>
+                      <th className="px-4 py-2">{t('reports.date')}</th>
+                      <th className="px-4 py-2">{t('reports.quantity')}</th>
+                      <th className="px-4 py-2">{t('reports.price')}</th>
                     </tr>
                   </thead>
                   <tbody>
