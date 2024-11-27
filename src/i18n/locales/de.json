@@ -19,7 +19,9 @@
     "orderError": "Fehler beim Senden der Bestellung. Bitte versuchen Sie es erneut.",
     "quantity": "Menge",
     "size": "Größe",
-    "price": "Preis"
+    "price": "Preis",
+    "searchProducts": "Alle Produkte durchsuchen...",
+    "noResults": "Keine Produkte gefunden."
   },
   "categories": {
     "categoryA": "Kategorie A",

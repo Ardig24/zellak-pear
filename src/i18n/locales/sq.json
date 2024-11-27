@@ -19,7 +19,9 @@
     "orderError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
     "quantity": "Sasia",
     "size": "Madhësia",
-    "price": "Çmimi"
+    "price": "Çmimi",
+    "searchProducts": "Kërko të gjitha produktet...",
+    "noResults": "Nuk u gjetën produkte."
   },
   "categories": {
     "categoryA": "Kategoria A",

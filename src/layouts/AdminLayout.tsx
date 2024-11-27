@@ -1,17 +1,22 @@
+// src/layouts/AdminLayout.tsx
 import React from 'react';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import ManageProducts from '/home/Ardig24/zellak-pear/src/pages/admin/ManageProducts.tsx';
-import ManageUsers from '/home/Ardig24/zellak-pear/src/pages/admin/ManageUsers.tsx';
-import Reports from '../components/Reports'; // Update the import path according to your structure
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
+import ManageProducts from '../pages/admin/ManageProducts';
+import ManageUsers from '../pages/admin/ManageUsers';
+import Reports from '../components/Reports';
 
+function AdminLayout() {
+  const location = useLocation();
+  const { t } = useTranslation();
+  const { logout } = useAuth();
 
-function AdminPanel() {
   return (
     <div className="flex">
       {/* Sidebar */}
       <div className="w-64 min-h-screen bg-white shadow-lg">
-        <div className="p-6">
+        <div className="p-6 flex flex-col">
           <h1 className="text-2xl font-bold text-orange-600">Admin Dashboard</h1>
         </div>
         <nav className="mt-2">
@@ -24,7 +29,7 @@ function AdminPanel() {
             }`}
           >
             <span className="material-icons mr-3">inventory_2</span>
-            {t('manageProducts')}
+            Manage Products
           </Link>
           <Link
             to="/admin/users"
@@ -35,7 +40,7 @@ function AdminPanel() {
             }`}
           >
             <span className="material-icons mr-3">people</span>
-            {t('manageUsers')}
+            Manage Users
           </Link>
           <Link
             to="/admin/reports"
@@ -46,8 +51,19 @@ function AdminPanel() {
             }`}
           >
             <span className="material-icons mr-3">assessment</span>
-            {t('reports')}
+            Reports
           </Link>
+          
+          {/* Logout Button at the bottom of sidebar */}
+          <div className="absolute bottom-0 w-64 p-4 border-t">
+            <button
+              onClick={logout}
+              className="flex items-center w-full px-4 py-2 text-sm text-white bg-orange-600 rounded-md hover:bg-orange-700 transition-colors duration-200"
+            >
+              <span className="material-icons mr-2">logout</span>
+              Logout
+            </button>
+          </div>
         </nav>
       </div>
 
@@ -65,3 +81,5 @@ function AdminPanel() {
     </div>
   );
 }
+
+export default AdminLayout;

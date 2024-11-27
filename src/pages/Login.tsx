@@ -1,85 +1,73 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Utensils } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import LanguageSelector from '../components/LanguageSelector';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../contexts/AuthContext';
+import ErrorMessage from '../components/ErrorMessage';
 
-export default function Login() {
-  const [email, setEmail] = useState('');
+function Login() {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login, error, clearError, loading } = useAuth();
-  const { t } = useTranslation();
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
-    } catch (error) {
-      // Error is handled by the AuthContext
+      await login(username, password);
+      navigate('/admin/products');
+    } catch (err) {
+      setError('Invalid credentials');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-red-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md relative">
-        <div className="absolute top-4 right-4">
-          <LanguageSelector />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
+      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900">Welcome Back</h2>
+          <p className="mt-2 text-sm text-gray-600">Please sign in to continue</p>
         </div>
-        
-        <div className="flex flex-col items-center mb-8">
-          <Utensils className="w-12 h-12 text-orange-500 mb-2" />
-          <h1 className="text-3xl font-bold text-gray-800">{t('login.title')}</h1>
-          <p className="text-gray-600">{t('login.subtitle')}</p>
-        </div>
-
-        {error && (
-          <ErrorMessage 
-            message={error} 
-            onDismiss={clearError} 
-          />
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              {t('login.email')}
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-              disabled={loading}
-              required
-            />
+        {error && <ErrorMessage message={error} onDismiss={() => setError('')} />}
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="username" className="sr-only">Username</label>
+              <input
+                id="username"
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Username"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">Password</label>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Password"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              {t('login.password')}
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-              disabled={loading}
-              required
-            />
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
+            >
+              Sign in
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-orange-300"
-          >
-            {loading ? <LoadingSpinner /> : t('login.signIn')}
-          </button>
         </form>
       </div>
     </div>
   );
 }
+
+export default Login;

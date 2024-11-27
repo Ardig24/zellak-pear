@@ -4,14 +4,8 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { OrderItem } from '../types';
 import emailjs from '@emailjs/browser';
 
-// Add constants for EmailJS configuration
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
-
 interface OrderContextType {
-  sendOrder: (items: OrderItem[], userData: any) => Promise<string>;
+  sendOrder: (items: OrderItem[], userData: any) => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | null>(null);
@@ -24,49 +18,46 @@ export const useOrders = () => {
   return context;
 };
 
-const sendOrderEmail = async (orderItems: OrderItem[], userData: any, orderId: string) => {
-  try {
-    const total = orderItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
-    
-    const templateParams = {
-      to_email: ADMIN_EMAIL || 'admin@example.com',
+export function OrderProvider({ children }: { children: React.ReactNode }) {
+  const sendOrderEmail = async (orderItems: OrderItem[], userData: any, orderId: string) => {
+    try {
+      const total = orderItems.reduce((sum, item) => 
+        sum + (Number(item.price) * Number(item.quantity)), 0);
+      
+      const orderDetailsString = orderItems.map(item => 
+        `${item.productName} - ${item.size} - Quantity: ${item.quantity} - Price: €${Number(item.price).toFixed(2)} - Subtotal: €${(Number(item.price) * Number(item.quantity)).toFixed(2)}`
+      ).join('\n');
+
+      const templateParams = {
+        to_email: import.meta.env.VITE_ADMIN_EMAIL,
               from_name: userData.companyName,
-      order_details: orderItems.map(item => ({
-        productName: item.productName,
-        size: item.size,
-        quantity: item.quantity,
-        price: Number(item.price).toFixed(2),
-        subtotal: (Number(item.price) * Number(item.quantity)).toFixed(2)
-      })),
-      total: total.toFixed(2),
-      customer_details: {
-        company: userData.companyName,
-        contact: userData.contactNumber || 'Not provided',
+        company_name: userData.companyName,
+        contact_number: userData.contactNumber || 'Not provided',
         address: userData.address || 'Not provided',
         email: userData.email || 'Not provided',
-        category: userData.category
-            },
-      order_id: orderId
+        category: userData.category,
+        order_details: orderDetailsString,
+        total_amount: `€${total.toFixed(2)}`,
+        order_id: orderId
   };
 
-    const response = await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      templateParams,
-      EMAILJS_PUBLIC_KEY
+      const response = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        templateParams,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
   );
 
-    if (response.status === 200) {
-      console.log('Order email sent successfully!');
-      return true;
+      if (response.status === 200) {
+        console.log('Order email sent successfully!');
+        return true;
 }
-  } catch (error) {
-    console.error('Error sending order email:', error);
-    // Don't throw here to prevent order failure due to email issues
-  }
-};
+    } catch (error) {
+      console.error('Error sending order email:', error);
+      // Don't throw here to prevent order failure due to email issues
+    }
+  };
 
-export function OrderProvider({ children }: { children: React.ReactNode }) {
   const sendOrder = async (items: OrderItem[], userData: any) => {
     try {
       if (!items.length) {
@@ -102,8 +93,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
       console.log('Order saved to Firestore with ID:', orderRef.id);
 
-      // Check if EmailJS is properly configured
-      const hasEmailConfig = EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY;
+      const hasEmailConfig = 
+        import.meta.env.VITE_EMAILJS_SERVICE_ID && 
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID && 
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
       if (hasEmailConfig) {
         await sendOrderEmail(items, userData, orderRef.id);
