@@ -1,6 +1,6 @@
 // src/components/Reports.tsx
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
@@ -49,15 +49,28 @@ export default function Reports() {
     setLoading(true);
     setError(null);
     try {
-      const ordersQuery = query(collection(db, 'orders'), where('userId', '==', userId));
+      // Get the user's email first
+      const userDocRef = doc(db, 'users', userId);
+      const userDocSnap = await getDoc(userDocRef);
+      
+      if (!userDocSnap.exists()) {
+        throw new Error('User not found');
+      }
+
+      const userEmail = userDocSnap.data().email;
+      if (!userEmail) {
+        throw new Error('User email not found');
+      }
+
+      const ordersQuery = query(collection(db, 'orders'), where('userEmail', '==', userEmail));
       const ordersSnapshot = await getDocs(ordersQuery);
       const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
       const totalOrders = orders.length;
-      const totalSpent = orders.reduce((sum, order: any) => sum + order.totalAmount, 0);
+      const totalSpent = orders.reduce((sum, order: any) => sum + order.total, 0);
       const orderHistory = orders.map((order: any) => ({
-        date: order.date,
-        amount: order.totalAmount,
+        date: order.orderDate,
+        amount: order.total,
         items: order.items
       }));
 
@@ -68,6 +81,7 @@ export default function Reports() {
       });
     } catch (err) {
       setError('Failed to fetch user report');
+      console.error('Error fetching user report:', err);
     }
     setLoading(false);
   };
@@ -77,7 +91,7 @@ export default function Reports() {
     setError(null);
     try {
       const ordersSnapshot = await getDocs(collection(db, 'orders'));
-      const orders = ordersSnapshot.docs.map(doc => doc.data());
+      const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
       const productOrders = orders.filter((order: any) => 
         order.items.some((item: any) => item.productId === productId)
@@ -92,13 +106,24 @@ export default function Reports() {
         return sum + (item.price * item.quantity);
       }, 0);
 
+      // Format the orders to include proper dates
+      const formattedOrders = productOrders.map((order: any) => ({
+        ...order,
+        orderDate: order.orderDate ? new Date(order.orderDate).toISOString() : new Date().toISOString(),
+        items: order.items.map((item: any) => ({
+          ...item,
+          date: order.orderDate ? new Date(order.orderDate).toISOString() : new Date().toISOString()
+        }))
+      }));
+
       setReportData({
         totalSold,
         revenue,
-        orders: productOrders
+        orders: formattedOrders
       });
     } catch (err) {
       setError('Failed to fetch product report');
+      console.error('Error fetching product report:', err);
     }
     setLoading(false);
   };
@@ -239,7 +264,7 @@ export default function Reports() {
                     {reportData.orders.map((order: any, index: number) => (
                       <tr key={index}>
                         <td className="border px-4 py-2">
-                          {new Date(order.date).toLocaleDateString()}
+                          {new Date(order.orderDate).toLocaleDateString()}
                         </td>
                         <td className="border px-4 py-2">
                           {order.items.find((item: any) => 

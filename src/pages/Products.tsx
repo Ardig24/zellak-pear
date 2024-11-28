@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { OrderItem } from '../types';
-import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search } from 'lucide-react';
+import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProducts } from '../contexts/ProductsContext';
 import { useOrders } from '../contexts/OrderContext';
+import { Link } from 'react-router-dom';
 import LanguageSelector from '../components/LanguageSelector';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -124,30 +125,31 @@ export default function Products() {
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            {selectedCategory ? (
+          <div className="flex items-center space-x-4">
+            {selectedCategory && (
               <button
-                onClick={() => {
-                  setSelectedCategory(null);
-                }}
-                className="flex items-center text-gray-600 hover:text-gray-800"
+                onClick={() => setSelectedCategory(null)}
+                className="flex items-center text-gray-600 hover:text-gray-900"
               >
                 <ChevronLeft className="w-5 h-5 mr-1" />
                 {t('products.backToCategories')}
               </button>
-            ) : (
-              <h1 className="text-2xl font-bold text-gray-800">
-                {t('products.categories')}
-              </h1>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/orders"
+              className="flex items-center text-gray-600 hover:text-gray-900"
+            >
+              <ClipboardList className="w-5 h-5 mr-1" />
+              {t('orders.myOrders')}
+            </Link>
             <LanguageSelector />
             <button
               onClick={handleLogout}
-              className="flex items-center px-4 py-2 text-red-600 hover:text-red-800"
+              className="flex items-center text-red-600 hover:text-red-700"
             >
-              <LogOut className="w-5 h-5 mr-2" />
+              <LogOut className="w-5 h-5 mr-1" />
               {t('common.logout')}
             </button>
           </div>
@@ -269,8 +271,15 @@ export default function Products() {
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left"
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left flex items-center space-x-4"
                   >
+                    {category.imageUrl && (
+                      <img
+                        src={category.imageUrl}
+                        alt={category.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    )}
                     <h2 className="text-xl font-semibold text-gray-800">
                       {category.name}
                     </h2>
@@ -284,70 +293,72 @@ export default function Products() {
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow p-4 flex items-center"
+                  className="bg-white rounded-lg shadow p-6"
                 >
-                  {product.icon && (
-                    <img
-                      src={product.icon}
-                      alt={product.name}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  )}
-                  <div className="ml-4 flex-grow">
-                    <h3 className="text-lg font-semibold">{product.name}</h3>
-                    <div className="mt-2 space-y-2">
-                      {product.variants.map((variant, index) => {
-                        const safeVariantId = variant.id || `${product.id}-variant-${index}`;
-                        const orderItem = orderItems.find(
-                          item => item.productId === product.id && item.variantId === safeVariantId
-                        );
-                        const currentQuantity = orderItem?.quantity || 0;
+                  <div className="flex items-start space-x-4">
+                    {product.icon && (
+                      <img
+                        src={product.icon}
+                        alt={product.name}
+                        className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-grow">
+                      <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                      <div className="mt-2 space-y-2">
+                        {product.variants.map((variant, index) => {
+                          const safeVariantId = variant.id || `${product.id}-variant-${index}`;
+                          const orderItem = orderItems.find(
+                            item => item.productId === product.id && item.variantId === safeVariantId
+                          );
+                          const currentQuantity = orderItem?.quantity || 0;
 
-                        return (
-                          <div
-                            key={`${product.id}-${safeVariantId}`}
-                            className="flex items-center justify-between"
-                          >
-                            <span className="text-gray-600">{variant.size}</span>
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => {
-                                  const newQuantity = Math.max(0, currentQuantity - 1);
-                                  handleQuantityChange(
-                                    product.id,
-                                    product.name,
-                                    safeVariantId,
-                                    variant.size,
-                                    variant.prices[userData.category],
-                                    newQuantity
-                                  );
-                                }}
-                                className="px-2 py-1 border rounded hover:bg-gray-100"
-                                disabled={currentQuantity === 0}
-                              >
-                                -
-                              </button>
-                              <span className="w-16 text-center">{currentQuantity}</span>
-                              <button
-                                onClick={() => {
-                                  const newQuantity = currentQuantity + 1;
-                                  handleQuantityChange(
-                                    product.id,
-                                    product.name,
-                                    safeVariantId,
-                                    variant.size,
-                                    variant.prices[userData.category],
-                                    newQuantity
-                                  );
-                                }}
-                                className="px-2 py-1 border rounded hover:bg-gray-100"
-                              >
-                                +
-                              </button>
+                          return (
+                            <div
+                              key={`${product.id}-${safeVariantId}`}
+                              className="flex items-center justify-between"
+                            >
+                              <span className="text-gray-600">{variant.size}</span>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => {
+                                    const newQuantity = Math.max(0, currentQuantity - 1);
+                                    handleQuantityChange(
+                                      product.id,
+                                      product.name,
+                                      safeVariantId,
+                                      variant.size,
+                                      variant.prices[userData.category],
+                                      newQuantity
+                                    );
+                                  }}
+                                  className="px-2 py-1 border rounded hover:bg-gray-100"
+                                  disabled={currentQuantity === 0}
+                                >
+                                  -
+                                </button>
+                                <span className="w-16 text-center">{currentQuantity}</span>
+                                <button
+                                  onClick={() => {
+                                    const newQuantity = currentQuantity + 1;
+                                    handleQuantityChange(
+                                      product.id,
+                                      product.name,
+                                      safeVariantId,
+                                      variant.size,
+                                      variant.prices[userData.category],
+                                      newQuantity
+                                    );
+                                  }}
+                                  className="px-2 py-1 border rounded hover:bg-gray-100"
+                                >
+                                  +
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>

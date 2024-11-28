@@ -83,7 +83,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         status: 'pending',
         total: items.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0),
         createdAt: serverTimestamp(),
-        orderDate: new Date().toISOString()
+        orderDate: serverTimestamp()
       };
 
       console.log('Saving order to Firestore:', orderData);

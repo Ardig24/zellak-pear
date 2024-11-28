@@ -1,9 +1,10 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Users, Coffee, LogOut, FileText } from 'lucide-react';
+import { Users, Coffee, LogOut, FileText, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ManageUsers from './admin/ManageUsers';
 import ManageProducts from './admin/ManageProducts';
+import ManageOrders from './admin/ManageOrders';
 import Reports from '../components/Reports';
 import LanguageSelector from '../components/LanguageSelector';
 import { useAuth } from '../contexts/AuthContext';
@@ -59,6 +60,15 @@ export default function AdminPanel() {
             <FileText className="w-5 h-5 mr-2" />
             {t('admin.reports')}
           </Link>
+          <Link
+            to="/admin/orders"
+            className={`flex items-center px-4 py-2 ${
+              location.pathname.includes('/orders') ? 'bg-orange-100 text-orange-600' : 'text-gray-700 hover:bg-orange-100'
+            }`}
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            {t('admin.manageOrders')}
+          </Link>
           <button
             onClick={handleLogout}
             className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50"
@@ -75,6 +85,7 @@ export default function AdminPanel() {
           <Route path="users" element={<ManageUsers />} />
           <Route path="products" element={<ManageProducts />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="orders" element={<ManageOrders />} />
           <Route
             path="/"
             element={
