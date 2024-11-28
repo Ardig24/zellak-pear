@@ -13,9 +13,11 @@ export default function ManageProducts() {
   const [isManagingCategories, setIsManagingCategories] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<string[]>(categories.map(c => c.id));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -173,6 +175,13 @@ export default function ManageProducts() {
     );
   };
 
+  // Filter products based on search and category
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   if (loading && !isAddingProduct) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -183,79 +192,120 @@ export default function ManageProducts() {
 
   return (
     <div className="container mx-auto px-4 py-8 pb-24 lg:pb-8">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-black drop-shadow-lg">{t('admin.products.title')}</h1>
+      {error && <ErrorMessage message={error} onDismiss={() => clearError()} />}
 
-      {/* Search and Filter Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <input
-          type="text"
-          value={''}
-          onChange={(e) => {}}
-          placeholder={t('admin.products.searchPlaceholder')}
-          className="glass-input px-4 py-2 rounded-lg text-black"
-        />
-        <select
-          value={''}
-          onChange={(e) => {}}
-          className="glass-input px-4 py-2 rounded-lg text-black"
-        >
-          <option value="all">{t('admin.products.allCategories')}</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {t(`categories.${category}`)}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => setIsAddingProduct(true)}
-          className="glass-button-primary px-4 py-2 rounded-lg flex items-center justify-center sm:justify-start gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          <span>{t('admin.products.addNew')}</span>
-        </button>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-black drop-shadow-lg">
+          {t('admin.products.title')}
+        </h1>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsManagingCategories(true)}
+            className="glass-button px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            <Settings className="w-5 h-5" />
+            <span className="hidden sm:inline">{t('admin.products.manageCategories')}</span>
+          </button>
+          <button
+            onClick={() => setIsAddingProduct(true)}
+            className="glass-button-primary px-4 py-2 rounded-lg flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            <span>{t('admin.products.addNew')}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Mobile View - Cards */}
-      <div className="lg:hidden space-y-4">
-        {products.map((product) => (
+      {/* Search and Filter Controls */}
+      <div className="glass-panel p-4 rounded-lg mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('admin.products.searchPlaceholder')}
+              className="w-full glass-input pl-10 pr-4 py-2 rounded-lg text-black"
+            />
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full glass-input px-4 py-2 rounded-lg text-black"
+            >
+              <option value="all">{t('admin.products.allCategories')}</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Products Grid/List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredProducts.map((product) => (
           <div
             key={product.id}
-            className="glass-panel p-4 rounded-lg space-y-4 hover:bg-white/10 transition-colors duration-200"
+            className="glass-panel p-4 rounded-lg hover:bg-white/10 transition-colors duration-200"
           >
             <div className="flex gap-4">
               <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                <img
-                  src={product.icon}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+                {product.icon ? (
+                  <img
+                    src={product.icon}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                    <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-black truncate">{product.name}</h3>
-                    <p className="text-sm text-gray-600">{t(`categories.${product.category}`)}</p>
-                  </div>
-                  <p className="text-black font-medium">€{product.variants[0].prices.A.toFixed(2)}</p>
+                <h3 className="font-medium text-black truncate">{product.name}</h3>
+                <p className="text-sm text-gray-600">
+                  {categories.find(c => c.id === product.category)?.name}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {product.variants.map((variant) => (
+                    <span
+                      key={variant.id}
+                      className="px-2 py-0.5 text-xs rounded-full bg-gray-200/50 text-black"
+                    >
+                      {variant.size}
+                    </span>
+                  ))}
                 </div>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-600 line-clamp-2">{''}</p>
+                  <p className="text-sm font-medium text-black">
+                    {t('admin.products.basePrice')}: €{product.variants[0]?.prices.A.toFixed(2)}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 text-sm">
-              {product.variants.map((variant) => (
-                <span
-                  key={variant.id}
-                  className="px-2 py-1 rounded-full bg-gray-200/50 text-black"
-                >
-                  {variant.size}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
+            <div className="mt-4 flex gap-2">
               <button
                 onClick={() => startEdit(product)}
                 className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
@@ -265,97 +315,35 @@ export default function ManageProducts() {
               </button>
               <button
                 onClick={() => handleDeleteProduct(product.id)}
-                className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+                className="glass-button px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-200 flex items-center justify-center"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>{t('admin.products.delete')}</span>
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Desktop View - Table */}
-      <div className="hidden lg:block overflow-x-auto glass-panel rounded-lg p-4">
-        <table className="min-w-full glass-table">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.products.product')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.products.category')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.products.price')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.products.sizes')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.products.actions')}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200/30">
-            {products.map((product) => (
-              <tr key={product.id} className="hover:bg-white/10 transition-colors duration-200">
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                      <img
-                        src={product.icon}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-black">{product.name}</div>
-                      <div className="text-sm text-gray-600 line-clamp-1">{''}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-black">{t(`categories.${product.category}`)}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-black">€{product.variants[0].prices.A.toFixed(2)}</div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-wrap gap-1">
-                    {product.variants.map((variant) => (
-                      <span
-                        key={variant.id}
-                        className="px-2 py-0.5 text-xs rounded-full bg-gray-200/50 text-black"
-                      >
-                        {variant.size}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => startEdit(product)}
-                      className="glass-button px-3 py-1.5 rounded-lg hover:bg-blue-500/30 transition-all duration-200 flex items-center gap-1"
-                    >
-                      <Pencil className="w-4 h-4" />
-                      <span>{t('admin.products.edit')}</span>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="glass-button px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-all duration-200 flex items-center gap-1"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      <span>{t('admin.products.delete')}</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Empty State */}
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-12">
+          <div className="mb-4">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-1">
+            {searchTerm || selectedCategory !== 'all'
+              ? t('admin.products.noProductsFound')
+              : t('admin.products.noProducts')}
+          </h3>
+          <p className="text-gray-500">
+            {searchTerm || selectedCategory !== 'all'
+              ? t('admin.products.tryDifferentSearch')
+              : t('admin.products.addFirstProduct')}
+          </p>
+        </div>
+      )}
 
       {/* Add/Edit Product Modal */}
       {(isAddingProduct || editingProduct) && (
@@ -408,8 +396,8 @@ export default function ManageProducts() {
                     >
                       <option value="">{t('admin.products.selectCategory')}</option>
                       {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {t(`categories.${category}`)}
+                        <option key={category.id} value={category.id}>
+                          {category.name}
                         </option>
                       ))}
                     </select>

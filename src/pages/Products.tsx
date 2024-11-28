@@ -12,7 +12,10 @@ import ErrorMessage from '../components/ErrorMessage';
 
 export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>(() => {
+    const savedItems = localStorage.getItem('cartItems');
+    return savedItems ? JSON.parse(savedItems) : [];
+  });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,14 +72,18 @@ export default function Products() {
         });
       }
 
+      // Save to localStorage
+      localStorage.setItem('cartItems', JSON.stringify(newItems));
       return newItems;
     });
   };
 
   const removeItem = (productId: string, variantId: string) => {
-    setOrderItems(prev => 
-      prev.filter(item => !(item.productId === productId && item.variantId === variantId))
-    );
+    setOrderItems(prev => {
+      const newItems = prev.filter(item => !(item.productId === productId && item.variantId === variantId));
+      localStorage.setItem('cartItems', JSON.stringify(newItems));
+      return newItems;
+    });
   };
 
   const calculateTotal = () => {
@@ -93,6 +100,7 @@ export default function Products() {
       await sendOrder(orderItems, userData);
       
       setOrderItems([]); // Clear cart
+      localStorage.removeItem('cartItems'); // Clear localStorage
       alert(t('products.orderSuccess'));
     } catch (err: any) {
       setError(err.message || t('products.orderError'));
@@ -124,6 +132,79 @@ export default function Products() {
 
   return (
     <div className="min-h-screen app-page">
+      {/* Mobile Cart Modal */}
+      {showCart && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowCart(false)} />
+          <div className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white rounded-t-2xl shadow-xl transform transition-transform duration-300 ease-out">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-semibold">{t('products.myOrder')}</h2>
+                <button onClick={() => setShowCart(false)} className="text-gray-500 hover:text-gray-700">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 70px)' }}>
+              {orderItems.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <ShoppingCart className="w-16 h-16 text-gray-300 mb-4" />
+                  <p className="text-gray-500">{t('products.emptyCart')}</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {orderItems.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div>
+                          <p className="font-medium">{item.productName}</p>
+                          <p className="text-sm text-gray-500">{item.size}</p>
+                          <p className="text-sm text-gray-600">
+                            {t('products.quantity')}: {item.quantity} × ${item.price}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => removeItem(item.productId, item.variantId)}
+                          className="text-red-500 hover:text-red-700 p-2"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6 space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                      <span className="font-semibold">{t('products.total')}:</span>
+                      <span className="font-semibold">${calculateTotal().toFixed(2)}</span>
+                    </div>
+                    
+                    <button
+                      onClick={() => {
+                        handleSendOrder();
+                        setShowCart(false);
+                      }}
+                      disabled={sending}
+                      className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {sending ? (
+                        <LoadingSpinner size="sm" />
+                      ) : (
+                        <Send className="w-5 h-5" />
+                      )}
+                      {t('products.sendOrder')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Bottom Navigation */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200 z-50">
         <nav className="flex justify-around items-center px-2 py-3">
