@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProducts } from '../contexts/ProductsContext';
 import { useOrders } from '../contexts/OrderContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import LanguageSelector from '../components/LanguageSelector';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -21,6 +21,7 @@ export default function Products() {
   const { userData, logout } = useAuth();
   const { sendOrder } = useOrders();
   const { t } = useTranslation();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -124,37 +125,63 @@ export default function Products() {
     <div className="min-h-screen app-page">
       {/* Mobile Bottom Navigation */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200 z-50">
-        <nav className="flex justify-around p-2">
+        <nav className="flex justify-around items-center px-2 py-3">
           <button
             onClick={() => setSelectedCategory(null)}
-            className={`flex flex-col items-center p-2 rounded-lg ${
-              !selectedCategory ? 'text-indigo-600' : 'text-gray-700'
+            className={`flex flex-col items-center min-w-[64px] ${
+              !selectedCategory 
+                ? 'text-indigo-600' 
+                : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            <Coffee className="w-6 h-6" />
-            <span className="text-xs mt-1">{t('products.categories')}</span>
+            <Coffee className={`w-6 h-6 ${
+              !selectedCategory 
+                ? 'stroke-[2.5]' 
+                : 'stroke-2'
+            }`} />
+            <span className="text-xs mt-1 font-medium">{t('products.categories')}</span>
           </button>
+
+          {/* Cart Button with Order Items Count */}
           <button
             onClick={() => {
-              // Open cart modal or show cart section
+              // Show cart modal/drawer
               // You can implement this based on your needs
             }}
-            className="flex flex-col items-center p-2 rounded-lg text-gray-700 relative"
+            className={`flex flex-col items-center min-w-[64px] relative ${
+              orderItems.length > 0 
+                ? 'text-indigo-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
           >
-            <ShoppingCart className="w-6 h-6" />
-            <span className="text-xs mt-1">{t('products.myOrder')}</span>
+            <ShoppingCart className={`w-6 h-6 ${
+              orderItems.length > 0 
+                ? 'stroke-[2.5]' 
+                : 'stroke-2'
+            }`} />
+            <span className="text-xs mt-1 font-medium">{t('products.myOrder')}</span>
             {orderItems.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
                 {orderItems.length}
               </span>
             )}
           </button>
+
+          {/* Order History Link */}
           <Link
             to="/orders"
-            className="flex flex-col items-center p-2 rounded-lg text-gray-700"
+            className={`flex flex-col items-center min-w-[64px] ${
+              location.pathname === '/orders'
+                ? 'text-indigo-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
           >
-            <ClipboardList className="w-6 h-6" />
-            <span className="text-xs mt-1">{t('orders.myOrders')}</span>
+            <ClipboardList className={`w-6 h-6 ${
+              location.pathname === '/orders'
+                ? 'stroke-[2.5]'
+                : 'stroke-2'
+            }`} />
+            <span className="text-xs mt-1 font-medium">{t('orders.myOrders')}</span>
           </Link>
         </nav>
       </div>

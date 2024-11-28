@@ -27,51 +27,68 @@ export default function AdminPanel() {
       <div className="container mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
         {/* Sidebar for desktop / Bottom nav for mobile */}
         <div className="order-2 lg:order-1 lg:w-64">
+          {/* Mobile Bottom Navigation */}
           <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200 z-50">
-            <nav className="flex justify-around p-2">
+            <nav className="flex justify-around items-center px-2 py-3">
               <Link
                 to="/admin/users"
-                className={`flex flex-col items-center p-2 rounded-lg ${
+                className={`flex flex-col items-center min-w-[64px] ${
                   location.pathname.includes('/users') 
                     ? 'text-indigo-600' 
-                    : 'text-gray-700'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <Users className="w-6 h-6" />
-                <span className="text-xs mt-1">{t('admin.users')}</span>
+                <Users className={`w-6 h-6 ${
+                  location.pathname.includes('/users') 
+                    ? 'stroke-[2.5]' 
+                    : 'stroke-2'
+                }`} />
+                <span className="text-xs mt-1 font-medium">{t('admin.users')}</span>
               </Link>
               <Link
                 to="/admin/products"
-                className={`flex flex-col items-center p-2 rounded-lg ${
+                className={`flex flex-col items-center min-w-[64px] ${
                   location.pathname.includes('/products')
                     ? 'text-indigo-600'
-                    : 'text-gray-700'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <Coffee className="w-6 h-6" />
-                <span className="text-xs mt-1">{t('admin.products')}</span>
+                <Coffee className={`w-6 h-6 ${
+                  location.pathname.includes('/products') 
+                    ? 'stroke-[2.5]' 
+                    : 'stroke-2'
+                }`} />
+                <span className="text-xs mt-1 font-medium">{t('admin.products')}</span>
               </Link>
               <Link
                 to="/admin/orders"
-                className={`flex flex-col items-center p-2 rounded-lg ${
+                className={`flex flex-col items-center min-w-[64px] ${
                   location.pathname.includes('/orders')
                     ? 'text-indigo-600'
-                    : 'text-gray-700'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <ShoppingBag className="w-6 h-6" />
-                <span className="text-xs mt-1">{t('admin.orders')}</span>
+                <ShoppingBag className={`w-6 h-6 ${
+                  location.pathname.includes('/orders') 
+                    ? 'stroke-[2.5]' 
+                    : 'stroke-2'
+                }`} />
+                <span className="text-xs mt-1 font-medium">{t('admin.orders')}</span>
               </Link>
               <Link
                 to="/admin/reports"
-                className={`flex flex-col items-center p-2 rounded-lg ${
+                className={`flex flex-col items-center min-w-[64px] ${
                   location.pathname.includes('/reports')
                     ? 'text-indigo-600'
-                    : 'text-gray-700'
+                    : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <FileText className="w-6 h-6" />
-                <span className="text-xs mt-1">{t('admin.reports')}</span>
+                <FileText className={`w-6 h-6 ${
+                  location.pathname.includes('/reports') 
+                    ? 'stroke-[2.5]' 
+                    : 'stroke-2'
+                }`} />
+                <span className="text-xs mt-1 font-medium">{t('admin.reports')}</span>
               </Link>
             </nav>
           </div>
