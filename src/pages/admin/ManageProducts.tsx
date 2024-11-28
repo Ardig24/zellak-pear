@@ -349,25 +349,75 @@ export default function ManageProducts() {
       {(isAddingProduct || editingProduct) && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glass-panel rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-4 sm:p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-black drop-shadow-lg">
-                  {editingProduct ? t('admin.products.editProduct') : t('admin.products.addProduct')}
+            <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-200 p-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-black">
+                  {editingProduct ? t('admin.products.editProduct') : t('admin.products.addNew')}
                 </h2>
                 <button
                   onClick={() => {
                     setIsAddingProduct(false);
                     setEditingProduct(null);
+                    resetForm();
                   }}
-                  className="text-gray-300 hover:text-black transition-colors"
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-6 h-6" />
                 </button>
               </div>
+            </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="p-4">
+              <div className="space-y-6">
+                {/* Product Image */}
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">
+                    {t('admin.products.image')}
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      {formData.icon ? (
+                        typeof formData.icon === 'string' ? (
+                          <img
+                            src={formData.icon}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <img
+                            src={URL.createObjectURL(formData.icon)}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        )
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="glass-button px-4 py-2 rounded-lg"
+                      >
+                        {t('admin.products.uploadImage')}
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Basic Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
@@ -375,23 +425,20 @@ export default function ManageProducts() {
                     </label>
                     <input
                       type="text"
-                      name="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                      className="w-full glass-input px-4 py-2 rounded-lg"
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-black mb-1">
                       {t('admin.products.category')}
                     </label>
                     <select
-                      name="category"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                      className="w-full glass-input px-4 py-2 rounded-lg"
                       required
                     >
                       <option value="">{t('admin.products.selectCategory')}</option>
@@ -404,90 +451,125 @@ export default function ManageProducts() {
                   </div>
                 </div>
 
+                {/* Variants */}
                 <div>
-                  <label className="block text-sm font-medium text-black mb-1">
-                    {t('admin.products.description')}
-                  </label>
-                  <textarea
-                    name="description"
-                    value={''}
-                    onChange={(e) => {}}
-                    rows={3}
-                    className="w-full glass-input px-4 py-2 rounded-lg text-black"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-black mb-1">
-                      {t('admin.products.price')}
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-black">
+                      {t('admin.products.variants')}
                     </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.variants[0].prices.A}
-                      onChange={(e) => updateVariant(0, 'prices.A', e.target.value)}
-                      step="0.01"
-                      min="0"
-                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
-                      required
-                    />
+                    <button
+                      type="button"
+                      onClick={addVariant}
+                      className="glass-button-primary px-3 py-1 rounded-lg text-sm flex items-center gap-1"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {t('admin.products.addVariant')}
+                    </button>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-black mb-1">
-                      {t('admin.products.image')}
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-black mb-1">
-                    {t('admin.products.sizes')}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="space-y-4">
                     {formData.variants.map((variant, index) => (
-                      <label key={variant.id} className="inline-flex items-center">
-                        <input
-                          type="text"
-                          name="sizes"
-                          value={variant.size}
-                          onChange={(e) => updateVariant(index, 'size', e.target.value)}
-                          className="form-input h-4 w-4 text-blue-600"
-                        />
-                        <span className="ml-2 text-sm text-black">{variant.size}</span>
-                      </label>
+                      <div
+                        key={variant.id}
+                        className="glass-panel p-4 rounded-lg relative"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => removeVariant(index)}
+                          className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                          disabled={formData.variants.length === 1}
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-black mb-1">
+                              {t('admin.products.size')}
+                            </label>
+                            <input
+                              type="text"
+                              value={variant.size}
+                              onChange={(e) => updateVariant(index, 'size', e.target.value)}
+                              className="w-full glass-input px-4 py-2 rounded-lg"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-black mb-1">
+                              {t('admin.products.priceA')}
+                            </label>
+                            <input
+                              type="number"
+                              value={variant.prices.A}
+                              onChange={(e) => updateVariant(index, 'price.A', e.target.value)}
+                              className="w-full glass-input px-4 py-2 rounded-lg"
+                              required
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-black mb-1">
+                              {t('admin.products.priceB')}
+                            </label>
+                            <input
+                              type="number"
+                              value={variant.prices.B}
+                              onChange={(e) => updateVariant(index, 'price.B', e.target.value)}
+                              className="w-full glass-input px-4 py-2 rounded-lg"
+                              required
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-black mb-1">
+                              {t('admin.products.priceC')}
+                            </label>
+                            <input
+                              type="number"
+                              value={variant.prices.C}
+                              onChange={(e) => updateVariant(index, 'price.C', e.target.value)}
+                              className="w-full glass-input px-4 py-2 rounded-lg"
+                              required
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
+              </div>
 
-                <div className="flex gap-4 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAddingProduct(false);
-                      setEditingProduct(null);
-                    }}
-                    className="flex-1 glass-button bg-gray-500/30 hover:bg-gray-600/30 text-black py-2"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 glass-button bg-blue-500/30 hover:bg-blue-600/30 text-black py-2"
-                  >
-                    {editingProduct ? t('common.save') : t('common.add')}
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 glass-button-primary px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    <Plus className="w-5 h-5" />
+                  )}
+                  {editingProduct ? t('admin.products.saveChanges') : t('admin.products.addProduct')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAddingProduct(false);
+                    setEditingProduct(null);
+                    resetForm();
+                  }}
+                  className="glass-button px-4 py-2 rounded-lg"
+                >
+                  {t('common.cancel')}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
