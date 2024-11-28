@@ -16,6 +16,7 @@ export default function Products() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCart, setShowCart] = useState(false);
   
   const { products, categories } = useProducts();
   const { userData, logout } = useAuth();
@@ -144,10 +145,7 @@ export default function Products() {
 
           {/* Cart Button with Order Items Count */}
           <button
-            onClick={() => {
-              // Show cart modal/drawer
-              // You can implement this based on your needs
-            }}
+            onClick={() => setShowCart(!showCart)}
             className={`flex flex-col items-center min-w-[64px] relative ${
               orderItems.length > 0 
                 ? 'text-indigo-600' 
@@ -225,6 +223,78 @@ export default function Products() {
       </div>
 
       {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
+
+      {/* Cart Modal */}
+      {showCart && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowCart(false)} />
+          <div className="relative min-h-screen flex items-center justify-center p-4">
+            <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold">{t('products.myOrder')}</h2>
+                  <button onClick={() => setShowCart(false)} className="text-gray-500 hover:text-gray-700">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-4">
+                {orderItems.length === 0 ? (
+                  <p className="text-center text-gray-500 py-4">{t('products.emptyCart')}</p>
+                ) : (
+                  <>
+                    <div className="space-y-4">
+                      {orderItems.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                          <div>
+                            <p className="font-medium">{item.productName}</p>
+                            <p className="text-sm text-gray-500">{item.size}</p>
+                            <p className="text-sm text-gray-600">
+                              {t('products.quantity')}: {item.quantity} × ${item.price}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeItem(item.productId, item.variantId)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-semibold">{t('products.total')}:</span>
+                        <span className="font-semibold">${calculateTotal().toFixed(2)}</span>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          handleSendOrder();
+                          setShowCart(false);
+                        }}
+                        disabled={sending}
+                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {sending ? (
+                          <LoadingSpinner size="sm" />
+                        ) : (
+                          <Send className="w-5 h-5" />
+                        )}
+                        {t('products.sendOrder')}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search Bar */}
       <div className="max-w-7xl mx-auto px-4 pt-6">
