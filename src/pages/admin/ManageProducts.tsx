@@ -182,235 +182,172 @@ export default function ManageProducts() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">{t('admin.manageProducts')}</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setIsManagingCategories(!isManagingCategories)}
-            className="glass-button flex items-center"
-          >
-            <Settings className="w-5 h-5 mr-2" />
-            {t('admin.manageCategories')}
-          </button>
-          <button
-            onClick={() => setIsAddingProduct(true)}
-            className="glass-button-primary flex items-center"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            {t('admin.addNewProduct')}
-          </button>
-        </div>
+    <div className="container mx-auto px-4 py-8 pb-24 lg:pb-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-black drop-shadow-lg">{t('admin.products.title')}</h1>
+
+      {/* Search and Filter Controls */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <input
+          type="text"
+          value={''}
+          onChange={(e) => {}}
+          placeholder={t('admin.products.searchPlaceholder')}
+          className="glass-input px-4 py-2 rounded-lg text-black"
+        />
+        <select
+          value={''}
+          onChange={(e) => {}}
+          className="glass-input px-4 py-2 rounded-lg text-black"
+        >
+          <option value="all">{t('admin.products.allCategories')}</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {t(`categories.${category}`)}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => setIsAddingProduct(true)}
+          className="glass-button-primary px-4 py-2 rounded-lg flex items-center justify-center sm:justify-start gap-2"
+        >
+          <Plus className="w-5 h-5" />
+          <span>{t('admin.products.addNew')}</span>
+        </button>
       </div>
 
-      {error && <ErrorMessage message={error} onDismiss={clearError} />}
-
-      {isManagingCategories && (
-        <div className="glass-panel rounded-xl p-6 mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('admin.categories')}</h3>
-          
-          {/* Add new category form */}
-          <form onSubmit={handleAddCategory} className="mb-4 flex gap-2">
-            <input
-              type="text"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder={t('admin.newCategoryName')}
-              className="glass-input flex-1"
-            />
-            <button type="submit" className="glass-button-primary">
-              {t('common.add')}
-            </button>
-          </form>
-
-          {/* Categories list */}
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div key={category.id} className="glass-panel-darker rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-800 font-medium">{category.name}</span>
-                  <button
-                    onClick={() => toggleCategory(category.id)}
-                    className="p-1 text-gray-600 hover:text-gray-800"
-                  >
-                    {expandedCategories.includes(category.id) ? (
-                      <ChevronUp className="w-5 h-5" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5" />
-                    )}
-                  </button>
+      {/* Mobile View - Cards */}
+      <div className="lg:hidden space-y-4">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="glass-panel p-4 rounded-lg space-y-4 hover:bg-white/10 transition-colors duration-200"
+          >
+            <div className="flex gap-4">
+              <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                <img
+                  src={product.icon}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium text-black truncate">{product.name}</h3>
+                    <p className="text-sm text-gray-600">{t(`categories.${product.category}`)}</p>
+                  </div>
+                  <p className="text-black font-medium">€{product.variants[0].prices.A.toFixed(2)}</p>
+                </div>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600 line-clamp-2">{''}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {isAddingProduct && (
-        <form onSubmit={handleSubmit} className="glass-panel rounded-xl p-6 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.productName')}
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="glass-input"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.category')}
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="glass-input"
-                required
-              >
-                <option value="">{t('admin.selectCategory')}</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.productIcon')}
-              </label>
-              <input
-                type="file"
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="glass-input"
-                ref={fileInputRef}
-              />
-            </div>
-          </div>
-
-          {/* Variants section */}
-          <div className="mt-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-800">{t('admin.variants')}</h3>
-              <button
-                type="button"
-                onClick={addVariant}
-                className="glass-button flex items-center"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {t('admin.addVariant')}
-              </button>
             </div>
 
-            <div className="space-y-4">
-              {formData.variants.map((variant, index) => (
-                <div key={variant.id} className="glass-panel-darker rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1 mr-4">
-                      <label className="block text-sm font-medium text-gray-800 mb-1">
-                        {t('admin.size')}
-                      </label>
-                      <input
-                        type="text"
-                        value={variant.size}
-                        onChange={(e) => updateVariant(index, 'size', e.target.value)}
-                        className="glass-input"
-                        required
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeVariant(index)}
-                      className="p-1 text-red-600 hover:text-red-800"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    {Object.keys(variant.prices).map((category) => (
-                      <div key={category}>
-                        <label className="block text-sm font-medium text-gray-800 mb-1">
-                          {t(`admin.priceCategory${category}`)}
-                        </label>
-                        <input
-                          type="number"
-                          value={variant.prices[category as keyof typeof variant.prices]}
-                          onChange={(e) => updateVariant(index, `price.${category}`, e.target.value)}
-                          className="glass-input"
-                          required
-                          min="0"
-                          step="0.01"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {product.variants.map((variant) => (
+                <span
+                  key={variant.id}
+                  className="px-2 py-1 rounded-full bg-gray-200/50 text-black"
+                >
+                  {variant.size}
+                </span>
               ))}
             </div>
-          </div>
 
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={resetForm}
-              className="glass-button"
-            >
-              {t('common.cancel')}
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="glass-button-primary"
-            >
-              {loading ? <LoadingSpinner /> : editingProduct ? t('common.save') : t('common.add')}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => startEdit(product)}
+                className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Pencil className="w-4 h-4" />
+                <span>{t('admin.products.edit')}</span>
+              </button>
+              <button
+                onClick={() => handleDeleteProduct(product.id)}
+                className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{t('admin.products.delete')}</span>
+              </button>
+            </div>
           </div>
-        </form>
-      )}
+        ))}
+      </div>
 
-      {/* Products list */}
-      <div className="glass-panel rounded-xl overflow-hidden">
-        <table className="glass-table">
+      {/* Desktop View - Table */}
+      <div className="hidden lg:block overflow-x-auto glass-panel rounded-lg p-4">
+        <table className="min-w-full glass-table">
           <thead>
             <tr>
-              <th>{t('admin.productName')}</th>
-              <th>{t('admin.category')}</th>
-              <th>{t('admin.variants')}</th>
-              <th className="text-right pr-8">{t('admin.actions')}</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
+                {t('admin.products.product')}
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
+                {t('admin.products.category')}
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
+                {t('admin.products.price')}
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
+                {t('admin.products.sizes')}
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
+                {t('admin.products.actions')}
+              </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200/30">
             {products.map((product) => (
-              <tr key={product.id}>
-                <td>
+              <tr key={product.id} className="hover:bg-white/10 transition-colors duration-200">
+                <td className="px-6 py-4">
                   <div className="flex items-center">
-                    {product.icon && (
-                      <img src={product.icon} alt="" className="w-8 h-8 mr-3 rounded-full" />
-                    )}
-                    {product.name}
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img
+                        src={product.icon}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="ml-4">
+                      <div className="text-sm font-medium text-black">{product.name}</div>
+                      <div className="text-sm text-gray-600 line-clamp-1">{''}</div>
+                    </div>
                   </div>
                 </td>
-                <td>{categories.find(c => c.id === product.category)?.name}</td>
-                <td>{product.variants.length} {t('admin.variantsCount')}</td>
-                <td className="text-right">
-                  <div className="flex justify-end gap-2 pr-6">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-black">{t(`categories.${product.category}`)}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-black">€{product.variants[0].prices.A.toFixed(2)}</div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex flex-wrap gap-1">
+                    {product.variants.map((variant) => (
+                      <span
+                        key={variant.id}
+                        className="px-2 py-0.5 text-xs rounded-full bg-gray-200/50 text-black"
+                      >
+                        {variant.size}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex space-x-2">
                     <button
                       onClick={() => startEdit(product)}
-                      className="p-1.5 text-blue-600 hover:text-blue-800 transition-colors"
+                      className="glass-button px-3 py-1.5 rounded-lg hover:bg-blue-500/30 transition-all duration-200 flex items-center gap-1"
                     >
                       <Pencil className="w-4 h-4" />
+                      <span>{t('admin.products.edit')}</span>
                     </button>
                     <button
                       onClick={() => handleDeleteProduct(product.id)}
-                      className="p-1.5 text-red-600 hover:text-red-800 transition-colors"
+                      className="glass-button px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-all duration-200 flex items-center gap-1"
                     >
                       <Trash2 className="w-4 h-4" />
+                      <span>{t('admin.products.delete')}</span>
                     </button>
                   </div>
                 </td>
@@ -419,6 +356,153 @@ export default function ManageProducts() {
           </tbody>
         </table>
       </div>
+
+      {/* Add/Edit Product Modal */}
+      {(isAddingProduct || editingProduct) && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glass-panel rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-black drop-shadow-lg">
+                  {editingProduct ? t('admin.products.editProduct') : t('admin.products.addProduct')}
+                </h2>
+                <button
+                  onClick={() => {
+                    setIsAddingProduct(false);
+                    setEditingProduct(null);
+                  }}
+                  className="text-gray-300 hover:text-black transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      {t('admin.products.name')}
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      {t('admin.products.category')}
+                    </label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                      required
+                    >
+                      <option value="">{t('admin.products.selectCategory')}</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {t(`categories.${category}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">
+                    {t('admin.products.description')}
+                  </label>
+                  <textarea
+                    name="description"
+                    value={''}
+                    onChange={(e) => {}}
+                    rows={3}
+                    className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      {t('admin.products.price')}
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.variants[0].prices.A}
+                      onChange={(e) => updateVariant(0, 'prices.A', e.target.value)}
+                      step="0.01"
+                      min="0"
+                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">
+                      {t('admin.products.image')}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-1">
+                    {t('admin.products.sizes')}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.variants.map((variant, index) => (
+                      <label key={variant.id} className="inline-flex items-center">
+                        <input
+                          type="text"
+                          name="sizes"
+                          value={variant.size}
+                          onChange={(e) => updateVariant(index, 'size', e.target.value)}
+                          className="form-input h-4 w-4 text-blue-600"
+                        />
+                        <span className="ml-2 text-sm text-black">{variant.size}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingProduct(false);
+                      setEditingProduct(null);
+                    }}
+                    className="flex-1 glass-button bg-gray-500/30 hover:bg-gray-600/30 text-black py-2"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 glass-button bg-blue-500/30 hover:bg-blue-600/30 text-black py-2"
+                  >
+                    {editingProduct ? t('common.save') : t('common.add')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

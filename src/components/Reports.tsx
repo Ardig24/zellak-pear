@@ -139,14 +139,14 @@ export default function Reports() {
   if (loading && !reportData) return <LoadingSpinner />;
 
   return (
-    <div className="p-4">
-      <h2 className="text-3xl font-bold mb-6 text-black drop-shadow-lg">{t('reports.dashboard')}</h2>
+    <div className="container mx-auto px-4 py-8 pb-24 lg:pb-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-black drop-shadow-lg">{t('reports.dashboard')}</h1>
       
       {/* Report Type Selection */}
-      <div className="glass-panel p-6 rounded-lg mb-6">
-        <div className="flex space-x-4 mb-4">
+      <div className="glass-panel p-4 sm:p-6 rounded-lg mb-6">
+        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-4 mb-4">
           <button
-            className={`glass-button px-4 py-2 rounded-lg transition-all duration-200 ${
+            className={`glass-button px-4 py-3 sm:py-2 rounded-lg transition-all duration-200 flex-1 ${
               reportType === 'user' 
                 ? 'bg-orange-500/20 text-orange-800 font-bold' 
                 : 'hover:bg-gray-500/20'
@@ -156,7 +156,7 @@ export default function Reports() {
             {t('reports.userReport')}
           </button>
           <button
-            className={`glass-button px-4 py-2 rounded-lg transition-all duration-200 ${
+            className={`glass-button px-4 py-3 sm:py-2 rounded-lg transition-all duration-200 flex-1 ${
               reportType === 'product' 
                 ? 'bg-orange-500/20 text-orange-800 font-bold' 
                 : 'hover:bg-gray-500/20'
@@ -197,7 +197,7 @@ export default function Reports() {
         )}
 
         <button
-          className="glass-button px-6 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="glass-button w-full sm:w-auto px-6 py-3 sm:py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleGenerateReport}
           disabled={!(selectedUser || selectedProduct)}
         >
@@ -211,91 +211,145 @@ export default function Reports() {
 
       {/* Report Results */}
       {reportData && !loading && (
-        <div className="glass-panel rounded-lg p-6">
+        <div className="glass-panel rounded-lg p-4 sm:p-6">
           {reportType === 'user' ? (
             <div>
-              <h3 className="text-2xl font-bold mb-6 text-black">{t('reports.userReport')}</h3>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <h3 className="text-xl sm:text-2xl font-bold mb-6 text-black">{t('reports.userReport')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="glass-panel p-4 rounded-lg">
-                  <p className="text-lg font-semibold text-black">{t('reports.totalOrders')}</p>
-                  <p className="text-2xl font-bold text-black">{reportData.totalOrders}</p>
+                  <p className="text-base sm:text-lg font-semibold text-black">{t('reports.totalOrders')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-black">{reportData.totalOrders}</p>
                 </div>
                 <div className="glass-panel p-4 rounded-lg">
-                  <p className="text-lg font-semibold text-black">{t('reports.totalSpent')}</p>
-                  <p className="text-2xl font-bold text-black">€{reportData.totalSpent.toFixed(2)}</p>
+                  <p className="text-base sm:text-lg font-semibold text-black">{t('reports.totalSpent')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-black">€{reportData.totalSpent.toFixed(2)}</p>
                 </div>
               </div>
-              <h4 className="text-xl font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
-              <div className="overflow-x-auto">
-                <table className="min-w-full glass-table">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.date')}</th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.amount')}</th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.items')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200/30">
-                    {reportData.orderHistory.map((order: any, index: number) => (
-                      <tr key={index} className="hover:bg-white/10 transition-colors duration-200">
-                        <td className="px-4 py-3 text-black">
+
+              {/* Mobile View - Cards */}
+              <div className="block sm:hidden">
+                <h4 className="text-lg font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
+                <div className="space-y-4">
+                  {reportData.orderHistory.map((order: any, index: number) => (
+                    <div key={index} className="glass-panel p-4 rounded-lg space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
                           {new Date(order.date).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 text-black">
+                        </span>
+                        <span className="font-medium text-black">
                           €{order.amount.toFixed(2)}
-                        </td>
-                        <td className="px-4 py-3 text-black">
-                          {order.items.length} {t('reports.items')}
-                        </td>
+                        </span>
+                      </div>
+                      <div className="text-sm text-black">
+                        {order.items.length} {t('reports.items')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop View - Table */}
+              <div className="hidden sm:block">
+                <h4 className="text-xl font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full glass-table">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.date')}</th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.amount')}</th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.items')}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200/30">
+                      {reportData.orderHistory.map((order: any, index: number) => (
+                        <tr key={index} className="hover:bg-white/10 transition-colors duration-200">
+                          <td className="px-4 py-3 text-black">
+                            {new Date(order.date).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-black">
+                            €{order.amount.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-3 text-black">
+                            {order.items.length} {t('reports.items')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           ) : (
             <div>
-              <h3 className="text-2xl font-bold mb-6 text-black">{t('reports.productReport')}</h3>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <h3 className="text-xl sm:text-2xl font-bold mb-6 text-black">{t('reports.productReport')}</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="glass-panel p-4 rounded-lg">
-                  <p className="text-lg font-semibold text-black">{t('reports.totalUnitsSold')}</p>
-                  <p className="text-2xl font-bold text-black">{reportData.totalSold}</p>
+                  <p className="text-base sm:text-lg font-semibold text-black">{t('reports.totalUnitsSold')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-black">{reportData.totalSold}</p>
                 </div>
                 <div className="glass-panel p-4 rounded-lg">
-                  <p className="text-lg font-semibold text-black">{t('reports.totalRevenue')}</p>
-                  <p className="text-2xl font-bold text-black">€{reportData.revenue.toFixed(2)}</p>
+                  <p className="text-base sm:text-lg font-semibold text-black">{t('reports.totalRevenue')}</p>
+                  <p className="text-xl sm:text-2xl font-bold text-black">€{reportData.revenue.toFixed(2)}</p>
                 </div>
               </div>
-              <h4 className="text-xl font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
-              <div className="overflow-x-auto">
-                <table className="min-w-full glass-table">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.date')}</th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.quantity')}</th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.price')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200/30">
-                    {reportData.orders.map((order: any, index: number) => (
-                      <tr key={index} className="hover:bg-white/10 transition-colors duration-200">
-                        <td className="px-4 py-3 text-black">
-                          {new Date(order.orderDate).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3 text-black">
-                          {order.items.find((item: any) => 
-                            item.productId === selectedProduct
-                          ).quantity}
-                        </td>
-                        <td className="px-4 py-3 text-black">
-                          €{order.items.find((item: any) => 
-                            item.productId === selectedProduct
-                          ).price.toFixed(2)}
-                        </td>
+
+              {/* Mobile View - Cards */}
+              <div className="block sm:hidden">
+                <h4 className="text-lg font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
+                <div className="space-y-4">
+                  {reportData.orders.map((order: any, index: number) => {
+                    const item = order.items.find((item: any) => item.productId === selectedProduct);
+                    return (
+                      <div key={index} className="glass-panel p-4 rounded-lg space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">
+                            {new Date(order.orderDate).toLocaleDateString()}
+                          </span>
+                          <span className="font-medium text-black">
+                            €{item.price.toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="text-sm text-black">
+                          {t('reports.quantity')}: {item.quantity}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Desktop View - Table */}
+              <div className="hidden sm:block">
+                <h4 className="text-xl font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full glass-table">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.date')}</th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.quantity')}</th>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.price')}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200/30">
+                      {reportData.orders.map((order: any, index: number) => {
+                        const item = order.items.find((item: any) => item.productId === selectedProduct);
+                        return (
+                          <tr key={index} className="hover:bg-white/10 transition-colors duration-200">
+                            <td className="px-4 py-3 text-black">
+                              {new Date(order.orderDate).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-3 text-black">
+                              {item.quantity}
+                            </td>
+                            <td className="px-4 py-3 text-black">
+                              €{item.price.toFixed(2)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
