@@ -124,7 +124,7 @@ export default function Products() {
     <div className="min-h-screen app-page">
       {/* Header */}
       <div className="glass-panel shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
           <div className="flex items-center space-x-4">
             {selectedCategory && (
               <button
@@ -136,7 +136,7 @@ export default function Products() {
               </button>
             )}
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link
               to="/orders"
               className="flex items-center text-gray-600 hover:text-gray-900"
@@ -173,7 +173,7 @@ export default function Products() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-6 flex gap-6">
+      <div className="max-w-7xl mx-auto px-4 pb-6 flex flex-col lg:flex-row gap-6">
         {/* Products Section */}
         <div className="flex-1">
           {!selectedCategory ? (
@@ -187,16 +187,16 @@ export default function Products() {
                       {categoryProducts.map((product) => (
                         <div
                           key={product.id}
-                          className="glass-panel p-4 rounded-lg flex items-center"
+                          className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
                         >
                           {product.icon && (
                             <img
                               src={product.icon}
                               alt={product.name}
-                              className="w-16 h-16 object-cover rounded"
+                              className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
                             />
                           )}
-                          <div className="ml-4 flex-grow">
+                          <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
                             <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
                             <div className="mt-2 space-y-2">
                               {product.variants.map((variant, index) => {
@@ -209,7 +209,7 @@ export default function Products() {
                                 return (
                                   <div
                                     key={`${product.id}-${safeVariantId}`}
-                                    className="flex items-center justify-between"
+                                    className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
                                   >
                                     <span className="text-gray-700">{variant.size}</span>
                                     <div className="flex items-center space-x-2">
@@ -286,16 +286,16 @@ export default function Products() {
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="glass-panel p-4 rounded-lg flex items-center"
+                  className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
                 >
                   {product.icon && (
                     <img
                       src={product.icon}
                       alt={product.name}
-                      className="w-16 h-16 object-cover rounded"
+                      className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
                     />
                   )}
-                  <div className="ml-4 flex-grow">
+                  <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
                     <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
                     <div className="mt-2 space-y-2">
                       {product.variants.map((variant, index) => {
