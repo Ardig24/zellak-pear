@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { OrderItem } from '../types';
-import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList } from 'lucide-react';
+import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList, Coffee } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProducts } from '../contexts/ProductsContext';
@@ -122,36 +122,77 @@ export default function Products() {
 
   return (
     <div className="min-h-screen app-page">
+      {/* Mobile Bottom Navigation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200 z-50">
+        <nav className="flex justify-around p-2">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`flex flex-col items-center p-2 rounded-lg ${
+              !selectedCategory ? 'text-indigo-600' : 'text-gray-700'
+            }`}
+          >
+            <Coffee className="w-6 h-6" />
+            <span className="text-xs mt-1">{t('products.categories')}</span>
+          </button>
+          <button
+            onClick={() => {
+              // Open cart modal or show cart section
+              // You can implement this based on your needs
+            }}
+            className="flex flex-col items-center p-2 rounded-lg text-gray-700 relative"
+          >
+            <ShoppingCart className="w-6 h-6" />
+            <span className="text-xs mt-1">{t('products.myOrder')}</span>
+            {orderItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {orderItems.length}
+              </span>
+            )}
+          </button>
+          <Link
+            to="/orders"
+            className="flex flex-col items-center p-2 rounded-lg text-gray-700"
+          >
+            <ClipboardList className="w-6 h-6" />
+            <span className="text-xs mt-1">{t('orders.myOrders')}</span>
+          </Link>
+        </nav>
+      </div>
+
       {/* Header */}
       <div className="glass-panel shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-          <div className="flex items-center space-x-4">
-            {selectedCategory && (
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center space-x-4">
+              {selectedCategory && (
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="flex items-center text-gray-600 hover:text-gray-900"
+                >
+                  <ChevronLeft className="w-5 h-5 mr-1" />
+                  {t('products.backToCategories')}
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="hidden lg:block">
+                <Link
+                  to="/orders"
+                  className="flex items-center text-gray-600 hover:text-gray-900"
+                >
+                  <ClipboardList className="w-5 h-5 mr-1" />
+                  {t('orders.myOrders')}
+                </Link>
+              </div>
+              <LanguageSelector />
               <button
-                onClick={() => setSelectedCategory(null)}
-                className="flex items-center text-gray-600 hover:text-gray-900"
+                onClick={handleLogout}
+                className="flex items-center text-red-600 hover:text-red-700"
               >
-                <ChevronLeft className="w-5 h-5 mr-1" />
-                {t('products.backToCategories')}
+                <LogOut className="w-5 h-5 mr-1" />
+                <span className="hidden sm:inline">{t('common.logout')}</span>
               </button>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link
-              to="/orders"
-              className="flex items-center text-gray-600 hover:text-gray-900"
-            >
-              <ClipboardList className="w-5 h-5 mr-1" />
-              {t('orders.myOrders')}
-            </Link>
-            <LanguageSelector />
-            <button
-              onClick={handleLogout}
-              className="flex items-center text-red-600 hover:text-red-700"
-            >
-              <LogOut className="w-5 h-5 mr-1" />
-              {t('common.logout')}
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -173,9 +214,9 @@ export default function Products() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-6 flex flex-col lg:flex-row gap-6">
+      <div className="max-w-7xl mx-auto px-4 pb-24 lg:pb-6">
         {/* Products Section */}
-        <div className="flex-1">
+        <div className="space-y-6">
           {!selectedCategory ? (
             searchTerm ? (
               // Search Results
@@ -359,66 +400,71 @@ export default function Products() {
         </div>
 
         {/* Order Summary Section */}
-        <div className="w-96">
-          <div className="glass-panel p-6 rounded-lg sticky top-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">
-                {t('products.orderSummary')}
-              </h2>
-              <div className="flex items-center">
-                <ShoppingCart className="w-5 h-5 mr-2 text-indigo-600" />
-                <span className="text-indigo-600 font-medium">
-                  {orderItems.length} {t('products.items')}
-                </span>
-              </div>
-            </div>
+        {orderItems.length > 0 && (
+          <>
+            {/* Desktop Order Summary */}
+            <div className="hidden lg:block w-96">
+              <div className="glass-panel p-6 rounded-lg sticky top-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {t('products.orderSummary')}
+                  </h2>
+                  <button
+                    onClick={() => setOrderItems([])}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
 
-            {orderItems.length === 0 ? (
-              <p className="text-gray-500 text-center py-6">
-                {t('products.emptyOrder')}
-              </p>
-            ) : (
-              <>
-                <div className="space-y-4 mb-6 max-h-[calc(100vh-300px)] overflow-y-auto">
-                  {orderItems.map((item) => (
+                <div className="space-y-4 mb-6">
+                  {orderItems.map((item, index) => (
                     <div
-                      key={`order-${item.productId}-${item.variantId}`}
-                      className="flex justify-between items-start pb-4 border-b border-white/20"
+                      key={`${item.productId}-${item.variantId}-${index}`}
+                      className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
                     >
-                      <div>
-                        <h3 className="font-medium text-gray-800">{item.productName}</h3>
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium text-gray-800">
+                          {item.productName}
+                        </h3>
                         <p className="text-sm text-gray-600">{item.size}</p>
-                        <p className="text-sm text-gray-700">
-                          {item.quantity} × €{item.price.toFixed(2)}
+                        <p className="text-sm text-gray-600">
+                          {t('products.quantity')}: {item.quantity}
                         </p>
                       </div>
-                      <div className="flex items-center">
-                        <span className="font-medium mr-4 text-gray-800">
-                          €{(item.quantity * item.price).toFixed(2)}
-                        </span>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-gray-800">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </p>
                         <button
                           onClick={() => removeItem(item.productId, item.variantId)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 text-sm"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {t('products.remove')}
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="border-t border-white/20 pt-4">
-                  <div className="flex justify-between items-center mb-6">
-                    <span className="text-lg font-bold text-gray-800">{t('products.total')}:</span>
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-lg font-medium text-gray-800">
+                      {t('products.total')}
+                    </span>
                     <span className="text-lg font-bold text-gray-800">
-                      €{calculateTotal().toFixed(2)}
+                      ${calculateTotal().toFixed(2)}
                     </span>
                   </div>
 
                   <button
                     onClick={handleSendOrder}
-                    disabled={orderItems.length === 0 || sending}
-                    className="w-full glass-button bg-indigo-600/90 hover:bg-indigo-700/90 text-white flex items-center justify-center"
+                    disabled={sending || orderItems.length === 0}
+                    className="w-full flex justify-center items-center px-4 py-2 rounded-lg
+                      bg-indigo-600 text-white font-medium
+                      hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      transition-colors duration-200"
                   >
                     {sending ? (
                       <LoadingSpinner />
@@ -430,10 +476,26 @@ export default function Products() {
                     )}
                   </button>
                 </div>
-              </>
-            )}
-          </div>
-        </div>
+              </div>
+            </div>
+
+            {/* Mobile Order Summary Modal/Drawer */}
+            <div className="lg:hidden">
+              {/* Add a floating action button to show order summary */}
+              <button
+                onClick={() => {
+                  // Implement showing the order summary modal/drawer
+                }}
+                className="fixed right-4 bottom-20 z-50 bg-indigo-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
+              >
+                <ShoppingCart className="w-6 h-6" />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                  {orderItems.length}
+                </span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
