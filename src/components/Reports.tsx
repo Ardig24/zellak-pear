@@ -140,26 +140,26 @@ export default function Reports() {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-6">{t('reports.dashboard')}</h2>
+      <h2 className="text-3xl font-bold mb-6 text-black drop-shadow-lg">{t('reports.dashboard')}</h2>
       
       {/* Report Type Selection */}
-      <div className="mb-6">
+      <div className="glass-panel p-6 rounded-lg mb-6">
         <div className="flex space-x-4 mb-4">
           <button
-            className={`px-4 py-2 rounded ${
+            className={`glass-button px-4 py-2 rounded-lg transition-all duration-200 ${
               reportType === 'user' 
-                ? 'bg-orange-600 text-white' 
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-orange-500/20 text-orange-800 font-bold' 
+                : 'hover:bg-gray-500/20'
             }`}
             onClick={() => handleReportTypeChange('user')}
           >
             {t('reports.userReport')}
           </button>
           <button
-            className={`px-4 py-2 rounded ${
+            className={`glass-button px-4 py-2 rounded-lg transition-all duration-200 ${
               reportType === 'product' 
-                ? 'bg-orange-600 text-white' 
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-orange-500/20 text-orange-800 font-bold' 
+                : 'hover:bg-gray-500/20'
             }`}
             onClick={() => handleReportTypeChange('product')}
           >
@@ -170,7 +170,7 @@ export default function Reports() {
         {/* Selection Dropdown */}
         {reportType === 'user' ? (
           <select
-            className="w-full p-2 border rounded mb-4"
+            className="glass-input w-full p-3 rounded-lg mb-4 text-black"
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
           >
@@ -183,7 +183,7 @@ export default function Reports() {
           </select>
         ) : (
           <select
-            className="w-full p-2 border rounded mb-4"
+            className="glass-input w-full p-3 rounded-lg mb-4 text-black"
             value={selectedProduct}
             onChange={(e) => setSelectedProduct(e.target.value)}
           >
@@ -197,7 +197,7 @@ export default function Reports() {
         )}
 
         <button
-          className="bg-orange-600 text-white px-4 py-2 rounded disabled:bg-gray-300"
+          className="glass-button px-6 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleGenerateReport}
           disabled={!(selectedUser || selectedProduct)}
         >
@@ -211,32 +211,40 @@ export default function Reports() {
 
       {/* Report Results */}
       {reportData && !loading && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="glass-panel rounded-lg p-6">
           {reportType === 'user' ? (
             <div>
-              <h3 className="text-xl font-semibold mb-4">{t('reports.userReport')}</h3>
-              <p>{t('reports.totalOrders')}: {reportData.totalOrders}</p>
-              <p>{t('reports.totalSpent')}: €{reportData.totalSpent.toFixed(2)}</p>
-              <h4 className="font-semibold mt-4 mb-2">{t('reports.orderHistory')}</h4>
+              <h3 className="text-2xl font-bold mb-6 text-black">{t('reports.userReport')}</h3>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="glass-panel p-4 rounded-lg">
+                  <p className="text-lg font-semibold text-black">{t('reports.totalOrders')}</p>
+                  <p className="text-2xl font-bold text-black">{reportData.totalOrders}</p>
+                </div>
+                <div className="glass-panel p-4 rounded-lg">
+                  <p className="text-lg font-semibold text-black">{t('reports.totalSpent')}</p>
+                  <p className="text-2xl font-bold text-black">€{reportData.totalSpent.toFixed(2)}</p>
+                </div>
+              </div>
+              <h4 className="text-xl font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
               <div className="overflow-x-auto">
-                <table className="min-w-full">
+                <table className="min-w-full glass-table">
                   <thead>
                     <tr>
-                      <th className="px-4 py-2">{t('reports.date')}</th>
-                      <th className="px-4 py-2">{t('reports.amount')}</th>
-                      <th className="px-4 py-2">{t('reports.items')}</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.date')}</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.amount')}</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.items')}</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-200/30">
                     {reportData.orderHistory.map((order: any, index: number) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">
+                      <tr key={index} className="hover:bg-white/10 transition-colors duration-200">
+                        <td className="px-4 py-3 text-black">
                           {new Date(order.date).toLocaleDateString()}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="px-4 py-3 text-black">
                           €{order.amount.toFixed(2)}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="px-4 py-3 text-black">
                           {order.items.length} {t('reports.items')}
                         </td>
                       </tr>
@@ -247,31 +255,39 @@ export default function Reports() {
             </div>
           ) : (
             <div>
-              <h3 className="text-xl font-semibold mb-4">{t('reports.productReport')}</h3>
-              <p>{t('reports.totalUnitsSold')}: {reportData.totalSold}</p>
-              <p>{t('reports.totalRevenue')}: €{reportData.revenue.toFixed(2)}</p>
-              <h4 className="font-semibold mt-4 mb-2">{t('reports.orderHistory')}</h4>
+              <h3 className="text-2xl font-bold mb-6 text-black">{t('reports.productReport')}</h3>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="glass-panel p-4 rounded-lg">
+                  <p className="text-lg font-semibold text-black">{t('reports.totalUnitsSold')}</p>
+                  <p className="text-2xl font-bold text-black">{reportData.totalSold}</p>
+                </div>
+                <div className="glass-panel p-4 rounded-lg">
+                  <p className="text-lg font-semibold text-black">{t('reports.totalRevenue')}</p>
+                  <p className="text-2xl font-bold text-black">€{reportData.revenue.toFixed(2)}</p>
+                </div>
+              </div>
+              <h4 className="text-xl font-bold mb-4 text-black">{t('reports.orderHistory')}</h4>
               <div className="overflow-x-auto">
-                <table className="min-w-full">
+                <table className="min-w-full glass-table">
                   <thead>
                     <tr>
-                      <th className="px-4 py-2">{t('reports.date')}</th>
-                      <th className="px-4 py-2">{t('reports.quantity')}</th>
-                      <th className="px-4 py-2">{t('reports.price')}</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.date')}</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.quantity')}</th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black">{t('reports.price')}</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-200/30">
                     {reportData.orders.map((order: any, index: number) => (
-                      <tr key={index}>
-                        <td className="border px-4 py-2">
+                      <tr key={index} className="hover:bg-white/10 transition-colors duration-200">
+                        <td className="px-4 py-3 text-black">
                           {new Date(order.orderDate).toLocaleDateString()}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="px-4 py-3 text-black">
                           {order.items.find((item: any) => 
                             item.productId === selectedProduct
                           ).quantity}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="px-4 py-3 text-black">
                           €{order.items.find((item: any) => 
                             item.productId === selectedProduct
                           ).price.toFixed(2)}

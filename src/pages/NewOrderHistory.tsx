@@ -110,20 +110,20 @@ export default function NewOrderHistory() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(/path-to-your-geometric-image.png)', backgroundSize: 'cover', backgroundBlendMode: 'overlay' }}>
+    <div className="min-h-screen app-page">
       {/* Header */}
-      <div className="bg-white shadow">
+      <div className="glass-panel shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
               <button
                 onClick={() => navigate('/products')}
-                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="glass-button flex items-center px-4 py-2 text-gray-700 hover:text-gray-900"
               >
                 <ChevronLeft className="w-5 h-5 mr-2" />
                 {t('orders.backToProducts')}
               </button>
-              <h1 className="ml-8 text-2xl font-bold text-gray-900">{t('orders.myOrders')}</h1>
+              <h1 className="ml-8 text-2xl font-bold text-gray-800">{t('orders.myOrders')}</h1>
             </div>
 
             {/* Language Selector */}
@@ -135,59 +135,64 @@ export default function NewOrderHistory() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">{t('orders.noOrders')}</p>
+          <div className="glass-panel text-center py-12 rounded-lg">
+            <p className="text-gray-700 text-lg">{t('orders.noOrders')}</p>
           </div>
         ) : (
-          <div className="bg-white shadow overflow-hidden rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="glass-panel overflow-hidden rounded-lg">
+            <table className="min-w-full glass-table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     {t('orders.orderDate')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     {t('orders.total')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     {t('orders.status')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     {t('orders.actions')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/10">
                 {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr 
+                    key={order.id} 
+                    className="hover:bg-white/10 transition-colors duration-200 cursor-pointer"
+                    onClick={() => setSelectedOrder(order)}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
                       {formatDate(order.orderDate)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
                       €{order.total.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusStyle(order.status)}`}>
+                      <span className={`px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full ${
+                        order.status === 'completed' 
+                          ? 'bg-green-200 text-green-800' 
+                          : order.status === 'cancelled'
+                          ? 'bg-red-200 text-red-800'
+                          : 'bg-yellow-200 text-yellow-800'
+                      }`}>
                         {getStatusTranslation(order.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex space-x-4">
+                      {order.status === 'pending' && (
                         <button
-                          onClick={() => setSelectedOrder(order)}
-                          className="text-blue-600 hover:text-blue-900 font-medium"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCancelOrder(order.id);
+                          }}
+                          className="glass-button text-red-600 hover:text-red-700 font-medium"
                         >
-                          {t('orders.viewDetails')}
+                          {t('orders.cancel')}
                         </button>
-                        {order.status === 'pending' && (
-                          <button
-                            onClick={() => handleCancelOrder(order.id)}
-                            className="text-red-600 hover:text-red-900 font-medium"
-                          >
-                            {t('orders.cancelOrder')}
-                          </button>
-                        )}
-                      </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -198,47 +203,76 @@ export default function NewOrderHistory() {
 
         {/* Order Details Modal */}
         {selectedOrder && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">{t('orders.orderDetails')}</h2>
-                  <button
-                    onClick={() => setSelectedOrder(null)}
-                    className="text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100"
-                  >
-                    {t('orders.close')}
-                  </button>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="glass-panel max-w-2xl w-full rounded-xl p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    {t('orders.orderDetails')}
+                  </h2>
+                  <p className="text-gray-600">
+                    {formatDate(selectedOrder.orderDate)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="glass-button text-gray-500 hover:text-gray-700"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {t('orders.items')}
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedOrder.items.map((item, index) => (
+                      <div 
+                        key={index}
+                        className="flex justify-between items-center bg-white/20 p-3 rounded-lg"
+                      >
+                        <div>
+                          <p className="font-medium text-gray-800">{item.productName}</p>
+                          <p className="text-sm text-gray-600">{item.size}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-gray-800">
+                            {item.quantity} × €{item.price.toFixed(2)}
+                          </p>
+                          <p className="font-medium text-gray-800">
+                            €{(item.quantity * item.price).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">{t('orders.orderDate')}</h3>
-                    <p className="mt-1 text-lg text-gray-900">{formatDate(selectedOrder.orderDate)}</p>
+                <div className="border-t border-white/20 pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">
+                      {t('orders.total')}
+                    </span>
+                    <span className="text-lg font-bold text-gray-800">
+                      €{selectedOrder.total.toFixed(2)}
+                    </span>
                   </div>
+                </div>
 
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500 mb-3">{t('orders.items')}</h3>
-                    <div className="space-y-4">
-                      {selectedOrder.items.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center border-b pb-3">
-                          <div>
-                            <p className="font-medium text-gray-900">{item.productName}</p>
-                            <p className="text-sm text-gray-500">
-                              {t('orders.size')}: {item.size} | {t('orders.quantity')}: {item.quantity}
-                            </p>
-                          </div>
-                          <p className="text-gray-900 font-medium">€{(item.price * item.quantity).toFixed(2)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between items-center text-lg font-medium text-gray-900">
-                      <span>{t('orders.total')}</span>
-                      <span>€{selectedOrder.total.toFixed(2)}</span>
-                    </div>
+                <div className="border-t border-white/20 pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">{t('orders.status')}</span>
+                    <span className={`px-3 py-1 text-sm font-bold rounded-full ${
+                      selectedOrder.status === 'completed' 
+                        ? 'bg-green-200 text-green-800' 
+                        : selectedOrder.status === 'cancelled'
+                        ? 'bg-red-200 text-red-800'
+                        : 'bg-yellow-200 text-yellow-800'
+                    }`}>
+                      {getStatusTranslation(selectedOrder.status)}
+                    </span>
                   </div>
                 </div>
               </div>

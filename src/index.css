@@ -2,6 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global styles */
 body {
-  background-color: #e0f7fa; /* Light blue background */
+  @apply min-h-screen font-sans;
+}
+
+/* Login page specific background */
+.login-page {
+  background-image: url('/images/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Admin/User interface background */
+.app-page {
+  background-image: url('/images/admin-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 
+    transition-all duration-200 ease-in-out focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg shadow-md hover:bg-gray-200
+    transition-all duration-200 ease-in-out border border-gray-300;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white/30 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/50;
+}
+
+/* Input styles */
+.input-field {
+  @apply w-full px-4 py-3 rounded-lg 
+    bg-white/50 backdrop-blur-sm
+    border border-white/50
+    text-gray-900 placeholder-gray-500
+    focus:ring-2 focus:ring-white focus:border-white
+    transition-all duration-200 ease-in-out;
+}
+
+/* Container styles */
+.container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Utility classes */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600;
+}
+
+/* Glass effect for panels */
+.glass-panel {
+  @apply bg-white/30 backdrop-blur-md rounded-xl shadow-lg border border-white/50;
+}
+
+/* Glass effect styles */
+.glass-panel {
+  @apply bg-white/20 backdrop-blur-md border border-white/20 shadow-lg;
+}
+
+.glass-panel-darker {
+  @apply bg-white/30 backdrop-blur-md border border-white/30 shadow-lg;
+}
+
+.glass-table {
+  @apply w-full border-collapse;
+}
+
+.glass-table th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider bg-white/30 backdrop-blur-sm border-b border-white/20;
+}
+
+.glass-table td {
+  @apply px-6 py-4 whitespace-nowrap text-gray-800 border-b border-white/10 bg-white/10 backdrop-blur-sm;
+}
+
+.glass-table tr:hover td {
+  @apply bg-white/20 transition-all duration-200;
+}
+
+.glass-input {
+  @apply block w-full px-4 py-2 bg-white/30 backdrop-blur-sm border border-white/30 
+    rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+    text-gray-900 placeholder-gray-500;
+}
+
+.glass-button {
+  @apply px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 
+    rounded-lg hover:bg-white/30 transition-all duration-200
+    text-gray-800 font-medium;
+}
+
+.glass-button-primary {
+  @apply px-4 py-2 bg-indigo-600/90 backdrop-blur-sm border border-indigo-500/50
+    rounded-lg hover:bg-indigo-700/90 transition-all duration-200
+    text-white font-medium shadow-lg hover:shadow-xl;
+}
+
+.glass-button-danger {
+  @apply px-4 py-2 bg-red-600/90 backdrop-blur-sm border border-red-500/50
+    rounded-lg hover:bg-red-700/90 transition-all duration-200
+    text-white font-medium;
+}
+
+/* Text shadow utility for better readability on images */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-md {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }

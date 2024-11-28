@@ -121,9 +121,9 @@ export default function Products() {
   }, {} as Record<string, typeof products>);
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen app-page">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="glass-panel shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             {selectedCategory && (
@@ -187,7 +187,7 @@ export default function Products() {
                       {categoryProducts.map((product) => (
                         <div
                           key={product.id}
-                          className="bg-white rounded-lg shadow p-4 flex items-center"
+                          className="glass-panel p-4 rounded-lg flex items-center"
                         >
                           {product.icon && (
                             <img
@@ -197,7 +197,7 @@ export default function Products() {
                             />
                           )}
                           <div className="ml-4 flex-grow">
-                            <h3 className="text-lg font-semibold">{product.name}</h3>
+                            <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
                             <div className="mt-2 space-y-2">
                               {product.variants.map((variant, index) => {
                                 const safeVariantId = variant.id || `${product.id}-variant-${index}`;
@@ -211,7 +211,7 @@ export default function Products() {
                                     key={`${product.id}-${safeVariantId}`}
                                     className="flex items-center justify-between"
                                   >
-                                    <span className="text-gray-600">{variant.size}</span>
+                                    <span className="text-gray-700">{variant.size}</span>
                                     <div className="flex items-center space-x-2">
                                       <button
                                         onClick={() => {
@@ -225,12 +225,12 @@ export default function Products() {
                                             newQuantity
                                           );
                                         }}
-                                        className="px-2 py-1 border rounded hover:bg-gray-100"
+                                        className="glass-button px-3 py-1"
                                         disabled={currentQuantity === 0}
                                       >
                                         -
                                       </button>
-                                      <span className="w-16 text-center">{currentQuantity}</span>
+                                      <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
                                       <button
                                         onClick={() => {
                                           const newQuantity = currentQuantity + 1;
@@ -243,7 +243,7 @@ export default function Products() {
                                             newQuantity
                                           );
                                         }}
-                                        className="px-2 py-1 border rounded hover:bg-gray-100"
+                                        className="glass-button px-3 py-1"
                                       >
                                         +
                                       </button>
@@ -271,15 +271,8 @@ export default function Products() {
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left flex items-center space-x-4"
+                    className="glass-panel p-6 rounded-lg text-left hover:scale-105 transition-all duration-200"
                   >
-                    {category.imageUrl && (
-                      <img
-                        src={category.imageUrl}
-                        alt={category.name}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    )}
                     <h2 className="text-xl font-semibold text-gray-800">
                       {category.name}
                     </h2>
@@ -293,72 +286,70 @@ export default function Products() {
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow p-6"
+                  className="glass-panel p-4 rounded-lg flex items-center"
                 >
-                  <div className="flex items-start space-x-4">
-                    {product.icon && (
-                      <img
-                        src={product.icon}
-                        alt={product.name}
-                        className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
-                      />
-                    )}
-                    <div className="flex-grow">
-                      <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                      <div className="mt-2 space-y-2">
-                        {product.variants.map((variant, index) => {
-                          const safeVariantId = variant.id || `${product.id}-variant-${index}`;
-                          const orderItem = orderItems.find(
-                            item => item.productId === product.id && item.variantId === safeVariantId
-                          );
-                          const currentQuantity = orderItem?.quantity || 0;
+                  {product.icon && (
+                    <img
+                      src={product.icon}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                  )}
+                  <div className="ml-4 flex-grow">
+                    <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
+                    <div className="mt-2 space-y-2">
+                      {product.variants.map((variant, index) => {
+                        const safeVariantId = variant.id || `${product.id}-variant-${index}`;
+                        const orderItem = orderItems.find(
+                          item => item.productId === product.id && item.variantId === safeVariantId
+                        );
+                        const currentQuantity = orderItem?.quantity || 0;
 
-                          return (
-                            <div
-                              key={`${product.id}-${safeVariantId}`}
-                              className="flex items-center justify-between"
-                            >
-                              <span className="text-gray-600">{variant.size}</span>
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  onClick={() => {
-                                    const newQuantity = Math.max(0, currentQuantity - 1);
-                                    handleQuantityChange(
-                                      product.id,
-                                      product.name,
-                                      safeVariantId,
-                                      variant.size,
-                                      variant.prices[userData.category],
-                                      newQuantity
-                                    );
-                                  }}
-                                  className="px-2 py-1 border rounded hover:bg-gray-100"
-                                  disabled={currentQuantity === 0}
-                                >
-                                  -
-                                </button>
-                                <span className="w-16 text-center">{currentQuantity}</span>
-                                <button
-                                  onClick={() => {
-                                    const newQuantity = currentQuantity + 1;
-                                    handleQuantityChange(
-                                      product.id,
-                                      product.name,
-                                      safeVariantId,
-                                      variant.size,
-                                      variant.prices[userData.category],
-                                      newQuantity
-                                    );
-                                  }}
-                                  className="px-2 py-1 border rounded hover:bg-gray-100"
-                                >
-                                  +
-                                </button>
-                              </div>
+                        return (
+                          <div
+                            key={`${product.id}-${safeVariantId}`}
+                            className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
+                          >
+                            <span className="text-gray-700">{variant.size}</span>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => {
+                                  const newQuantity = Math.max(0, currentQuantity - 1);
+                                  handleQuantityChange(
+                                    product.id,
+                                    product.name,
+                                    safeVariantId,
+                                    variant.size,
+                                    variant.prices[userData.category],
+                                    newQuantity
+                                  );
+                                }}
+                                className="glass-button px-3 py-1"
+                                disabled={currentQuantity === 0}
+                              >
+                                -
+                              </button>
+                              <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
+                              <button
+                                onClick={() => {
+                                  const newQuantity = currentQuantity + 1;
+                                  handleQuantityChange(
+                                    product.id,
+                                    product.name,
+                                    safeVariantId,
+                                    variant.size,
+                                    variant.prices[userData.category],
+                                    newQuantity
+                                  );
+                                }}
+                                className="glass-button px-3 py-1"
+                              >
+                                +
+                              </button>
                             </div>
-                          );
-                        })}
-                      </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -369,14 +360,14 @@ export default function Products() {
 
         {/* Order Summary Section */}
         <div className="w-96">
-          <div className="bg-white rounded-lg shadow-lg p-6 sticky top-6">
+          <div className="glass-panel p-6 rounded-lg sticky top-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800">
                 {t('products.orderSummary')}
               </h2>
               <div className="flex items-center">
-                <ShoppingCart className="w-5 h-5 mr-2 text-orange-600" />
-                <span className="text-orange-600 font-medium">
+                <ShoppingCart className="w-5 h-5 mr-2 text-indigo-600" />
+                <span className="text-indigo-600 font-medium">
                   {orderItems.length} {t('products.items')}
                 </span>
               </div>
@@ -392,17 +383,17 @@ export default function Products() {
                   {orderItems.map((item) => (
                     <div
                       key={`order-${item.productId}-${item.variantId}`}
-                      className="flex justify-between items-start pb-4 border-b"
+                      className="flex justify-between items-start pb-4 border-b border-white/20"
                     >
                       <div>
-                        <h3 className="font-medium">{item.productName}</h3>
+                        <h3 className="font-medium text-gray-800">{item.productName}</h3>
                         <p className="text-sm text-gray-600">{item.size}</p>
-                        <p className="text-sm">
+                        <p className="text-sm text-gray-700">
                           {item.quantity} × €{item.price.toFixed(2)}
                         </p>
                       </div>
                       <div className="flex items-center">
-                        <span className="font-medium mr-4">
+                        <span className="font-medium mr-4 text-gray-800">
                           €{(item.quantity * item.price).toFixed(2)}
                         </span>
                         <button
@@ -416,10 +407,10 @@ export default function Products() {
                   ))}
                 </div>
 
-                <div className="border-t pt-4">
+                <div className="border-t border-white/20 pt-4">
                   <div className="flex justify-between items-center mb-6">
-                    <span className="text-lg font-bold">{t('products.total')}:</span>
-                    <span className="text-lg font-bold">
+                    <span className="text-lg font-bold text-gray-800">{t('products.total')}:</span>
+                    <span className="text-lg font-bold text-gray-800">
                       €{calculateTotal().toFixed(2)}
                     </span>
                   </div>
@@ -427,7 +418,7 @@ export default function Products() {
                   <button
                     onClick={handleSendOrder}
                     disabled={orderItems.length === 0 || sending}
-                    className="w-full flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full glass-button bg-indigo-600/90 hover:bg-indigo-700/90 text-white flex items-center justify-center"
                   >
                     {sending ? (
                       <LoadingSpinner />
