@@ -176,338 +176,330 @@ export default function ManageUsers() {
     user.contactNumber?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading && !isAddingUser) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 pb-24 lg:pb-8">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-black drop-shadow-lg">{t('admin.users.title')}</h1>
-
-      {/* Search Input */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t('admin.users.searchPlaceholder')}
-          className="w-full glass-input px-4 py-2 rounded-lg text-black"
-        />
-      </div>
-
-      {/* Mobile View - Cards */}
-      <div className="lg:hidden space-y-4">
-        {filteredUsers.map((user) => (
-          <div
-            key={user.id}
-            className="glass-panel p-4 rounded-lg space-y-4 hover:bg-white/10 transition-colors duration-200"
+    <div className="h-full w-full overflow-y-auto">
+      <div className="p-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <h2 className="text-xl font-bold text-gray-800">{t('admin.manageUsers')}</h2>
+          <button
+            onClick={() => setIsAddingUser(true)}
+            className="glass-button-primary flex items-center text-sm"
           >
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <div className="font-medium text-black">{user.companyName}</div>
-                <div className="text-sm text-gray-600">{user.email}</div>
-              </div>
-              <span className={`px-3 py-1 text-sm font-bold rounded-full ${
-                user.isAdmin 
-                  ? 'bg-purple-200 text-purple-800' 
-                  : 'bg-blue-200 text-blue-800'
-              }`}>
-                {t(`admin.users.roles.${user.isAdmin ? 'admin' : 'user'}`)}
-              </span>
-            </div>
+            <Plus className="w-4 h-4 mr-1" />
+            {t('admin.addNewUser')}
+          </button>
+        </div>
 
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <div className="text-gray-600">{t('admin.users.company')}:</div>
-                <div className="text-black">{user.companyName}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-gray-600">{t('admin.users.contact')}:</div>
-                <div className="text-black">{user.contactNumber}</div>
-              </div>
-            </div>
+        {/* Search Input */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('admin.users.searchPlaceholder')}
+            className="w-full glass-input px-3 py-1.5 rounded-lg text-sm"
+          />
+        </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-              <button
-                onClick={() => startEdit(user)}
-                className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-blue-500/30 transition-all duration-200"
-              >
-                {t('admin.users.edit')}
-              </button>
-              <button
-                onClick={() => handleDeleteUser(user.id)}
-                className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-200"
-              >
-                {t('admin.users.delete')}
-              </button>
-            </div>
+        {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
+
+        {/* Users List */}
+        <div className="space-y-3">
+          {/* Desktop View - Table */}
+          <div className="hidden lg:block glass-panel rounded-lg p-3">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className="px-2 py-2 text-left font-medium text-black">
+                    {t('admin.users.email')}
+                  </th>
+                  <th className="px-2 py-2 text-left font-medium text-black">
+                    {t('admin.users.company')}
+                  </th>
+                  <th className="px-2 py-2 text-left font-medium text-black">
+                    {t('admin.users.contact')}
+                  </th>
+                  <th className="px-2 py-2 text-left font-medium text-black w-24">
+                    {t('admin.users.role')}
+                  </th>
+                  <th className="px-2 py-2 text-left font-medium text-black w-32">
+                    {t('admin.users.actions')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200/30">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-white/10">
+                    <td className="px-2 py-2">
+                      <div className="truncate max-w-[200px]">{user.email}</div>
+                    </td>
+                    <td className="px-2 py-2">
+                      <div className="truncate max-w-[150px]">{user.companyName}</div>
+                    </td>
+                    <td className="px-2 py-2">
+                      <div className="truncate max-w-[120px]">{user.contactNumber}</div>
+                    </td>
+                    <td className="px-2 py-2">
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        user.isAdmin 
+                          ? 'bg-purple-200 text-purple-800' 
+                          : 'bg-blue-200 text-blue-800'
+                      }`}>
+                        {t(`admin.users.roles.${user.isAdmin ? 'admin' : 'user'}`)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-2">
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => startEdit(user)}
+                          className="glass-button px-2 py-1 text-xs rounded hover:bg-blue-500/30"
+                        >
+                          {t('admin.users.edit')}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="glass-button px-2 py-1 text-xs rounded hover:bg-red-500/30"
+                        >
+                          {t('admin.users.delete')}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
 
-      {/* Desktop View - Table */}
-      <div className="hidden lg:block overflow-x-auto glass-panel rounded-lg p-4">
-        <table className="min-w-full glass-table">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.users.company')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.users.email')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.users.contact')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.users.role')}
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
-                {t('admin.users.actions')}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200/30">
+          {/* Mobile View - Cards */}
+          <div className="lg:hidden space-y-3">
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-white/10 transition-colors duration-200">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-black">
-                    {user.companyName}
+              <div
+                key={user.id}
+                className="glass-panel p-3 rounded-lg space-y-3 hover:bg-white/10"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <div className="font-medium text-black">{user.email}</div>
+                    <div className="text-sm text-gray-600">{user.companyName}</div>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-black">{user.email}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-black">
-                    {user.contactNumber}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full ${
+                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                     user.isAdmin 
                       ? 'bg-purple-200 text-purple-800' 
                       : 'bg-blue-200 text-blue-800'
                   }`}>
                     {t(`admin.users.roles.${user.isAdmin ? 'admin' : 'user'}`)}
                   </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex space-x-2">
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <div className="text-gray-600">{t('admin.users.company')}:</div>
+                    <div className="text-black">{user.companyName}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-gray-600">{t('admin.users.contact')}:</div>
+                    <div className="text-black">{user.contactNumber}</div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={() => startEdit(user)}
+                    className="flex-1 glass-button px-2 py-1 text-xs rounded hover:bg-blue-500/30"
+                  >
+                    {t('admin.users.edit')}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteUser(user.id)}
+                    className="flex-1 glass-button px-2 py-1 text-xs rounded hover:bg-red-500/30"
+                  >
+                    {t('admin.users.delete')}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Edit User Modal */}
+          {selectedUser && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+              <div className="glass-panel rounded-lg w-full max-w-lg">
+                <div className="p-4 sm:p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-black drop-shadow-lg">
+                      {t('admin.users.editUser')}
+                    </h2>
                     <button
-                      onClick={() => startEdit(user)}
-                      className="glass-button px-4 py-2 rounded-lg hover:bg-blue-500/30 transition-all duration-200"
+                      onClick={() => setSelectedUser(null)}
+                      className="text-gray-300 hover:text-black transition-colors"
                     >
-                      {t('admin.users.edit')}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="glass-button px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-200"
-                    >
-                      {t('admin.users.delete')}
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
-      {/* Edit User Modal */}
-      {selectedUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glass-panel rounded-lg w-full max-w-lg">
-            <div className="p-4 sm:p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-black drop-shadow-lg">
-                  {t('admin.users.editUser')}
-                </h2>
-                <button
-                  onClick={() => setSelectedUser(null)}
-                  className="text-gray-300 hover:text-black transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <form onSubmit={handleUpdateUser} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        {t('admin.users.company')}
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.companyName}
+                        onChange={(e) => setEditForm({ ...editForm, companyName: e.target.value })}
+                        className="w-full glass-input px-3 py-1.5 rounded-lg text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        {t('admin.users.contact')}
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.contactNumber}
+                        onChange={(e) => setEditForm({ ...editForm, contactNumber: e.target.value })}
+                        className="w-full glass-input px-3 py-1.5 rounded-lg text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">
+                        {t('admin.users.role')}
+                      </label>
+                      <select
+                        value={editForm.role}
+                        onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'user' | 'admin' })}
+                        className="w-full glass-input px-3 py-1.5 rounded-lg text-sm"
+                      >
+                        <option value="user">{t('admin.users.roles.user')}</option>
+                        <option value="admin">{t('admin.users.roles.admin')}</option>
+                      </select>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedUser(null)}
+                        className="flex-1 glass-button bg-gray-500/30 hover:bg-gray-600/30 text-black py-2"
+                      >
+                        {t('common.cancel')}
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 glass-button bg-blue-500/30 hover:bg-blue-600/30 text-black py-2"
+                      >
+                        {t('common.save')}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
+            </div>
+          )}
 
-              <form onSubmit={handleUpdateUser} className="space-y-4">
+          {isAddingUser && (
+            <form onSubmit={handleSubmit} className="glass-panel rounded-xl p-6 mb-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-1">
-                    {t('admin.users.company')}
+                  <label className="block text-sm font-medium text-gray-800 mb-1">
+                    {t('login.email')}
                   </label>
                   <input
-                    type="text"
-                    value={editForm.companyName}
-                    onChange={(e) => setEditForm({ ...editForm, companyName: e.target.value })}
-                    className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="glass-input"
+                    required
                   />
                 </div>
-
+                {!editingUser && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-800 mb-1">
+                      {t('login.password')}
+                    </label>
+                    <input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="glass-input"
+                      required={!editingUser}
+                      minLength={6}
+                    />
+                  </div>
+                )}
                 <div>
-                  <label className="block text-sm font-medium text-black mb-1">
-                    {t('admin.users.contact')}
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.contactNumber}
-                    onChange={(e) => setEditForm({ ...editForm, contactNumber: e.target.value })}
-                    className="w-full glass-input px-4 py-2 rounded-lg text-black"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-black mb-1">
-                    {t('admin.users.role')}
+                  <label className="block text-sm font-medium text-gray-800 mb-1">
+                    {t('admin.category')}
                   </label>
                   <select
-                    value={editForm.role}
-                    onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'user' | 'admin' })}
-                    className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' | 'C' })}
+                    className="glass-input"
+                    required
                   >
-                    <option value="user">{t('admin.users.roles.user')}</option>
-                    <option value="admin">{t('admin.users.roles.admin')}</option>
+                    <option value="A">{t('categories.categoryA')}</option>
+                    <option value="B">{t('categories.categoryB')}</option>
+                    <option value="C">{t('categories.categoryC')}</option>
                   </select>
                 </div>
-
-                <div className="flex gap-4 pt-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-1">
+                    {t('admin.companyName')}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.companyName}
+                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                    className="glass-input"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-1">
+                    {t('admin.contactNumber')}
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.contactNumber}
+                    onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+                    className="glass-input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-1">
+                    {t('admin.address')}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="glass-input"
+                  />
+                </div>
+                <div className="col-span-2 flex justify-end gap-4">
                   <button
                     type="button"
-                    onClick={() => setSelectedUser(null)}
-                    className="flex-1 glass-button bg-gray-500/30 hover:bg-gray-600/30 text-black py-2"
+                    onClick={resetForm}
+                    className="glass-button"
                   >
                     {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 glass-button bg-blue-500/30 hover:bg-blue-600/30 text-black py-2"
+                    disabled={loading}
+                    className="glass-button-primary"
                   >
-                    {t('common.save')}
+                    {loading ? <LoadingSpinner /> : editingUser ? t('common.save') : t('common.add')}
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isAddingUser && (
-        <form onSubmit={handleSubmit} className="glass-panel rounded-xl p-6 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('login.email')}
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="glass-input"
-                required
-              />
-            </div>
-            {!editingUser && (
-              <div>
-                <label className="block text-sm font-medium text-gray-800 mb-1">
-                  {t('login.password')}
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="glass-input"
-                  required={!editingUser}
-                  minLength={6}
-                />
               </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.category')}
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' | 'C' })}
-                className="glass-input"
-                required
-              >
-                <option value="A">{t('categories.categoryA')}</option>
-                <option value="B">{t('categories.categoryB')}</option>
-                <option value="C">{t('categories.categoryC')}</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.companyName')}
-              </label>
-              <input
-                type="text"
-                value={formData.companyName}
-                onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                className="glass-input"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.contactNumber')}
-              </label>
-              <input
-                type="tel"
-                value={formData.contactNumber}
-                onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-                className="glass-input"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                {t('admin.address')}
-              </label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                className="glass-input"
-              />
-            </div>
-            <div className="col-span-2 flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={resetForm}
-                className="glass-button"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="glass-button-primary"
-              >
-                {loading ? <LoadingSpinner /> : editingUser ? t('common.save') : t('common.add')}
-              </button>
-            </div>
-          </div>
-        </form>
-      )}
-
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">{t('admin.manageUsers')}</h2>
-        <button
-          onClick={() => setIsAddingUser(true)}
-          className="glass-button-primary flex items-center"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          {t('admin.addNewUser')}
-        </button>
+            </form>
+          )}
+        </div>
       </div>
-
-      {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
     </div>
   );
 }

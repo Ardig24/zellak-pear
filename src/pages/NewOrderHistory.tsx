@@ -141,93 +141,97 @@ export default function NewOrderHistory() {
         ) : (
           <>
             {/* Mobile View - Cards */}
-            <div className="lg:hidden space-y-4">
-              {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="glass-panel p-4 rounded-lg space-y-3 hover:bg-white/10 transition-colors duration-200"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-600">{formatDate(order.orderDate)}</div>
-                      <div className="font-bold text-gray-800">€{order.total.toFixed(2)}</div>
+            <div className="lg:hidden">
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto space-y-4 pr-2">
+                {orders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="glass-panel p-4 rounded-lg space-y-3 hover:bg-white/10 transition-colors duration-200"
+                    onClick={() => setSelectedOrder(order)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-600">{formatDate(order.orderDate)}</div>
+                        <div className="font-bold text-gray-800">€{order.total.toFixed(2)}</div>
+                      </div>
+                      <span className={`px-3 py-1 text-sm font-bold rounded-full ${getStatusStyle(order.status)}`}>
+                        {getStatusTranslation(order.status)}
+                      </span>
                     </div>
-                    <span className={`px-3 py-1 text-sm font-bold rounded-full ${getStatusStyle(order.status)}`}>
-                      {getStatusTranslation(order.status)}
-                    </span>
+                    {order.status === 'pending' && (
+                      <div className="pt-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCancelOrder(order.id);
+                          }}
+                          className="w-full glass-button text-red-600 hover:text-red-700 font-medium py-2"
+                        >
+                          {t('orders.cancel')}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {order.status === 'pending' && (
-                    <div className="pt-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCancelOrder(order.id);
-                        }}
-                        className="w-full glass-button text-red-600 hover:text-red-700 font-medium py-2"
-                      >
-                        {t('orders.cancel')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Desktop View - Table */}
-            <div className="hidden lg:block glass-panel overflow-hidden rounded-lg">
-              <table className="min-w-full glass-table">
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t('orders.orderDate')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t('orders.total')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t('orders.status')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t('orders.actions')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {orders.map((order) => (
-                    <tr 
-                      key={order.id} 
-                      className="hover:bg-white/10 transition-colors duration-200 cursor-pointer"
-                      onClick={() => setSelectedOrder(order)}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                        {formatDate(order.orderDate)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                        €{order.total.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full ${getStatusStyle(order.status)}`}>
-                          {getStatusTranslation(order.status)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {order.status === 'pending' && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCancelOrder(order.id);
-                            }}
-                            className="glass-button text-red-600 hover:text-red-700 font-medium"
-                          >
-                            {t('orders.cancel')}
-                          </button>
-                        )}
-                      </td>
+            <div className="hidden lg:block glass-panel rounded-lg">
+              <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+                <table className="min-w-full glass-table">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        {t('orders.orderDate')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        {t('orders.total')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        {t('orders.status')}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        {t('orders.actions')}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {orders.map((order) => (
+                      <tr 
+                        key={order.id} 
+                        className="hover:bg-white/10 transition-colors duration-200 cursor-pointer"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                          {formatDate(order.orderDate)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                          €{order.total.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full ${getStatusStyle(order.status)}`}>
+                            {getStatusTranslation(order.status)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {order.status === 'pending' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCancelOrder(order.id);
+                              }}
+                              className="glass-button text-red-600 hover:text-red-700 font-medium"
+                            >
+                              {t('orders.cancel')}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}
