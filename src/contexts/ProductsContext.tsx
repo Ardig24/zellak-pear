@@ -20,8 +20,8 @@ interface ProductsContextType {
   addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
   updateProduct: (id: string, product: Omit<Product, 'id'>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
-  addCategory: (category: Omit<Category, 'id'>) => Promise<void>;
-  updateCategory: (id: string, category: Omit<Category, 'id'>) => Promise<void>;
+  addCategory: (category: Omit<Category, 'id'> & { imageUrl?: File | string }) => Promise<void>;
+  updateCategory: (id: string, category: Omit<Category, 'id'> & { imageUrl?: File | string }) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -77,10 +77,16 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const uploadProductImage = async (file: File): Promise<string> => {
-    const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    return getDownloadURL(storageRef);
+  const uploadImage = async (file: File, path: string): Promise<string> => {
+    try {
+      const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
   };
 
   const addProduct = async (productData: Omit<Product, 'id'>) => {
@@ -91,15 +97,16 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // If icon is a File, upload it first
       let iconUrl = productData.icon;
       if (productData.icon instanceof File) {
-        iconUrl = await uploadProductImage(productData.icon);
+        iconUrl = await uploadImage(productData.icon, 'products');
       }
 
-      await setDoc(productRef, {
+      const finalProductData = {
         ...productData,
         icon: iconUrl,
         createdAt: new Date().toISOString()
-      });
+      };
 
+      await setDoc(productRef, finalProductData);
       await fetchProducts();
     } catch (err: any) {
       setError(err.message);
@@ -116,22 +123,28 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // If icon is a File, upload it first
       let iconUrl = productData.icon;
       if (productData.icon instanceof File) {
-        iconUrl = await uploadProductImage(productData.icon);
-        
         // Delete old image if it exists
         const oldProduct = products.find(p => p.id === id);
         if (oldProduct?.icon) {
-          const oldImageRef = ref(storage, oldProduct.icon);
-          await deleteObject(oldImageRef).catch(() => {});
+          try {
+            const oldImageRef = ref(storage, oldProduct.icon);
+            await deleteObject(oldImageRef);
+          } catch (error) {
+            console.error('Error deleting old image:', error);
+          }
         }
+        
+        // Upload new image
+        iconUrl = await uploadImage(productData.icon, 'products');
       }
 
-      await setDoc(doc(db, 'products', id), {
+      const finalProductData = {
         ...productData,
         icon: iconUrl,
         updatedAt: new Date().toISOString()
-      });
+      };
 
+      await setDoc(doc(db, 'products', id), finalProductData);
       await fetchProducts();
     } catch (err: any) {
       setError(err.message);
@@ -162,14 +175,24 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addCategory = async (categoryData: Omit<Category, 'id'>) => {
+  const addCategory = async (categoryData: Omit<Category, 'id'> & { imageUrl?: File | string }) => {
     try {
       setLoading(true);
       const categoryRef = doc(collection(db, 'categories'));
-      await setDoc(categoryRef, {
-        ...categoryData,
+      
+      // If imageUrl is a File, upload it first
+      let imageUrl = categoryData.imageUrl;
+      if (categoryData.imageUrl instanceof File) {
+        imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
+      }
+
+      const finalCategoryData = {
+        name: categoryData.name,
+        imageUrl,
         createdAt: new Date().toISOString()
-      });
+      };
+
+      await setDoc(categoryRef, finalCategoryData);
       await fetchCategories();
     } catch (err: any) {
       setError(err.message);
@@ -179,13 +202,35 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateCategory = async (id: string, categoryData: Omit<Category, 'id'>) => {
+  const updateCategory = async (id: string, categoryData: Omit<Category, 'id'> & { imageUrl?: File | string }) => {
     try {
       setLoading(true);
-      await setDoc(doc(db, 'categories', id), {
-        ...categoryData,
+      
+      // If imageUrl is a File, upload it first
+      let imageUrl = categoryData.imageUrl;
+      if (categoryData.imageUrl instanceof File) {
+        // Delete old image if it exists
+        const oldCategory = categories.find(c => c.id === id);
+        if (oldCategory?.imageUrl) {
+          try {
+            const oldImageRef = ref(storage, oldCategory.imageUrl);
+            await deleteObject(oldImageRef);
+          } catch (error) {
+            console.error('Error deleting old image:', error);
+          }
+        }
+        
+        // Upload new image
+        imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
+      }
+
+      const finalCategoryData = {
+        name: categoryData.name,
+        imageUrl,
         updatedAt: new Date().toISOString()
-      });
+      };
+
+      await setDoc(doc(db, 'categories', id), finalCategoryData);
       await fetchCategories();
     } catch (err: any) {
       setError(err.message);
@@ -198,6 +243,17 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
   const deleteCategory = async (id: string) => {
     try {
       setLoading(true);
+      
+      // Delete category image if it exists
+      const category = categories.find(c => c.id === id);
+      if (category?.imageUrl) {
+        try {
+          const imageRef = ref(storage, category.imageUrl);
+          await deleteObject(imageRef);
+        } catch (error) {
+          console.error('Error deleting category image:', error);
+        }
+      }
       
       // Delete all products in this category first
       const productsInCategory = query(collection(db, 'products'), where('category', '==', id));

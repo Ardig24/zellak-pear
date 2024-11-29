@@ -329,7 +329,10 @@ export default function Products() {
                   <>
                     <div className="space-y-4">
                       {orderItems.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div
+                          key={`${item.productId}-${item.variantId}-${index}`}
+                          className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
+                        >
                           <div>
                             <p className="font-medium">{item.productName}</p>
                             <p className="text-sm text-gray-500">{item.size}</p>
@@ -393,287 +396,297 @@ export default function Products() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pb-24 lg:pb-6">
-        {/* Products Section */}
-        <div className="space-y-6">
-          {!selectedCategory ? (
-            searchTerm ? (
-              // Search Results
-              <div className="space-y-6">
-                {Object.entries(groupedProducts).map(([categoryName, categoryProducts]) => (
-                  <div key={categoryName}>
-                    <h2 className="text-xl font-semibold mb-4">{categoryName}</h2>
-                    <div className="space-y-4">
-                      {categoryProducts.map((product) => (
-                        <div
-                          key={product.id}
-                          className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
-                        >
-                          {product.icon && (
-                            <img
-                              src={product.icon}
-                              alt={product.name}
-                              className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
-                            />
-                          )}
-                          <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
-                            <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-                            <div className="mt-2 space-y-2">
-                              {product.variants.map((variant, index) => {
-                                const safeVariantId = variant.id || `${product.id}-variant-${index}`;
-                                const orderItem = orderItems.find(
-                                  item => item.productId === product.id && item.variantId === safeVariantId
-                                );
-                                const currentQuantity = orderItem?.quantity || 0;
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Products Section */}
+          <div className="flex-1 space-y-6">
+            {!selectedCategory ? (
+              searchTerm ? (
+                // Search Results
+                <div className="space-y-6">
+                  {Object.entries(groupedProducts).map(([categoryName, categoryProducts]) => (
+                    <div key={categoryName}>
+                      <h2 className="text-xl font-semibold mb-4">{categoryName}</h2>
+                      <div className="space-y-4">
+                        {categoryProducts.map((product) => (
+                          <div
+                            key={product.id}
+                            className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
+                          >
+                            {product.icon && (
+                              <img
+                                src={product.icon}
+                                alt={product.name}
+                                className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
+                              />
+                            )}
+                            <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
+                              <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
+                              <div className="mt-2 space-y-2">
+                                {product.variants.map((variant, index) => {
+                                  const safeVariantId = variant.id || `${product.id}-variant-${index}`;
+                                  const orderItem = orderItems.find(
+                                    item => item.productId === product.id && item.variantId === safeVariantId
+                                  );
+                                  const currentQuantity = orderItem?.quantity || 0;
 
-                                return (
-                                  <div
-                                    key={`${product.id}-${safeVariantId}`}
-                                    className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
-                                  >
-                                    <span className="text-gray-700">{variant.size}</span>
-                                    <div className="flex items-center space-x-2">
-                                      <button
-                                        onClick={() => {
-                                          const newQuantity = Math.max(0, currentQuantity - 1);
-                                          handleQuantityChange(
-                                            product.id,
-                                            product.name,
-                                            safeVariantId,
-                                            variant.size,
-                                            variant.prices[userData.category],
-                                            newQuantity
-                                          );
-                                        }}
-                                        className="glass-button px-3 py-1"
-                                        disabled={currentQuantity === 0}
-                                      >
-                                        -
-                                      </button>
-                                      <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
-                                      <button
-                                        onClick={() => {
-                                          const newQuantity = currentQuantity + 1;
-                                          handleQuantityChange(
-                                            product.id,
-                                            product.name,
-                                            safeVariantId,
-                                            variant.size,
-                                            variant.prices[userData.category],
-                                            newQuantity
-                                          );
-                                        }}
-                                        className="glass-button px-3 py-1"
-                                      >
-                                        +
-                                      </button>
+                                  return (
+                                    <div
+                                      key={`${product.id}-${safeVariantId}`}
+                                      className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
+                                    >
+                                      <span className="text-gray-700">{variant.size}</span>
+                                      <div className="flex items-center space-x-2">
+                                        <button
+                                          onClick={() => {
+                                            const newQuantity = Math.max(0, currentQuantity - 1);
+                                            handleQuantityChange(
+                                              product.id,
+                                              product.name,
+                                              safeVariantId,
+                                              variant.size,
+                                              variant.prices[userData.category],
+                                              newQuantity
+                                            );
+                                          }}
+                                          className="glass-button px-3 py-1"
+                                          disabled={currentQuantity === 0}
+                                        >
+                                          -
+                                        </button>
+                                        <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
+                                        <button
+                                          onClick={() => {
+                                            const newQuantity = currentQuantity + 1;
+                                            handleQuantityChange(
+                                              product.id,
+                                              product.name,
+                                              safeVariantId,
+                                              variant.size,
+                                              variant.prices[userData.category],
+                                              newQuantity
+                                            );
+                                          }}
+                                          className="glass-button px-3 py-1"
+                                        >
+                                          +
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
                             </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {Object.keys(groupedProducts).length === 0 && (
+                    <p className="text-center text-gray-500 py-8">
+                      {t('products.noResults')}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                // Categories Grid
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      className="glass-panel p-6 rounded-lg text-left hover:scale-105 transition-all duration-200"
+                    >
+                      <h2 className="text-xl font-semibold text-gray-800">
+                        {category.name}
+                      </h2>
+                    </button>
+                  ))}
+                </div>
+              )
+            ) : (
+              // Selected Category Products
+              <div className="space-y-4">
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
+                  >
+                    {product.icon && (
+                      <img
+                        src={product.icon}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
+                      />
+                    )}
+                    <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
+                      <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
+                      <div className="mt-2 space-y-2">
+                        {product.variants.map((variant, index) => {
+                          const safeVariantId = variant.id || `${product.id}-variant-${index}`;
+                          const orderItem = orderItems.find(
+                            item => item.productId === product.id && item.variantId === safeVariantId
+                          );
+                          const currentQuantity = orderItem?.quantity || 0;
+
+                          return (
+                            <div
+                              key={`${product.id}-${safeVariantId}`}
+                              className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
+                            >
+                              <span className="text-gray-700">{variant.size}</span>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => {
+                                    const newQuantity = Math.max(0, currentQuantity - 1);
+                                    handleQuantityChange(
+                                      product.id,
+                                      product.name,
+                                      safeVariantId,
+                                      variant.size,
+                                      variant.prices[userData.category],
+                                      newQuantity
+                                    );
+                                  }}
+                                  className="glass-button px-3 py-1"
+                                  disabled={currentQuantity === 0}
+                                >
+                                  -
+                                </button>
+                                <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
+                                <button
+                                  onClick={() => {
+                                    const newQuantity = currentQuantity + 1;
+                                    handleQuantityChange(
+                                      product.id,
+                                      product.name,
+                                      safeVariantId,
+                                      variant.size,
+                                      variant.prices[userData.category],
+                                      newQuantity
+                                    );
+                                  }}
+                                  className="glass-button px-3 py-1"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Order Summary Section */}
+          <>
+            {/* Desktop Order Summary */}
+            <div className="hidden lg:block sticky top-6 w-96">
+              <div className="glass-panel p-6 rounded-lg">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-gray-800">
+                    {t('products.orderSummary')}
+                  </h2>
+                  {orderItems.length > 0 && (
+                    <button
+                      onClick={() => setOrderItems([])}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+
+                {orderItems.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                    <ShoppingCart className="w-12 h-12 mb-4 text-gray-400" />
+                    <p>{t('products.emptyCart')}</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-4 mb-6">
+                      {orderItems.map((item, index) => (
+                        <div
+                          key={`${item.productId}-${item.variantId}-${index}`}
+                          className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
+                        >
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-gray-800">
+                              {item.productName}
+                            </h3>
+                            <p className="text-sm text-gray-600">{item.size}</p>
+                            <p className="text-sm text-gray-600">
+                              {t('products.quantity')}: {item.quantity}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-gray-800">
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </p>
+                            <button
+                              onClick={() => removeItem(item.productId, item.variantId)}
+                              className="text-red-600 hover:text-red-700 text-sm"
+                            >
+                              {t('products.remove')}
+                            </button>
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                ))}
-                {Object.keys(groupedProducts).length === 0 && (
-                  <p className="text-center text-gray-500 py-8">
-                    {t('products.noResults')}
-                  </p>
+
+                    <div className="border-t border-gray-200 pt-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-lg font-medium text-gray-800">
+                          {t('products.total')}
+                        </span>
+                        <span className="text-lg font-bold text-gray-800">
+                          ${calculateTotal().toFixed(2)}
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={handleSendOrder}
+                        disabled={sending || orderItems.length === 0}
+                        className="w-full flex justify-center items-center px-4 py-2 rounded-lg
+                          bg-indigo-600 text-white font-medium
+                          hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          transition-colors duration-200"
+                      >
+                        {sending ? (
+                          <LoadingSpinner />
+                        ) : (
+                          <>
+                            <Send className="w-5 h-5 mr-2" />
+                            {t('products.sendOrder')}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </>
                 )}
-              </div>
-            ) : (
-              // Categories Grid
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className="glass-panel p-6 rounded-lg text-left hover:scale-105 transition-all duration-200"
-                  >
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      {category.name}
-                    </h2>
-                  </button>
-                ))}
-              </div>
-            )
-          ) : (
-            // Selected Category Products
-            <div className="space-y-4">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
-                >
-                  {product.icon && (
-                    <img
-                      src={product.icon}
-                      alt={product.name}
-                      className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
-                    />
-                  )}
-                  <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
-                    <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-                    <div className="mt-2 space-y-2">
-                      {product.variants.map((variant, index) => {
-                        const safeVariantId = variant.id || `${product.id}-variant-${index}`;
-                        const orderItem = orderItems.find(
-                          item => item.productId === product.id && item.variantId === safeVariantId
-                        );
-                        const currentQuantity = orderItem?.quantity || 0;
-
-                        return (
-                          <div
-                            key={`${product.id}-${safeVariantId}`}
-                            className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
-                          >
-                            <span className="text-gray-700">{variant.size}</span>
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => {
-                                  const newQuantity = Math.max(0, currentQuantity - 1);
-                                  handleQuantityChange(
-                                    product.id,
-                                    product.name,
-                                    safeVariantId,
-                                    variant.size,
-                                    variant.prices[userData.category],
-                                    newQuantity
-                                  );
-                                }}
-                                className="glass-button px-3 py-1"
-                                disabled={currentQuantity === 0}
-                              >
-                                -
-                              </button>
-                              <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
-                              <button
-                                onClick={() => {
-                                  const newQuantity = currentQuantity + 1;
-                                  handleQuantityChange(
-                                    product.id,
-                                    product.name,
-                                    safeVariantId,
-                                    variant.size,
-                                    variant.prices[userData.category],
-                                    newQuantity
-                                  );
-                                }}
-                                className="glass-button px-3 py-1"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Order Summary Section */}
-        {orderItems.length > 0 && (
-          <>
-            {/* Desktop Order Summary */}
-            <div className="hidden lg:block w-96">
-              <div className="glass-panel p-6 rounded-lg sticky top-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-800">
-                    {t('products.orderSummary')}
-                  </h2>
-                  <button
-                    onClick={() => setOrderItems([])}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="space-y-4 mb-6">
-                  {orderItems.map((item, index) => (
-                    <div
-                      key={`${item.productId}-${item.variantId}-${index}`}
-                      className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
-                    >
-                      <div className="flex-1">
-                        <h3 className="text-sm font-medium text-gray-800">
-                          {item.productName}
-                        </h3>
-                        <p className="text-sm text-gray-600">{item.size}</p>
-                        <p className="text-sm text-gray-600">
-                          {t('products.quantity')}: {item.quantity}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-gray-800">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </p>
-                        <button
-                          onClick={() => removeItem(item.productId, item.variantId)}
-                          className="text-red-600 hover:text-red-700 text-sm"
-                        >
-                          {t('products.remove')}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-gray-200 pt-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-lg font-medium text-gray-800">
-                      {t('products.total')}
-                    </span>
-                    <span className="text-lg font-bold text-gray-800">
-                      ${calculateTotal().toFixed(2)}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={handleSendOrder}
-                    disabled={sending || orderItems.length === 0}
-                    className="w-full flex justify-center items-center px-4 py-2 rounded-lg
-                      bg-indigo-600 text-white font-medium
-                      hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      transition-colors duration-200"
-                  >
-                    {sending ? (
-                      <LoadingSpinner />
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5 mr-2" />
-                        {t('products.sendOrder')}
-                      </>
-                    )}
-                  </button>
-                </div>
               </div>
             </div>
 
             {/* Mobile Order Summary Modal/Drawer */}
             <div className="lg:hidden">
-              {/* Add a floating action button to show order summary */}
               <button
-                onClick={() => {
-                  // Implement showing the order summary modal/drawer
-                }}
+                onClick={() => setShowCart(true)}
                 className="fixed right-4 bottom-20 z-50 bg-indigo-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
               >
                 <ShoppingCart className="w-6 h-6" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-                  {orderItems.length}
-                </span>
+                {orderItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                    {orderItems.length}
+                  </span>
+                )}
               </button>
             </div>
           </>
-        )}
+        </div>
       </div>
     </div>
   );
