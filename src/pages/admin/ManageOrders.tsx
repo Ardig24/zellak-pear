@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { collection, query, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useTranslation } from 'react-i18next';
+import OrderInvoice from '../../components/OrderInvoice';
 
 interface OrderItem {
   productName: string;
@@ -28,6 +29,8 @@ export default function ManageOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'pending' | 'completed'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [invoiceError, setInvoiceError] = useState<string | null>(null);
   const { t } = useTranslation();
 
   // Add formatDate function
@@ -320,6 +323,14 @@ export default function ManageOrders() {
 
                   <div className="mt-6 flex gap-4">
                     <button
+                      onClick={() => setShowInvoice(true)}
+                      className="flex-1 glass-button bg-blue-500/30 hover:bg-blue-600/30 text-black py-2"
+                      disabled={selectedOrder.status !== 'completed'}
+                      style={{ opacity: selectedOrder.status !== 'completed' ? 0.5 : 1 }}
+                    >
+                      {t('admin.orders.createInvoice')}
+                    </button>
+                    <button
                       onClick={() => setSelectedOrder(null)}
                       className="flex-1 glass-button bg-gray-500/30 hover:bg-gray-600/30 text-black py-2"
                     >
@@ -344,6 +355,41 @@ export default function ManageOrders() {
                         : t('admin.orders.markPending')}
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Invoice Preview Modal */}
+          {showInvoice && selectedOrder && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+              <div className="glass-panel rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-black">
+                      {t('admin.orders.invoicePreview')}
+                    </h2>
+                    <button
+                      onClick={() => {
+                        setShowInvoice(false);
+                        setInvoiceError(null);
+                      }}
+                      className="text-gray-300 hover:text-black transition-colors"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  {invoiceError ? (
+                    <div className="p-4 bg-red-100 text-red-700 rounded-lg">
+                      {invoiceError}
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-lg overflow-hidden">
+                      <OrderInvoice order={selectedOrder} />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

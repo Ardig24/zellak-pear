@@ -39,6 +39,11 @@ body {
   @apply bg-white/30 backdrop-blur-md rounded-xl shadow-2xl p-8 border border-white/50;
 }
 
+/* Glass panel style */
+.glass-panel {
+  @apply bg-white/30 backdrop-blur-md border border-white/50;
+}
+
 /* Input styles */
 .input-field {
   @apply w-full px-4 py-3 rounded-lg 

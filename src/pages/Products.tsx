@@ -266,14 +266,14 @@ export default function Products() {
       </div>
 
       {/* Header */}
-      <div className="glass-panel shadow-lg">
+      <div className="glass-panel shadow-lg bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center space-x-4">
               {selectedCategory && (
                 <button
                   onClick={() => setSelectedCategory(null)}
-                  className="flex items-center text-gray-600 hover:text-gray-900"
+                  className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5 mr-1" />
                   {t('products.backToCategories')}
@@ -284,7 +284,7 @@ export default function Products() {
               <div className="hidden lg:block">
                 <Link
                   to="/orders"
-                  className="flex items-center text-gray-600 hover:text-gray-900"
+                  className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <ClipboardList className="w-5 h-5 mr-1" />
                   {t('orders.myOrders')}
@@ -293,7 +293,7 @@ export default function Products() {
               <LanguageSelector />
               <button
                 onClick={handleLogout}
-                className="flex items-center text-red-600 hover:text-red-700"
+                className="flex items-center text-red-600 hover:text-red-700 transition-colors"
               >
                 <LogOut className="w-5 h-5 mr-1" />
                 <span className="hidden sm:inline">{t('common.logout')}</span>
@@ -305,81 +305,6 @@ export default function Products() {
 
       {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
 
-      {/* Cart Modal */}
-      {showCart && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowCart(false)} />
-          <div className="relative min-h-screen flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-lg font-semibold">{t('products.myOrder')}</h2>
-                  <button onClick={() => setShowCart(false)} className="text-gray-500 hover:text-gray-700">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              
-              <div className="p-4">
-                {orderItems.length === 0 ? (
-                  <p className="text-center text-gray-500 py-4">{t('products.emptyCart')}</p>
-                ) : (
-                  <>
-                    <div className="space-y-4">
-                      {orderItems.map((item, index) => (
-                        <div
-                          key={`${item.productId}-${item.variantId}-${index}`}
-                          className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
-                        >
-                          <div>
-                            <p className="font-medium">{item.productName}</p>
-                            <p className="text-sm text-gray-500">{item.size}</p>
-                            <p className="text-sm text-gray-600">
-                              {t('products.quantity')}: {item.quantity} × ${item.price}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => removeItem(item.productId, item.variantId)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="font-semibold">{t('products.total')}:</span>
-                        <span className="font-semibold">${calculateTotal().toFixed(2)}</span>
-                      </div>
-                      
-                      <button
-                        onClick={() => {
-                          handleSendOrder();
-                          setShowCart(false);
-                        }}
-                        disabled={sending}
-                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {sending ? (
-                          <LoadingSpinner size="sm" />
-                        ) : (
-                          <Send className="w-5 h-5" />
-                        )}
-                        {t('products.sendOrder')}
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Search Bar */}
       <div className="max-w-7xl mx-auto px-4 pt-6">
         <div className="relative mb-6">
@@ -388,7 +313,7 @@ export default function Products() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('products.searchProducts')}
-            className="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full p-3 pl-10 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/80 backdrop-blur-sm"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         </div>
@@ -406,22 +331,22 @@ export default function Products() {
                   {Object.entries(groupedProducts).map(([categoryName, categoryProducts]) => (
                     <div key={categoryName}>
                       <h2 className="text-xl font-semibold mb-4">{categoryName}</h2>
-                      <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {categoryProducts.map((product) => (
                           <div
                             key={product.id}
-                            className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
+                            className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                           >
                             {product.icon && (
                               <img
                                 src={product.icon}
                                 alt={product.name}
-                                className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
+                                className="w-16 h-16 object-cover rounded-lg mb-4"
                               />
                             )}
-                            <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
-                              <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-                              <div className="mt-2 space-y-2">
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
+                              <div className="space-y-2">
                                 {product.variants.map((variant, index) => {
                                   const safeVariantId = variant.id || `${product.id}-variant-${index}`;
                                   const orderItem = orderItems.find(
@@ -432,9 +357,12 @@ export default function Products() {
                                   return (
                                     <div
                                       key={`${product.id}-${safeVariantId}`}
-                                      className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
+                                      className="flex items-center justify-between bg-white/50 p-2 rounded-lg"
                                     >
-                                      <span className="text-gray-700">{variant.size}</span>
+                                      <div>
+                                        <span className="text-gray-700 font-medium">{variant.size}</span>
+                                        <p className="text-sm text-gray-500">${variant.prices[userData.category]}</p>
+                                      </div>
                                       <div className="flex items-center space-x-2">
                                         <button
                                           onClick={() => {
@@ -448,12 +376,12 @@ export default function Products() {
                                               newQuantity
                                             );
                                           }}
-                                          className="glass-button px-3 py-1"
+                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                                           disabled={currentQuantity === 0}
                                         >
                                           -
                                         </button>
-                                        <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
+                                        <span className="w-8 text-center font-medium text-gray-800">{currentQuantity}</span>
                                         <button
                                           onClick={() => {
                                             const newQuantity = currentQuantity + 1;
@@ -466,7 +394,7 @@ export default function Products() {
                                               newQuantity
                                             );
                                           }}
-                                          className="glass-button px-3 py-1"
+                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"
                                         >
                                           +
                                         </button>
@@ -482,23 +410,32 @@ export default function Products() {
                     </div>
                   ))}
                   {Object.keys(groupedProducts).length === 0 && (
-                    <p className="text-center text-gray-500 py-8">
-                      {t('products.noResults')}
-                    </p>
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 text-lg">{t('products.noResults')}</p>
+                    </div>
                   )}
                 </div>
               ) : (
                 // Categories Grid
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {categories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className="glass-panel p-6 rounded-lg text-left hover:scale-105 transition-all duration-200"
+                      className="glass-panel p-6 rounded-xl text-left hover:scale-102 hover:shadow-md transition-all duration-200"
                     >
-                      <h2 className="text-xl font-semibold text-gray-800">
-                        {category.name}
-                      </h2>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden">
+                          {category.imageUrl ? (
+                            <img src={category.imageUrl} alt={category.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Coffee className="w-6 h-6 text-indigo-600" />
+                          )}
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-800">
+                          {category.name}
+                        </h2>
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -509,18 +446,18 @@ export default function Products() {
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="glass-panel p-4 rounded-lg flex flex-col sm:flex-row items-center"
+                    className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                   >
                     {product.icon && (
                       <img
                         src={product.icon}
                         alt={product.name}
-                        className="w-16 h-16 object-cover rounded mb-4 sm:mb-0"
+                        className="w-16 h-16 object-cover rounded-lg mb-4"
                       />
                     )}
-                    <div className="ml-0 sm:ml-4 flex-grow text-center sm:text-left">
-                      <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-                      <div className="mt-2 space-y-2">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
+                      <div className="space-y-2">
                         {product.variants.map((variant, index) => {
                           const safeVariantId = variant.id || `${product.id}-variant-${index}`;
                           const orderItem = orderItems.find(
@@ -531,9 +468,12 @@ export default function Products() {
                           return (
                             <div
                               key={`${product.id}-${safeVariantId}`}
-                              className="flex items-center justify-between bg-white/30 p-2 rounded-lg"
+                              className="flex items-center justify-between bg-white/50 p-2 rounded-lg"
                             >
-                              <span className="text-gray-700">{variant.size}</span>
+                              <div>
+                                <span className="text-gray-700 font-medium">{variant.size}</span>
+                                <p className="text-sm text-gray-500">${variant.prices[userData.category]}</p>
+                              </div>
                               <div className="flex items-center space-x-2">
                                 <button
                                   onClick={() => {
@@ -547,12 +487,12 @@ export default function Products() {
                                       newQuantity
                                     );
                                   }}
-                                  className="glass-button px-3 py-1"
+                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                                   disabled={currentQuantity === 0}
                                 >
                                   -
                                 </button>
-                                <span className="w-16 text-center text-gray-800">{currentQuantity}</span>
+                                <span className="w-8 text-center font-medium text-gray-800">{currentQuantity}</span>
                                 <button
                                   onClick={() => {
                                     const newQuantity = currentQuantity + 1;
@@ -565,7 +505,7 @@ export default function Products() {
                                       newQuantity
                                     );
                                   }}
-                                  className="glass-button px-3 py-1"
+                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"
                                 >
                                   +
                                 </button>

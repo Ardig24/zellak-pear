@@ -35,6 +35,20 @@ export interface OrderItem {
   size: string;
   quantity: number;
   price: number;
+  total: number;
+}
+
+export interface Order {
+  id: string;
+  items: OrderItem[];
+  companyName: string;
+  userEmail: string;
+  address: string;
+  contactNumber: string;
+  category: string;
+  status: 'pending' | 'completed';
+  total: number;
+  orderDate: string;
 }
 
 export interface Category {

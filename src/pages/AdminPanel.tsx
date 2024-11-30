@@ -1,7 +1,8 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { Users, Coffee, LogOut, FileText, ShoppingBag } from 'lucide-react';
+import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import Home from './admin/Home';
 import ManageUsers from './admin/ManageUsers';
 import ManageProducts from './admin/ManageProducts';
 import ManageOrders from './admin/ManageOrders';
@@ -34,10 +35,21 @@ export default function AdminPanel() {
             </div>
             <nav className="space-y-2">
               <Link
+                to="/admin"
+                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                  location.pathname === '/admin' || location.pathname === '/admin/'
+                    ? 'bg-indigo-600/90 text-white'
+                    : 'text-gray-700 hover:bg-white/50'
+                }`}
+              >
+                <HomeIcon className="w-5 h-5 mr-3" />
+                {t('admin.home')}
+              </Link>
+              <Link
                 to="/admin/users"
                 className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                  location.pathname.includes('/users') 
-                    ? 'bg-indigo-600/90 text-white' 
+                  location.pathname.includes('/admin/users')
+                    ? 'bg-indigo-600/90 text-white'
                     : 'text-gray-700 hover:bg-white/50'
                 }`}
               >
@@ -47,7 +59,7 @@ export default function AdminPanel() {
               <Link
                 to="/admin/products"
                 className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                  location.pathname.includes('/products')
+                  location.pathname.includes('/admin/products')
                     ? 'bg-indigo-600/90 text-white'
                     : 'text-gray-700 hover:bg-white/50'
                 }`}
@@ -58,7 +70,7 @@ export default function AdminPanel() {
               <Link
                 to="/admin/orders"
                 className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                  location.pathname.includes('/orders')
+                  location.pathname.includes('/admin/orders')
                     ? 'bg-indigo-600/90 text-white'
                     : 'text-gray-700 hover:bg-white/50'
                 }`}
@@ -69,7 +81,7 @@ export default function AdminPanel() {
               <Link
                 to="/admin/reports"
                 className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
-                  location.pathname.includes('/reports')
+                  location.pathname.includes('/admin/reports')
                     ? 'bg-indigo-600/90 text-white'
                     : 'text-gray-700 hover:bg-white/50'
                 }`}
@@ -94,16 +106,31 @@ export default function AdminPanel() {
           <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200 z-50">
             <nav className="flex justify-around items-center px-2 py-3">
               <Link
+                to="/admin"
+                className={`flex flex-col items-center min-w-[64px] ${
+                  location.pathname === '/admin' || location.pathname === '/admin/'
+                    ? 'text-indigo-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <HomeIcon className={`w-6 h-6 ${
+                  location.pathname === '/admin' || location.pathname === '/admin/'
+                    ? 'stroke-[2.5]'
+                    : 'stroke-2'
+                }`} />
+                <span className="text-xs mt-1 font-medium">{t('admin.home')}</span>
+              </Link>
+              <Link
                 to="/admin/users"
                 className={`flex flex-col items-center min-w-[64px] ${
-                  location.pathname.includes('/users') 
-                    ? 'text-indigo-600' 
+                  location.pathname.includes('/admin/users')
+                    ? 'text-indigo-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <Users className={`w-6 h-6 ${
-                  location.pathname.includes('/users') 
-                    ? 'stroke-[2.5]' 
+                  location.pathname.includes('/admin/users')
+                    ? 'stroke-[2.5]'
                     : 'stroke-2'
                 }`} />
                 <span className="text-xs mt-1 font-medium">{t('admin.users')}</span>
@@ -111,14 +138,14 @@ export default function AdminPanel() {
               <Link
                 to="/admin/products"
                 className={`flex flex-col items-center min-w-[64px] ${
-                  location.pathname.includes('/products')
+                  location.pathname.includes('/admin/products')
                     ? 'text-indigo-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <Coffee className={`w-6 h-6 ${
-                  location.pathname.includes('/products') 
-                    ? 'stroke-[2.5]' 
+                  location.pathname.includes('/admin/products')
+                    ? 'stroke-[2.5]'
                     : 'stroke-2'
                 }`} />
                 <span className="text-xs mt-1 font-medium">{t('admin.products')}</span>
@@ -126,14 +153,14 @@ export default function AdminPanel() {
               <Link
                 to="/admin/orders"
                 className={`flex flex-col items-center min-w-[64px] ${
-                  location.pathname.includes('/orders')
+                  location.pathname.includes('/admin/orders')
                     ? 'text-indigo-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <ShoppingBag className={`w-6 h-6 ${
-                  location.pathname.includes('/orders') 
-                    ? 'stroke-[2.5]' 
+                  location.pathname.includes('/admin/orders')
+                    ? 'stroke-[2.5]'
                     : 'stroke-2'
                 }`} />
                 <span className="text-xs mt-1 font-medium">{t('admin.orders')}</span>
@@ -141,14 +168,14 @@ export default function AdminPanel() {
               <Link
                 to="/admin/reports"
                 className={`flex flex-col items-center min-w-[64px] ${
-                  location.pathname.includes('/reports')
+                  location.pathname.includes('/admin/reports')
                     ? 'text-indigo-600'
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <FileText className={`w-6 h-6 ${
-                  location.pathname.includes('/reports') 
-                    ? 'stroke-[2.5]' 
+                  location.pathname.includes('/admin/reports')
+                    ? 'stroke-[2.5]'
                     : 'stroke-2'
                 }`} />
                 <span className="text-xs mt-1 font-medium">{t('admin.reports')}</span>
@@ -159,11 +186,12 @@ export default function AdminPanel() {
           {/* Routes */}
           <div className="p-4">
             <Routes>
-              <Route path="/" element={<Navigate to="/admin/users" />} />
+              <Route path="/" element={<Home />} />
               <Route path="/users" element={<ManageUsers />} />
               <Route path="/products" element={<ManageProducts />} />
               <Route path="/orders" element={<ManageOrders />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </div>
