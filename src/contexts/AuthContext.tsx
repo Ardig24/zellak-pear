@@ -102,6 +102,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = userDoc.data() as UserData;
       setUserData(data);
+      
+      // Store minimal session data
+      sessionStorage.setItem('isLoggedIn', 'true');
 
       // Navigate based on admin status
       navigate(data.isAdmin ? '/admin' : '/products');
@@ -118,11 +121,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signOut(auth);
       setCurrentUser(null);
       setUserData(null);
-      // Clear any local storage or session storage
-      localStorage.clear();
+      // Clear session data
       sessionStorage.clear();
-      // Force reload to clear any cached state
-      window.location.href = '/login';
+      // Use navigate instead of location.href to prevent full page reload
+      navigate('/login', { replace: true });
     } catch (err: any) {
       setError(err.message);
       throw err;
