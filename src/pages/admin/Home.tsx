@@ -3,13 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { collection, query, where, getDocs, orderBy, limit, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { Order, Todo } from '../../types';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -20,8 +19,7 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -34,7 +32,7 @@ export default function Home() {
   const [newTodoText, setNewTodoText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [salesData, setSalesData] = useState<ChartData<'line'>>({
+  const [salesData, setSalesData] = useState<ChartData<'bar'>>({
     labels: [],
     datasets: []
   });
@@ -133,9 +131,11 @@ export default function Home() {
             {
               label: t('admin.home.monthlySales'),
               data: sortedData.map(([, total]) => total),
-              borderColor: 'rgb(75, 192, 192)',
-              backgroundColor: 'rgba(75, 192, 192, 0.5)',
-              tension: 0.4
+              backgroundColor: 'rgba(59, 130, 246, 0.8)',
+              borderColor: 'rgba(37, 99, 235, 0.9)',
+              borderWidth: 1,
+              borderRadius: 5,
+              maxBarThickness: 50
             }
           ]
         });
@@ -209,105 +209,123 @@ export default function Home() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Pending Orders */}
-        <div className="glass-panel p-4 rounded-lg shadow-lg">
+        <div className="backdrop-blur-md bg-white/70 p-6 rounded-xl shadow-lg border border-white/20">
           <h2 className="text-lg font-semibold mb-4">{t('admin.home.pendingOrders')}</h2>
-          <div className="space-y-3">
+          <div className="h-[250px] overflow-y-auto">
             {loading ? (
-              <p className="text-gray-500 text-center py-4">Loading...</p>
+              <div className="flex justify-center items-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
             ) : error ? (
-              <p className="text-red-500 text-center py-4">{error}</p>
+              <div className="text-red-500 text-center">{error}</div>
             ) : pendingOrders.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">{t('admin.home.noPendingOrders')}</p>
+              <div className="text-gray-500 text-center">{t('admin.home.noPendingOrders')}</div>
             ) : (
-              pendingOrders.map(order => (
-                <div key={order.id} className="p-3 bg-white/50 rounded-lg">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium">{order.companyName}</p>
-                      <p className="text-sm text-gray-600">
-                        {order.orderDate && order.orderDate.toDate ? 
-                          order.orderDate.toDate().toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric'
-                          }) : 
-                          new Date(order.orderDate).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric'
-                          })}
-                      </p>
+              <div className="space-y-4">
+                {pendingOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="p-4 backdrop-blur-sm bg-white/50 rounded-lg border border-white/10 transition-all duration-200 hover:bg-white/60"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className="font-medium">{order.companyName}</span>
+                        <p className="text-sm text-gray-600">
+                          {order.orderDate && order.orderDate.toDate ? 
+                            order.orderDate.toDate().toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric'
+                            }) : 
+                            new Date(order.orderDate).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric'
+                            })}
+                        </p>
+                      </div>
+                      <span className="text-orange-600 font-medium">
+                        €{order.total.toFixed(2)}
+                      </span>
                     </div>
-                    <p className="font-semibold">€{order.total.toFixed(2)}</p>
+                    <div className="text-sm text-gray-600">
+                      {order.items.length} {t('admin.home.items')}
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>
 
         {/* Todo List */}
-        <div className="glass-panel p-4 rounded-lg shadow-lg">
+        <div className="backdrop-blur-md bg-white/70 p-6 rounded-xl shadow-lg border border-white/20">
           <h2 className="text-lg font-semibold mb-4">{t('admin.home.todoList')}</h2>
           
-          {/* Add Todo Form */}
-          <form onSubmit={handleAddTodo} className="mb-4 flex gap-2">
-            <input
-              type="text"
-              value={newTodoText}
-              onChange={(e) => setNewTodoText(e.target.value)}
-              placeholder={t('admin.home.newTodo')}
-              className="flex-1 p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
-            >
-              {t('admin.home.add')}
-            </button>
+          {/* Todo Input Form */}
+          <form onSubmit={handleAddTodo} className="mb-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newTodoText}
+                onChange={(e) => setNewTodoText(e.target.value)}
+                placeholder={t('admin.home.newTodoPlaceholder')}
+                className="flex-1 px-4 py-2.5 backdrop-blur-sm bg-white/50 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2.5 bg-blue-600/90 text-white rounded-lg hover:bg-blue-700/90 transition-colors duration-200 backdrop-blur-sm"
+              >
+                {t('common.add')}
+              </button>
+            </div>
           </form>
 
           {/* Todo List */}
-          <div className="space-y-2">
-            {todos.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">{t('admin.home.noTodos')}</p>
-            ) : (
-              todos.map(todo => (
-                <div
-                  key={todo.id}
-                  className="flex items-center justify-between p-3 bg-white/50 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={todo.completed}
-                      onChange={() => toggleTodo(todo.id)}
-                      className="w-4 h-4"
-                    />
-                    <span className={todo.completed ? 'line-through text-gray-500' : ''}>
-                      {todo.text}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => deleteTodo(todo.id)}
-                    className="text-red-500 hover:text-red-700 focus:outline-none"
-                  >
-                    ×
-                  </button>
+          <div className="h-[200px] overflow-y-auto">
+            {todos.map((todo) => (
+              <div
+                key={todo.id}
+                className="flex items-center justify-between p-4 border-b border-white/10 last:border-b-0 hover:bg-white/40 transition-colors duration-200"
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => toggleTodo(todo.id)}
+                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500/50"
+                  />
+                  <span className={todo.completed ? 'line-through text-gray-400' : ''}>
+                    {todo.text}
+                  </span>
                 </div>
-              ))
-            )}
+                <button
+                  onClick={() => deleteTodo(todo.id)}
+                  className="text-red-500/90 hover:text-red-700/90 focus:outline-none transition-colors duration-200"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Sales Chart */}
-      <div className="mt-6">
-        <div className="glass-panel p-4 rounded-lg shadow-lg">
+        {/* Sales Chart */}
+        <div className="md:col-span-2 backdrop-blur-md bg-white/70 p-6 rounded-xl shadow-lg border border-white/20">
           <h2 className="text-lg font-semibold mb-4">{t('admin.home.salesChart')}</h2>
           <div className="w-full h-[300px]">
-            <Line
-              data={salesData}
+            <Bar
+              data={{
+                ...salesData,
+                datasets: salesData.datasets.map(dataset => ({
+                  ...dataset,
+                  backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                  borderColor: 'rgba(37, 99, 235, 0.9)',
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  maxBarThickness: 50
+                }))
+              }}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
@@ -317,14 +335,27 @@ export default function Home() {
                   },
                   title: {
                     display: true,
-                    text: t('admin.home.salesOverTime')
+                    text: t('admin.home.salesOverTime'),
+                    color: '#374151'
                   }
                 },
                 scales: {
                   y: {
                     beginAtZero: true,
+                    grid: {
+                      color: 'rgba(107, 114, 128, 0.1)'
+                    },
                     ticks: {
-                      callback: (value) => `€${value}`
+                      callback: (value) => `€${value}`,
+                      color: '#374151'
+                    }
+                  },
+                  x: {
+                    grid: {
+                      color: 'rgba(107, 114, 128, 0.1)'
+                    },
+                    ticks: {
+                      color: '#374151'
                     }
                   }
                 }

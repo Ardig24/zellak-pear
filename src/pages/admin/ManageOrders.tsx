@@ -100,7 +100,7 @@ export default function ManageOrders() {
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'pending' | 'completed')}
-              className="w-full sm:w-auto glass-input px-4 py-2 rounded-lg text-black"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg text-black border border-gray-200 bg-white shadow-sm"
             >
               <option value="all">{t('admin.orders.all')}</option>
               <option value="pending">{t('admin.orders.pending')}</option>
@@ -114,7 +114,7 @@ export default function ManageOrders() {
               {filteredOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="glass-panel p-4 rounded-lg space-y-4 hover:bg-white/10 transition-colors duration-200"
+                  className="bg-white p-4 rounded-lg space-y-4 hover:bg-gray-50 transition-colors duration-200 shadow-sm border border-gray-200"
                   onClick={() => setSelectedOrder(order)}
                 >
                   <div className="flex justify-between items-start">
@@ -154,10 +154,10 @@ export default function ManageOrders() {
                         order.status === 'pending' ? 'completed' : 'pending'
                       );
                     }}
-                    className={`w-full glass-button px-4 py-2 rounded-lg transition-all duration-200 ${
+                    className={`w-full px-4 py-2 rounded-lg transition-all duration-200 ${
                       order.status === 'pending'
-                        ? 'hover:bg-green-500/30'
-                        : 'hover:bg-yellow-500/30'
+                        ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
+                        : 'bg-white border border-yellow-500 text-yellow-700 hover:bg-yellow-50'
                     }`}
                   >
                     {order.status === 'pending' 
@@ -170,10 +170,10 @@ export default function ManageOrders() {
           </div>
 
           {/* Desktop View - Table */}
-          <div className="hidden lg:block glass-panel rounded-lg">
+          <div className="hidden lg:block bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="max-h-[calc(100vh-250px)] overflow-y-auto">
-              <table className="min-w-full glass-table">
-                <thead className="sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="sticky top-0 bg-white z-10">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider">
                       {t('admin.orders.orderDate')}
@@ -195,11 +195,11 @@ export default function ManageOrders() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200/30">
+                <tbody className="divide-y divide-gray-200">
                   {filteredOrders.map((order) => (
                     <tr 
                       key={order.id} 
-                      className="hover:bg-white/10 transition-colors duration-200 cursor-pointer"
+                      className="hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
                       onClick={() => setSelectedOrder(order)}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -234,10 +234,10 @@ export default function ManageOrders() {
                               order.status === 'pending' ? 'completed' : 'pending'
                             );
                           }}
-                          className={`glass-button px-4 py-2 rounded-lg transition-all duration-200 ${
+                          className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                             order.status === 'pending'
-                              ? 'hover:bg-green-500/30'
-                              : 'hover:bg-yellow-500/30'
+                              ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
+                              : 'bg-white border border-yellow-500 text-yellow-700 hover:bg-yellow-50'
                           }`}
                         >
                           {order.status === 'pending' 
@@ -254,8 +254,8 @@ export default function ManageOrders() {
 
           {/* Order Details Modal */}
           {selectedOrder && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="glass-panel rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-lg">
                 <div className="p-4 sm:p-6">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl sm:text-2xl font-bold text-black drop-shadow-lg">
@@ -272,12 +272,12 @@ export default function ManageOrders() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
-                    <div className="glass-panel p-4 rounded-lg">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                       <h3 className="font-semibold mb-2 text-black">{t('admin.orders.company')}</h3>
                       <p className="text-black">{selectedOrder.companyName}</p>
                       <p className="text-gray-600">{selectedOrder.category}</p>
                     </div>
-                    <div className="glass-panel p-4 rounded-lg">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                       <h3 className="font-semibold mb-2 text-black">{t('admin.orders.contact')}</h3>
                       <p className="text-black">{selectedOrder.userEmail}</p>
                       <p className="text-black">{selectedOrder.contactNumber}</p>
@@ -285,10 +285,10 @@ export default function ManageOrders() {
                     </div>
                   </div>
 
-                  <div className="glass-panel p-4 rounded-lg">
+                  <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                     <h3 className="font-semibold mb-4 text-black">{t('admin.orders.items')}</h3>
                     <div className="overflow-x-auto">
-                      <table className="min-w-full glass-table mb-4">
+                      <table className="min-w-full divide-y divide-gray-200 mb-4">
                         <thead>
                           <tr>
                             <th className="px-4 py-2 text-left text-black">{t('admin.orders.productName')}</th>
@@ -324,7 +324,7 @@ export default function ManageOrders() {
                   <div className="mt-6 flex gap-4">
                     <button
                       onClick={() => setShowInvoice(true)}
-                      className="flex-1 glass-button bg-blue-500/30 hover:bg-blue-600/30 text-black py-2"
+                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-lg border border-blue-300"
                       disabled={selectedOrder.status !== 'completed'}
                       style={{ opacity: selectedOrder.status !== 'completed' ? 0.5 : 1 }}
                     >
@@ -332,7 +332,7 @@ export default function ManageOrders() {
                     </button>
                     <button
                       onClick={() => setSelectedOrder(null)}
-                      className="flex-1 glass-button bg-gray-500/30 hover:bg-gray-600/30 text-black py-2"
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg border border-gray-300"
                     >
                       {t('common.close')}
                     </button>
@@ -344,10 +344,10 @@ export default function ManageOrders() {
                         );
                         setSelectedOrder(null);
                       }}
-                      className={`flex-1 glass-button py-2 ${
+                      className={`flex-1 py-2 rounded-lg ${
                         selectedOrder.status === 'pending'
-                          ? 'bg-green-500/30 hover:bg-green-600/30'
-                          : 'bg-yellow-500/30 hover:bg-yellow-600/30'
+                          ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
+                          : 'bg-white border border-yellow-500 text-yellow-700 hover:bg-yellow-50'
                       }`}
                     >
                       {selectedOrder.status === 'pending'
@@ -362,8 +362,8 @@ export default function ManageOrders() {
 
           {/* Invoice Preview Modal */}
           {showInvoice && selectedOrder && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
-              <div className="glass-panel rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+              <div className="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-lg">
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-black">
@@ -386,7 +386,7 @@ export default function ManageOrders() {
                       {invoiceError}
                     </div>
                   ) : (
-                    <div className="bg-white rounded-lg overflow-hidden">
+                    <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
                       <OrderInvoice order={selectedOrder} />
                     </div>
                   )}

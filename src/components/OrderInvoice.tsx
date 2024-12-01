@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer';
 import { Order, OrderItem } from '../types';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -48,6 +50,7 @@ const styles = StyleSheet.create({
 
 interface OrderInvoiceProps {
   order: Order;
+  onClose?: () => void;
 }
 
 const InvoiceDocument: React.FC<{ order: Order }> = ({ order }) => (
@@ -116,17 +119,59 @@ const InvoiceDocument: React.FC<{ order: Order }> = ({ order }) => (
   </Document>
 );
 
-const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order }) => {
+const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Use useEffect to set loading to false after a short delay
   useEffect(() => {
+    const saveInvoice = async () => {
+      try {
+        // Create invoice number (YYYY-MM-[4-digit-sequence])
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const invoiceNumber = `${year}-${month}-${random}`;
+
+        // Save invoice to Firestore
+        const invoiceData = {
+          orderId: order.id,
+          invoiceNumber,
+          companyName: order.companyName,
+          userEmail: order.userEmail,
+          address: order.address,
+          contactNumber: order.contactNumber,
+          items: order.items,
+          total: order.total,
+          createdAt: Timestamp.now(),
+          orderDate: order.orderDate
+        };
+
+        await addDoc(collection(db, 'invoices'), invoiceData);
+      } catch (err) {
+        console.error('Error saving invoice:', err);
+        setError('Failed to save invoice');
+      }
+    };
+
+    // Save the invoice when component mounts
+    saveInvoice();
+
+    // Set loading to false after a short delay
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [order]);
+
+  if (error) {
+    return (
+      <div className="w-full p-4 text-center text-red-600">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-[70vh] relative">

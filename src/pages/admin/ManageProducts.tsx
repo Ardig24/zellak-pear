@@ -242,14 +242,14 @@ export default function ManageProducts() {
           <div className="flex gap-2">
             <button
               onClick={() => setIsManagingCategories(true)}
-              className="glass-button px-4 py-2 rounded-lg flex items-center gap-2"
+              className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors duration-200"
             >
               <Settings className="w-5 h-5" />
               <span className="hidden sm:inline">{t('admin.products.manageCategories')}</span>
             </button>
             <button
               onClick={() => setIsAddingProduct(true)}
-              className="glass-button-primary px-4 py-2 rounded-lg flex items-center gap-2"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors duration-200 shadow-sm"
             >
               <Plus className="w-5 h-5" />
               <span>{t('admin.products.addNew')}</span>
@@ -258,7 +258,7 @@ export default function ManageProducts() {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="glass-panel p-4 rounded-lg mb-6">
+        <div className="bg-white p-4 rounded-lg mb-6 shadow-sm border border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="relative">
               <input
@@ -266,7 +266,7 @@ export default function ManageProducts() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('admin.products.searchPlaceholder')}
-                className="w-full glass-input pl-10 pr-4 py-2 rounded-lg text-black"
+                className="w-full px-3 py-2 rounded-lg text-black border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white pl-10"
               />
               <svg
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -286,7 +286,7 @@ export default function ManageProducts() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full glass-input px-4 py-2 rounded-lg text-black"
+                className="w-full px-3 py-2 rounded-lg text-black border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
               >
                 <option value="all">{t('admin.products.allCategories')}</option>
                 {categories.map((category) => (
@@ -304,69 +304,48 @@ export default function ManageProducts() {
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="glass-panel p-4 rounded-lg hover:bg-white/10 transition-colors duration-200"
+              className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
             >
-              <div className="flex gap-4">
-                <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                  {product.icon ? (
-                    typeof product.icon === 'string' ? (
-                      <img
-                        src={product.icon}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={URL.createObjectURL(product.icon)}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    )
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                      <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-black truncate">{product.name}</h3>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{product.name}</h3>
                   <p className="text-sm text-gray-600">
                     {categories.find(c => c.id === product.category)?.name}
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {product.variants.map((variant) => (
-                      <span
-                        key={variant.id}
-                        className="px-2 py-0.5 text-xs rounded-full bg-gray-200/50 text-black"
-                      >
-                        {variant.size}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-sm font-medium text-black">
-                      {t('admin.products.basePrice')}: €{product.variants[0]?.prices.A.toFixed(2)}
-                    </p>
-                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => startEdit(product)}
+                    className="p-1.5 rounded-lg bg-white border border-blue-500 text-blue-700 hover:bg-blue-50 transition-colors duration-200"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="p-1.5 rounded-lg bg-white border border-red-500 text-red-700 hover:bg-red-50 transition-colors duration-200"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-
-              <div className="mt-4 flex gap-2">
-                <button
-                  onClick={() => startEdit(product)}
-                  className="flex-1 glass-button px-4 py-2 rounded-lg hover:bg-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  <Pencil className="w-4 h-4" />
-                  <span>{t('admin.products.edit')}</span>
-                </button>
-                <button
-                  onClick={() => handleDeleteProduct(product.id)}
-                  className="glass-button px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all duration-200 flex items-center justify-center"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              
+              {/* Product Variants */}
+              <div className="space-y-2">
+                {product.variants.map((variant) => (
+                  <div
+                    key={variant.id}
+                    className="bg-gray-50 p-2 rounded-lg border border-gray-100"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium text-gray-700">{variant.size}</span>
+                      <div className="flex gap-2 text-sm">
+                        <span className="text-gray-600">A: €{variant.prices.A}</span>
+                        <span className="text-gray-600">B: €{variant.prices.B}</span>
+                        <span className="text-gray-600">C: €{variant.prices.C}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -396,239 +375,173 @@ export default function ManageProducts() {
         {/* Add/Edit Product Modal */}
         {(isAddingProduct || editingProduct) && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="glass-panel rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-200 p-4">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-black">
-                    {editingProduct ? t('admin.products.editProduct') : t('admin.products.addNew')}
+            <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {editingProduct ? t('admin.products.editProduct') : t('admin.products.addProduct')}
                   </h2>
                   <button
-                    onClick={() => {
-                      setIsAddingProduct(false);
-                      setEditingProduct(null);
-                      resetForm();
-                    }}
-                    className="text-gray-500 hover:text-gray-700"
+                    onClick={resetForm}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     <X className="w-6 h-6" />
                   </button>
                 </div>
-              </div>
 
-              <form onSubmit={handleSubmit} className="p-4">
-                <div className="space-y-6">
-                  {/* Product Image */}
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">
-                      {t('admin.products.image')}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('admin.products.name')}
                     </label>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                        {formData.icon ? (
-                          typeof formData.icon === 'string' ? (
-                            <img
-                              src={formData.icon}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <img
-                              src={URL.createObjectURL(formData.icon)}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          )
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                            <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="glass-button px-4 py-2 rounded-lg"
-                        >
-                          {t('admin.products.uploadImage')}
-                        </button>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                      </div>
-                    </div>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                      required
+                    />
                   </div>
 
-                  {/* Basic Info */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-black mb-1">
-                        {t('admin.products.name')}
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full glass-input px-4 py-2 rounded-lg"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-black mb-1">
-                        {t('admin.products.category')}
-                      </label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full glass-input px-4 py-2 rounded-lg"
-                        required
-                      >
-                        <option value="">{t('admin.products.selectCategory')}</option>
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Variants */}
                   <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="block text-sm font-medium text-black">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('admin.products.category')}
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                      required
+                    >
+                      <option value="">{t('admin.products.selectCategory')}</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('admin.products.icon')}
+                    </label>
+                    <input
+                      type="file"
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      ref={fileInputRef}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition-colors duration-200"
+                    >
+                      {t('admin.products.chooseFile')}
+                    </button>
+                  </div>
+
+                  {/* Variants Section */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium text-gray-900">
                         {t('admin.products.variants')}
-                      </label>
+                      </h3>
                       <button
                         type="button"
                         onClick={addVariant}
-                        className="glass-button-primary px-3 py-1 rounded-lg text-sm flex items-center gap-1"
+                        className="bg-white border border-blue-500 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors duration-200 flex items-center gap-1"
                       >
                         <Plus className="w-4 h-4" />
                         {t('admin.products.addVariant')}
                       </button>
                     </div>
 
-                    <div className="space-y-4">
-                      {formData.variants.map((variant, index) => (
-                        <div
-                          key={variant.id}
-                          className="glass-panel p-4 rounded-lg relative"
-                        >
-                          <button
-                            type="button"
-                            onClick={() => removeVariant(index)}
-                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
-                            disabled={formData.variants.length === 1}
-                          >
-                            <X className="w-5 h-5" />
-                          </button>
+                    {formData.variants.map((variant, index) => (
+                      <div
+                        key={variant.id}
+                        className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                      >
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="font-medium text-gray-900">
+                            {t('admin.products.variant')} {index + 1}
+                          </h4>
+                          {formData.variants.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeVariant(index)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-black mb-1">
-                                {t('admin.products.size')}
-                              </label>
-                              <input
-                                type="text"
-                                value={variant.size}
-                                onChange={(e) => updateVariant(index, 'size', e.target.value)}
-                                className="w-full glass-input px-4 py-2 rounded-lg"
-                                required
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-black mb-1">
-                                {t('admin.products.priceA')}
-                              </label>
-                              <input
-                                type="number"
-                                value={variant.prices.A}
-                                onChange={(e) => updateVariant(index, 'price.A', e.target.value)}
-                                className="w-full glass-input px-4 py-2 rounded-lg"
-                                required
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-black mb-1">
-                                {t('admin.products.priceB')}
-                              </label>
-                              <input
-                                type="number"
-                                value={variant.prices.B}
-                                onChange={(e) => updateVariant(index, 'price.B', e.target.value)}
-                                className="w-full glass-input px-4 py-2 rounded-lg"
-                                required
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-black mb-1">
-                                {t('admin.products.priceC')}
-                              </label>
-                              <input
-                                type="number"
-                                value={variant.prices.C}
-                                onChange={(e) => updateVariant(index, 'price.C', e.target.value)}
-                                className="w-full glass-input px-4 py-2 rounded-lg"
-                                required
-                                min="0"
-                                step="0.01"
-                              />
-                            </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {t('admin.products.size')}
+                            </label>
+                            <input
+                              type="text"
+                              value={variant.size}
+                              onChange={(e) => updateVariant(index, 'size', e.target.value)}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                              required
+                            />
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            {['A', 'B', 'C'].map((category) => (
+                              <div key={category}>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  {t('admin.products.price')} {category}
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  value={variant.prices[category as 'A' | 'B' | 'C']}
+                                  onChange={(e) => updateVariant(index, `price.${category}`, e.target.value)}
+                                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                                  required
+                                />
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
 
-                <div className="mt-6 flex gap-3">
-                  <button
-                    type="submit"
-                    className="flex-1 glass-button-primary px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <LoadingSpinner size="sm" />
-                    ) : (
-                      <Plus className="w-5 h-5" />
-                    )}
-                    {editingProduct ? t('admin.products.saveChanges') : t('admin.products.addProduct')}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAddingProduct(false);
-                      setEditingProduct(null);
-                      resetForm();
-                    }}
-                    className="glass-button px-4 py-2 rounded-lg"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                </div>
-              </form>
+                  <div className="flex gap-4 pt-4">
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="flex-1 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    >
+                      {editingProduct ? t('common.save') : t('common.add')}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Category Management Modal */}
+        {/* Manage Categories Modal */}
         {isManagingCategories && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="glass-panel rounded-lg w-full max-w-lg">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg w-full max-w-lg shadow-xl">
               <div className="p-4 border-b border-gray-200">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-black">
+                  <h2 className="text-xl font-bold text-gray-900">
                     {t('admin.products.manageCategories')}
                   </h2>
                   <button
@@ -665,7 +578,7 @@ export default function ManageProducts() {
                     <button
                       type="button"
                       onClick={() => categoryImageInputRef.current?.click()}
-                      className="glass-button px-4 py-2 rounded-lg"
+                      className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                     >
                       {t('admin.products.uploadImage')}
                     </button>
@@ -684,12 +597,12 @@ export default function ManageProducts() {
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       placeholder={t('admin.products.newCategoryPlaceholder')}
-                      className="flex-1 glass-input px-4 py-2 rounded-lg"
+                      className="flex-1 px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
                       required
                     />
                     <button
                       type="submit"
-                      className="glass-button-primary px-4 py-2 rounded-lg flex items-center gap-2"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                       disabled={!newCategoryName.trim() || loading}
                     >
                       {loading ? (
@@ -703,7 +616,7 @@ export default function ManageProducts() {
                       <button
                         type="button"
                         onClick={cancelEditCategory}
-                        className="glass-button px-4 py-2 rounded-lg"
+                        className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                       >
                         {t('common.cancel')}
                       </button>
@@ -716,7 +629,7 @@ export default function ManageProducts() {
                   {categories.map((category) => (
                     <div
                       key={category.id}
-                      className="glass-panel p-4 rounded-lg flex items-center justify-between gap-4"
+                      className="bg-white p-4 rounded-lg flex items-center justify-between gap-4 border border-gray-200"
                     >
                       <div className="flex items-center gap-3">
                         {category.imageUrl && (
@@ -728,7 +641,7 @@ export default function ManageProducts() {
                             />
                           </div>
                         )}
-                        <span className="font-medium text-black">{category.name}</span>
+                        <span className="font-medium text-gray-900">{category.name}</span>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -765,7 +678,7 @@ export default function ManageProducts() {
                     setIsManagingCategories(false);
                     cancelEditCategory();
                   }}
-                  className="w-full glass-button px-4 py-2 rounded-lg"
+                  className="w-full bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                 >
                   {t('common.close')}
                 </button>

@@ -130,14 +130,28 @@ export default function Products() {
     return acc;
   }, {} as Record<string, typeof products>);
 
+  // Add mesh gradient style
+  const meshGradientStyle = {
+    backgroundImage: `
+      radial-gradient(at 40% 20%, hsla(210, 100%, 93%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(189, 100%, 91%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(240, 100%, 91%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(22, 100%, 92%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 100%, hsla(242, 100%, 91%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, hsla(343, 100%, 92%, 1) 0px, transparent 50%)
+    `,
+    backgroundColor: '#f1f5f9'
+  };
+
   return (
-    <div className="min-h-screen app-page">
+    <div className="min-h-screen app-page" style={meshGradientStyle}>
       {/* Mobile Cart Modal */}
       {showCart && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowCart(false)} />
-          <div className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white rounded-t-2xl shadow-xl transform transition-transform duration-300 ease-out">
-            <div className="p-4 border-b border-gray-200">
+          <div className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white/70 backdrop-blur-md shadow-xl transform transition-transform duration-300 ease-out">
+            <div className="p-4 border-b border-white/20">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">{t('products.myOrder')}</h2>
                 <button onClick={() => setShowCart(false)} className="text-gray-500 hover:text-gray-700">
@@ -188,7 +202,7 @@ export default function Products() {
                         setShowCart(false);
                       }}
                       disabled={sending}
-                      className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 backdrop-blur-sm"
                     >
                       {sending ? (
                         <LoadingSpinner size="sm" />
@@ -206,13 +220,13 @@ export default function Products() {
       )}
 
       {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-gray-200 z-50">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg border-t border-white/20 z-50">
         <nav className="flex justify-around items-center px-2 py-3">
           <button
             onClick={() => setSelectedCategory(null)}
             className={`flex flex-col items-center min-w-[64px] ${
               !selectedCategory 
-                ? 'text-indigo-600' 
+                ? 'text-blue-600' 
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -229,7 +243,7 @@ export default function Products() {
             onClick={() => setShowCart(!showCart)}
             className={`flex flex-col items-center min-w-[64px] relative ${
               orderItems.length > 0 
-                ? 'text-indigo-600' 
+                ? 'text-blue-600' 
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -251,7 +265,7 @@ export default function Products() {
             to="/orders"
             className={`flex flex-col items-center min-w-[64px] ${
               location.pathname === '/orders'
-                ? 'text-indigo-600'
+                ? 'text-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -313,7 +327,7 @@ export default function Products() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={t('products.searchProducts')}
-            className="w-full p-3 pl-10 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white/80 backdrop-blur-sm"
+            className="w-full p-3 pl-10 border border-white/20 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all bg-white/70 backdrop-blur-sm"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         </div>
@@ -335,7 +349,7 @@ export default function Products() {
                         {categoryProducts.map((product) => (
                           <div
                             key={product.id}
-                            className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                            className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                           >
                             {product.icon && (
                               <img
@@ -376,7 +390,7 @@ export default function Products() {
                                               newQuantity
                                             );
                                           }}
-                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20"
                                           disabled={currentQuantity === 0}
                                         >
                                           -
@@ -394,7 +408,7 @@ export default function Products() {
                                               newQuantity
                                             );
                                           }}
-                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"
+                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20"
                                         >
                                           +
                                         </button>
@@ -422,14 +436,14 @@ export default function Products() {
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className="glass-panel p-6 rounded-xl text-left hover:scale-102 hover:shadow-md transition-all duration-200"
+                      className="glass-panel p-6 rounded-xl text-left hover:scale-102 hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden">
+                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
                           {category.imageUrl ? (
                             <img src={category.imageUrl} alt={category.name} className="w-full h-full object-cover" />
                           ) : (
-                            <Coffee className="w-6 h-6 text-indigo-600" />
+                            <Coffee className="w-6 h-6 text-blue-600" />
                           )}
                         </div>
                         <h2 className="text-xl font-semibold text-gray-800">
@@ -446,7 +460,7 @@ export default function Products() {
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                    className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                   >
                     {product.icon && (
                       <img
@@ -487,7 +501,7 @@ export default function Products() {
                                       newQuantity
                                     );
                                   }}
-                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20"
                                   disabled={currentQuantity === 0}
                                 >
                                   -
@@ -505,7 +519,7 @@ export default function Products() {
                                       newQuantity
                                     );
                                   }}
-                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition-colors"
+                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20"
                                 >
                                   +
                                 </button>
@@ -525,7 +539,7 @@ export default function Products() {
           <>
             {/* Desktop Order Summary */}
             <div className="hidden lg:block sticky top-6 w-96">
-              <div className="glass-panel p-6 rounded-lg">
+              <div className="glass-panel p-6 rounded-lg backdrop-blur-md bg-white/70 border border-white/20">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-gray-800">
                     {t('products.orderSummary')}
@@ -591,9 +605,9 @@ export default function Products() {
                         onClick={handleSendOrder}
                         disabled={sending || orderItems.length === 0}
                         className="w-full flex justify-center items-center px-4 py-2 rounded-lg
-                          bg-indigo-600 text-white font-medium
-                          hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                          disabled:opacity-50 disabled:cursor-not-allowed
+                          bg-blue-600 text-white font-medium
+                          hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                          disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm
                           transition-colors duration-200"
                       >
                         {sending ? (
@@ -615,7 +629,7 @@ export default function Products() {
             <div className="lg:hidden">
               <button
                 onClick={() => setShowCart(true)}
-                className="fixed right-4 bottom-20 z-50 bg-indigo-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
+                className="fixed right-4 bottom-20 z-50 bg-blue-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {orderItems.length > 0 && (

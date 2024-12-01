@@ -109,8 +109,21 @@ export default function NewOrderHistory() {
     }
   };
 
+  const meshGradientStyle = {
+    backgroundImage: `
+      radial-gradient(at 40% 20%, hsla(210, 100%, 93%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(189, 100%, 91%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, hsla(240, 100%, 91%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(22, 100%, 92%, 1) 0px, transparent 50%),
+      radial-gradient(at 80% 100%, hsla(242, 100%, 91%, 1) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, hsla(343, 100%, 92%, 1) 0px, transparent 50%)
+    `,
+    backgroundColor: '#f1f5f9'
+  };
+
   return (
-    <div className="min-h-screen app-page pb-20 lg:pb-6">
+    <div className="min-h-screen app-page" style={meshGradientStyle}>
       {/* Header */}
       <div className="glass-panel shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
