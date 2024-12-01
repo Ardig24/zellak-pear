@@ -214,6 +214,21 @@ export default function AdminPanel() {
           </div>
         )}
 
+        {/* Desktop Notification Icon */}
+        <div className="hidden lg:block fixed top-4 right-4 z-50">
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 rounded-lg hover:bg-white/20 transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20 shadow-lg"
+          >
+            <Bell className={`w-6 h-6 ${hasNewNotification ? 'text-blue-600' : 'text-gray-600'}`} />
+            {newOrders.length > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1 -translate-y-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {newOrders.length}
+              </span>
+            )}
+          </button>
+        </div>
+
         {/* Desktop Sidebar */}
         <div className="hidden lg:block w-64 flex-shrink-0 h-full overflow-y-auto">
           <div className="backdrop-blur-md bg-white/70 rounded-xl p-6 m-4 sticky top-4 border border-white/20 shadow-lg">
@@ -306,8 +321,7 @@ export default function AdminPanel() {
           <div className="container mx-auto p-4">
             {/* Notification Panel */}
             {showNotifications && (
-              <div className="absolute top-16 right-4 lg:right-8 lg:top-8 w-80 bg-white/90 backdrop-blur-md rounded-xl shadow-xl border border-white/20 z-50">
-                {/* Rest of the notification panel code */}
+              <div className="fixed right-4 mt-2 w-80 backdrop-blur-md bg-white/70 rounded-lg shadow-lg border border-white/20 z-50 lg:top-16 top-16">
                 <div className="p-3 border-b border-gray-200">
                   <h3 className="text-sm font-semibold text-gray-700">
                     {t('admin.notifications.newOrders')}
