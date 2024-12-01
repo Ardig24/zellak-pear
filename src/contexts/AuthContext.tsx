@@ -118,7 +118,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signOut(auth);
       setCurrentUser(null);
       setUserData(null);
-      navigate('/login');
+      // Clear any local storage or session storage
+      localStorage.clear();
+      sessionStorage.clear();
+      // Force reload to clear any cached state
+      window.location.href = '/login';
     } catch (err: any) {
       setError(err.message);
       throw err;
