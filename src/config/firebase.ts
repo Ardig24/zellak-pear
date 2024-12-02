@@ -3,6 +3,10 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+// Configuration flags
+export const USE_IMGBB = true; // Set to false to use Firebase Storage instead
+export const IMGBB_API_KEY = 'eb3f75326e69131568d868694122abc7';
+
 const firebaseConfig = {
   apiKey: "AIzaSyAOB1oDrYwu2q0vaP9tRe2uN5dv61ed66g",
   authDomain: "zellak-ce065.firebaseapp.com",

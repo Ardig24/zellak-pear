@@ -325,16 +325,16 @@ export default function ManageUsers() {
             ))}
           </div>
 
-          {/* Edit User Modal */}
-          {selectedUser && (
+          {/* Add/Edit User Modal */}
+          {isAddingUser && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg w-full max-w-lg p-4 shadow-sm border border-gray-200">
+              <div className="bg-white rounded-lg w-full max-w-2xl p-6 shadow-lg border border-gray-200">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 drop-shadow-lg">
-                    {t('admin.users.editUser')}
+                    {editingUser ? t('admin.users.editUser') : t('admin.users.addNewUser')}
                   </h2>
                   <button
-                    onClick={() => setSelectedUser(null)}
+                    onClick={resetForm}
                     className="text-gray-300 hover:text-black transition-colors"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,162 +343,105 @@ export default function ManageUsers() {
                   </button>
                 </div>
 
-                <form onSubmit={handleUpdateUser} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      {t('admin.users.company')}
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.companyName}
-                      onChange={(e) => setEditForm({ ...editForm, companyName: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      {t('admin.users.contact')}
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.contactNumber}
-                      onChange={(e) => setEditForm({ ...editForm, contactNumber: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      {t('admin.users.role')}
-                    </label>
-                    <select
-                      value={editForm.role}
-                      onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'user' | 'admin' })}
-                      className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                      <option value="user">{t('admin.users.roles.user')}</option>
-                      <option value="admin">{t('admin.users.roles.admin')}</option>
-                    </select>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        {t('login.email')}
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                        required
+                      />
+                    </div>
+                    {!editingUser && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-900 mb-1">
+                          {t('login.password')}
+                        </label>
+                        <input
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                          required={!editingUser}
+                          minLength={6}
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        {t('admin.category')}
+                      </label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' | 'C' })}
+                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                        required
+                      >
+                        <option value="A">{t('categories.categoryA')}</option>
+                        <option value="B">{t('categories.categoryB')}</option>
+                        <option value="C">{t('categories.categoryC')}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        {t('admin.companyName')}
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.companyName}
+                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        {t('admin.contactNumber')}
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.contactNumber}
+                        onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                        {t('admin.address')}
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex gap-4 pt-4">
                     <button
                       type="button"
-                      onClick={() => setSelectedUser(null)}
-                      className="flex-1 bg-gray-500/30 hover:bg-gray-600/30 text-gray-900 py-2"
+                      onClick={resetForm}
+                      className="flex-1 bg-gray-500/30 hover:bg-gray-600/30 text-gray-900 py-2 rounded-lg"
                     >
                       {t('common.cancel')}
                     </button>
                     <button
                       type="submit"
+                      disabled={loading}
                       className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
-                      {t('common.save')}
+                      {loading ? <LoadingSpinner /> : editingUser ? t('common.save') : t('common.add')}
                     </button>
                   </div>
                 </form>
               </div>
             </div>
-          )}
-
-          {isAddingUser && (
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
-                    {t('login.email')}
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                    required
-                  />
-                </div>
-                {!editingUser && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-1">
-                      {t('login.password')}
-                    </label>
-                    <input
-                      type="password"
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                      required={!editingUser}
-                      minLength={6}
-                    />
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
-                    {t('admin.category')}
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' | 'C' })}
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                    required
-                  >
-                    <option value="A">{t('categories.categoryA')}</option>
-                    <option value="B">{t('categories.categoryB')}</option>
-                    <option value="C">{t('categories.categoryC')}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
-                    {t('admin.companyName')}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
-                    {t('admin.contactNumber')}
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.contactNumber}
-                    onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-1">
-                    {t('admin.address')}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                  />
-                </div>
-                <div className="col-span-2 flex justify-end gap-4">
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="flex-1 bg-gray-500/30 hover:bg-gray-600/30 text-gray-900 py-2"
-                  >
-                    {t('common.cancel')}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                  >
-                    {loading ? <LoadingSpinner /> : editingUser ? t('common.save') : t('common.add')}
-                  </button>
-                </div>
-              </div>
-            </form>
           )}
         </div>
       </div>

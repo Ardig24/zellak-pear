@@ -27,7 +27,8 @@
     "noResults": "No products found.",
     "myOrder": "My Order",
     "emptyCart": "Your cart is empty",
-    "basePrice": "Base Price"
+    "basePrice": "Base Price",
+    "remove": "Remove"
   },
   "admin": {
     "title": "Admin Panel",

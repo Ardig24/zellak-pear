@@ -177,7 +177,7 @@ export default function Products() {
                           <p className="font-medium">{item.productName}</p>
                           <p className="text-sm text-gray-500">{item.size}</p>
                           <p className="text-sm text-gray-600">
-                            {t('products.quantity')}: {item.quantity} × ${item.price}
+                            {t('products.quantity')}: {item.quantity} × €{item.price}
                           </p>
                         </div>
                         <button
@@ -193,7 +193,7 @@ export default function Products() {
                   <div className="mt-6 space-y-4">
                     <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
                       <span className="font-semibold">{t('products.total')}:</span>
-                      <span className="font-semibold">${calculateTotal().toFixed(2)}</span>
+                      <span className="font-semibold">€{calculateTotal().toFixed(2)}</span>
                     </div>
                     
                     <button
@@ -369,15 +369,15 @@ export default function Products() {
                                   const currentQuantity = orderItem?.quantity || 0;
 
                                   return (
-                                    <div
+                                    <div 
                                       key={`${product.id}-${safeVariantId}`}
-                                      className="flex items-center justify-between bg-white/50 p-2 rounded-lg"
+                                      className="flex items-center justify-between bg-white/50 p-3 rounded-lg max-w-3xl"
                                     >
-                                      <div>
-                                        <span className="text-gray-700 font-medium">{variant.size}</span>
-                                        <p className="text-sm text-gray-500">${variant.prices[userData.category]}</p>
+                                      <div className="flex items-center gap-8">
+                                        <span className="text-gray-700 font-medium w-12">{variant.size}</span>
+                                        <p className="text-lg font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
                                       </div>
-                                      <div className="flex items-center space-x-2">
+                                      <div className="flex items-center gap-2 ml-auto">
                                         <button
                                           onClick={() => {
                                             const newQuantity = Math.max(0, currentQuantity - 1);
@@ -390,12 +390,12 @@ export default function Products() {
                                               newQuantity
                                             );
                                           }}
-                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20"
+                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium"
                                           disabled={currentQuantity === 0}
                                         >
                                           -
                                         </button>
-                                        <span className="w-8 text-center font-medium text-gray-800">{currentQuantity}</span>
+                                        <span className="w-8 text-center font-medium text-gray-800 text-lg">{currentQuantity}</span>
                                         <button
                                           onClick={() => {
                                             const newQuantity = currentQuantity + 1;
@@ -408,7 +408,7 @@ export default function Products() {
                                               newQuantity
                                             );
                                           }}
-                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20"
+                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20 text-lg font-medium"
                                         >
                                           +
                                         </button>
@@ -462,71 +462,82 @@ export default function Products() {
                     key={product.id}
                     className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                   >
-                    {product.icon && (
-                      <img
-                        src={product.icon}
-                        alt={product.name}
-                        className="w-16 h-16 object-cover rounded-lg mb-4"
-                      />
-                    )}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
-                      <div className="space-y-2">
-                        {product.variants.map((variant, index) => {
-                          const safeVariantId = variant.id || `${product.id}-variant-${index}`;
-                          const orderItem = orderItems.find(
-                            item => item.productId === product.id && item.variantId === safeVariantId
-                          );
-                          const currentQuantity = orderItem?.quantity || 0;
+                    <div className="flex gap-6">
+                      {/* Product Image */}
+                      <div className="flex-shrink-0 flex items-center">
+                        {product.icon ? (
+                          <img
+                            src={product.icon}
+                            alt={product.name}
+                            className="w-24 h-24 object-cover rounded-lg shadow-sm"
+                          />
+                        ) : (
+                          <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <Coffee className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
 
-                          return (
-                            <div
-                              key={`${product.id}-${safeVariantId}`}
-                              className="flex items-center justify-between bg-white/50 p-2 rounded-lg"
-                            >
-                              <div>
-                                <span className="text-gray-700 font-medium">{variant.size}</span>
-                                <p className="text-sm text-gray-500">${variant.prices[userData.category]}</p>
+                      {/* Product Details */}
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-gray-800 mb-3">{product.name}</h3>
+                        <div className="grid gap-2">
+                          {product.variants.map((variant, index) => {
+                            const safeVariantId = variant.id || `${product.id}-variant-${index}`;
+                            const orderItem = orderItems.find(
+                              item => item.productId === product.id && item.variantId === safeVariantId
+                            );
+                            const currentQuantity = orderItem?.quantity || 0;
+
+                            return (
+                              <div 
+                                key={`${product.id}-${safeVariantId}`}
+                                className="flex items-center justify-between bg-white/50 p-3 rounded-lg max-w-3xl"
+                              >
+                                <div className="flex items-center gap-8">
+                                  <span className="text-gray-700 font-medium w-12">{variant.size}</span>
+                                  <p className="text-lg font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                </div>
+                                <div className="flex items-center gap-2 ml-auto">
+                                  <button
+                                    onClick={() => {
+                                      const newQuantity = Math.max(0, currentQuantity - 1);
+                                      handleQuantityChange(
+                                        product.id,
+                                        product.name,
+                                        safeVariantId,
+                                        variant.size,
+                                        variant.prices[userData.category],
+                                        newQuantity
+                                      );
+                                    }}
+                                    className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium"
+                                    disabled={currentQuantity === 0}
+                                  >
+                                    -
+                                  </button>
+                                  <span className="w-8 text-center font-medium text-gray-800 text-lg">{currentQuantity}</span>
+                                  <button
+                                    onClick={() => {
+                                      const newQuantity = currentQuantity + 1;
+                                      handleQuantityChange(
+                                        product.id,
+                                        product.name,
+                                        safeVariantId,
+                                        variant.size,
+                                        variant.prices[userData.category],
+                                        newQuantity
+                                      );
+                                    }}
+                                    className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20 text-lg font-medium"
+                                  >
+                                    +
+                                  </button>
+                                </div>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <button
-                                  onClick={() => {
-                                    const newQuantity = Math.max(0, currentQuantity - 1);
-                                    handleQuantityChange(
-                                      product.id,
-                                      product.name,
-                                      safeVariantId,
-                                      variant.size,
-                                      variant.prices[userData.category],
-                                      newQuantity
-                                    );
-                                  }}
-                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20"
-                                  disabled={currentQuantity === 0}
-                                >
-                                  -
-                                </button>
-                                <span className="w-8 text-center font-medium text-gray-800">{currentQuantity}</span>
-                                <button
-                                  onClick={() => {
-                                    const newQuantity = currentQuantity + 1;
-                                    handleQuantityChange(
-                                      product.id,
-                                      product.name,
-                                      safeVariantId,
-                                      variant.size,
-                                      variant.prices[userData.category],
-                                      newQuantity
-                                    );
-                                  }}
-                                  className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -578,7 +589,7 @@ export default function Products() {
                           </div>
                           <div className="text-right">
                             <p className="text-sm font-medium text-gray-800">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              €{(item.price * item.quantity).toFixed(2)}
                             </p>
                             <button
                               onClick={() => removeItem(item.productId, item.variantId)}
@@ -597,7 +608,7 @@ export default function Products() {
                           {t('products.total')}
                         </span>
                         <span className="text-lg font-bold text-gray-800">
-                          ${calculateTotal().toFixed(2)}
+                          €{calculateTotal().toFixed(2)}
                         </span>
                       </div>
 

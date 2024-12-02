@@ -233,14 +233,14 @@
   },
   "products": {
     "categories": "Menü-Kategorien",
-    "backToCategories": "Zurück zu Kategorien",
+    "backToCategories": "Zurück zu den Kategorien",
     "orderSummary": "Bestellübersicht",
     "items": "Artikel",
     "emptyOrder": "Ihre Bestellung ist leer",
     "total": "Gesamt",
     "sendOrder": "Bestellung senden",
     "orderSuccess": "Bestellung erfolgreich gesendet!",
-    "orderError": "Bestellung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "orderError": "Fehler beim Senden der Bestellung. Bitte versuchen Sie es erneut.",
     "quantity": "Menge",
     "size": "Größe",
     "price": "Preis",
@@ -248,7 +248,8 @@
     "noResults": "Keine Produkte gefunden.",
     "myOrder": "Meine Bestellung",
     "emptyCart": "Ihr Warenkorb ist leer",
-    "basePrice": "Grundpreis"
+    "basePrice": "Grundpreis",
+    "remove": "Entfernen"
   },
   "categories": {
     "categoryA": "Kategorie A",

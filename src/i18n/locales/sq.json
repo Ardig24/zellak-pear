@@ -10,6 +10,26 @@
   "auth": {
     "logout": "Dilni"
   },
+  "products": {
+    "categories": "Kategoritë e Menysë",
+    "backToCategories": "Kthehu te Kategoritë",
+    "orderSummary": "Përmbledhja e Porosisë",
+    "items": "artikuj",
+    "emptyOrder": "Porosia juaj është e zbrazët",
+    "total": "Totali",
+    "sendOrder": "Dërgo Porosinë",
+    "orderSuccess": "Porosia u dërgua me sukses!",
+    "orderError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
+    "quantity": "Sasia",
+    "size": "Madhësia",
+    "price": "Çmimi",
+    "searchProducts": "Kërko të gjitha produktet...",
+    "noResults": "Nuk u gjetën produkte.",
+    "myOrder": "Porosia Ime",
+    "emptyCart": "Shporta juaj është e zbrazët",
+    "basePrice": "Çmimi Bazë",
+    "remove": "Hiq"
+  },
   "admin": {
     "title": "Paneli i Administratorit",
     "home": "Ballina",
@@ -47,7 +67,25 @@
       "category": "Kategoria",
       "selectCategory": "Zgjidhni kategorinë",
       "addCategory": "Shto Kategori",
-      "newCategoryPlaceholder": "Kategori e Re"
+      "newCategoryPlaceholder": "Kategori e Re",
+      "categories": "Kategoritë e Menysë",
+      "backToCategories": "Kthehu te Kategoritë",
+      "orderSummary": "Përmbledhja e Porosisë",
+      "items": "artikuj",
+      "emptyOrder": "Porosia juaj është e zbrazët",
+      "total": "Totali",
+      "sendOrder": "Dërgo Porosinë",
+      "orderSuccess": "Porosia u dërgua me sukses!",
+      "orderError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
+      "quantity": "Sasia",
+      "size": "Madhësia",
+      "price": "Çmimi",
+      "searchProducts": "Kërko të gjitha produktet...",
+      "noResults": "Nuk u gjetën produkte.",
+      "myOrder": "Porosia Ime",
+      "emptyCart": "Shporta juaj është e zbrazët",
+      "basePrice": "Çmimi Bazë",
+      "remove": "Hiq"
     },
     "invoices": {
       "title": "Faturat",

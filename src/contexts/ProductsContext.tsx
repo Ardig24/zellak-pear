@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db, storage } from '../config/firebase';
+import { db, storage, USE_IMGBB, IMGBB_API_KEY } from '../config/firebase';
 import { 
   collection, 
   query, 
@@ -78,14 +78,55 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const uploadImage = async (file: File, path: string): Promise<string> => {
-    try {
-      const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL;
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
-      throw new Error('Failed to upload image');
+    if (USE_IMGBB) {
+      try {
+        // Create FormData for ImgBB upload
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('key', IMGBB_API_KEY);
+
+        // Upload to ImgBB
+        const response = await fetch('https://api.imgbb.com/1/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image to ImgBB');
+        }
+
+        const data = await response.json();
+        return data.data.url; // Return the direct image URL
+      } catch (error: any) {
+        console.error('Error uploading image to ImgBB:', error);
+        throw new Error('Failed to upload image');
+      }
+    } else {
+      try {
+        // Original Firebase Storage upload logic
+        const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        return downloadURL;
+      } catch (error: any) {
+        console.error('Error uploading image to Firebase Storage:', error);
+        throw new Error('Failed to upload image');
+      }
+    }
+  };
+
+  const deleteImage = async (imageUrl: string) => {
+    if (USE_IMGBB) {
+      // ImgBB doesn't provide a delete API in the free tier
+      // We just need to remove the reference from our database
+      return;
+    } else {
+      try {
+        const imageRef = ref(storage, imageUrl);
+        await deleteObject(imageRef);
+      } catch (error) {
+        console.error('Error deleting image:', error);
+      }
     }
   };
 
@@ -126,12 +167,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         // Delete old image if it exists
         const oldProduct = products.find(p => p.id === id);
         if (oldProduct?.icon) {
-          try {
-            const oldImageRef = ref(storage, oldProduct.icon);
-            await deleteObject(oldImageRef);
-          } catch (error) {
-            console.error('Error deleting old image:', error);
-          }
+          await deleteImage(oldProduct.icon);
         }
         
         // Upload new image
@@ -161,8 +197,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // Delete product image if it exists
       const product = products.find(p => p.id === id);
       if (product?.icon) {
-        const imageRef = ref(storage, product.icon);
-        await deleteObject(imageRef).catch(() => {});
+        await deleteImage(product.icon);
       }
 
       await deleteDoc(doc(db, 'products', id));
@@ -212,12 +247,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         // Delete old image if it exists
         const oldCategory = categories.find(c => c.id === id);
         if (oldCategory?.imageUrl) {
-          try {
-            const oldImageRef = ref(storage, oldCategory.imageUrl);
-            await deleteObject(oldImageRef);
-          } catch (error) {
-            console.error('Error deleting old image:', error);
-          }
+          await deleteImage(oldCategory.imageUrl);
         }
         
         // Upload new image
@@ -247,12 +277,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // Delete category image if it exists
       const category = categories.find(c => c.id === id);
       if (category?.imageUrl) {
-        try {
-          const imageRef = ref(storage, category.imageUrl);
-          await deleteObject(imageRef);
-        } catch (error) {
-          console.error('Error deleting category image:', error);
-        }
+        await deleteImage(category.imageUrl);
       }
       
       // Delete all products in this category first
