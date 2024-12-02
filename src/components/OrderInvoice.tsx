@@ -144,7 +144,8 @@ const OrderInvoice: React.FC<OrderInvoiceProps> = ({ order, onClose }) => {
           items: order.items,
           total: order.total,
           createdAt: Timestamp.now(),
-          orderDate: order.orderDate
+          orderDate: order.orderDate,
+          status: 'pending'  // Always set initial status to pending
         };
 
         await addDoc(collection(db, 'invoices'), invoiceData);

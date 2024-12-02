@@ -129,7 +129,7 @@ export default function Home() {
           labels: sortedData.map(([month]) => month),
           datasets: [
             {
-              label: t('admin.home.monthlySales'),
+              label: t('admin.home_section.monthlySales'),
               data: sortedData.map(([, total]) => total),
               backgroundColor: 'rgba(59, 130, 246, 0.8)',
               borderColor: 'rgba(37, 99, 235, 0.9)',
@@ -205,12 +205,12 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">{t('admin.home.dashboard')}</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('admin.home_section.dashboard')}</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Pending Orders */}
         <div className="backdrop-blur-md bg-white/70 p-6 rounded-xl shadow-lg border border-white/20">
-          <h2 className="text-lg font-semibold mb-4">{t('admin.home.pendingOrders')}</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('admin.home_section.pendingOrders')}</h2>
           <div className="h-[250px] overflow-y-auto">
             {loading ? (
               <div className="flex justify-center items-center h-full">
@@ -219,7 +219,7 @@ export default function Home() {
             ) : error ? (
               <div className="text-red-500 text-center">{error}</div>
             ) : pendingOrders.length === 0 ? (
-              <div className="text-gray-500 text-center">{t('admin.home.noPendingOrders')}</div>
+              <div className="text-gray-500 text-center">{t('admin.home_section.noPendingOrders')}</div>
             ) : (
               <div className="space-y-4">
                 {pendingOrders.map((order) => (
@@ -249,7 +249,7 @@ export default function Home() {
                       </span>
                     </div>
                     <div className="text-sm text-gray-600">
-                      {order.items.length} {t('admin.home.items')}
+                      {order.items.length} {t('admin.home_section.items')}
                     </div>
                   </div>
                 ))}
@@ -260,7 +260,7 @@ export default function Home() {
 
         {/* Todo List */}
         <div className="backdrop-blur-md bg-white/70 p-6 rounded-xl shadow-lg border border-white/20">
-          <h2 className="text-lg font-semibold mb-4">{t('admin.home.todoList')}</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('admin.home_section.todoList')}</h2>
           
           {/* Todo Input Form */}
           <form onSubmit={handleAddTodo} className="mb-4">
@@ -269,14 +269,14 @@ export default function Home() {
                 type="text"
                 value={newTodoText}
                 onChange={(e) => setNewTodoText(e.target.value)}
-                placeholder={t('admin.home.newTodoPlaceholder')}
+                placeholder={t('admin.home_section.newToDoPlaceHolder')}
                 className="flex-1 px-4 py-2.5 backdrop-blur-sm bg-white/50 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               />
               <button
                 type="submit"
                 className="px-4 py-2.5 bg-blue-600/90 text-white rounded-lg hover:bg-blue-700/90 transition-colors duration-200 backdrop-blur-sm"
               >
-                {t('common.add')}
+                {t('admin.home_section.add')}
               </button>
             </div>
           </form>
@@ -312,7 +312,7 @@ export default function Home() {
 
         {/* Sales Chart */}
         <div className="md:col-span-2 backdrop-blur-md bg-white/70 p-6 rounded-xl shadow-lg border border-white/20">
-          <h2 className="text-lg font-semibold mb-4">{t('admin.home.salesChart')}</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('admin.home_section.salesChart')}</h2>
           <div className="w-full h-[300px]">
             <Bar
               data={{
@@ -335,7 +335,7 @@ export default function Home() {
                   },
                   title: {
                     display: true,
-                    text: t('admin.home.salesOverTime'),
+                    text: t('admin.home_section.salesOverTime'),
                     color: '#374151'
                   }
                 },

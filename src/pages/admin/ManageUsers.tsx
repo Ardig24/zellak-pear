@@ -220,8 +220,8 @@ export default function ManageUsers() {
                   <th className="px-2 py-2 text-left font-medium text-gray-900">
                     {t('admin.users.contact')}
                   </th>
-                  <th className="px-2 py-2 text-left font-medium text-gray-900 w-24">
-                    {t('admin.users.role')}
+                  <th className="px-2 py-2 text-left font-medium text-gray-900 w-36">
+                    {t('admin.category')}
                   </th>
                   <th className="px-2 py-2 text-left font-medium text-gray-900 w-32">
                     {t('admin.users.actions')}
@@ -241,12 +241,14 @@ export default function ManageUsers() {
                       <div className="truncate max-w-[120px]">{user.contactNumber}</div>
                     </td>
                     <td className="px-2 py-2">
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        user.isAdmin 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-blue-100 text-blue-800'
+                      <span className={`inline-flex items-center whitespace-nowrap px-2 py-0.5 text-xs font-medium rounded-full ${
+                        user.category === 'A' 
+                          ? 'bg-green-100 text-green-800'
+                          : user.category === 'B'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-purple-100 text-purple-800'
                       }`}>
-                        {t(`admin.users.roles.${user.isAdmin ? 'admin' : 'user'}`)}
+                        {t(`categories.category${user.category}`)}
                       </span>
                     </td>
                     <td className="px-2 py-2">
@@ -283,12 +285,14 @@ export default function ManageUsers() {
                     <div className="font-medium text-gray-900">{user.email}</div>
                     <div className="text-sm text-gray-600">{user.companyName}</div>
                   </div>
-                  <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                    user.isAdmin 
-                      ? 'bg-purple-100 text-purple-800' 
-                      : 'bg-blue-100 text-blue-800'
+                  <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
+                    user.category === 'A' 
+                      ? 'bg-green-100 text-green-800'
+                      : user.category === 'B'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-purple-100 text-purple-800'
                   }`}>
-                    {t(`admin.users.roles.${user.isAdmin ? 'admin' : 'user'}`)}
+                    {t(`categories.category${user.category}`)}
                   </span>
                 </div>
 

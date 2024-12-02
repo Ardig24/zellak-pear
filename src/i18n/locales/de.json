@@ -7,58 +7,46 @@
     "signIn": "Anmelden",
     "invalidCredentials": "Ungültige Anmeldedaten"
   },
-  "products": {
-    "categories": "Menü-Kategorien",
-    "backToCategories": "Zurück zu Kategorien",
-    "orderSummary": "Bestellübersicht",
-    "items": "Artikel",
-    "emptyOrder": "Ihre Bestellung ist leer",
-    "total": "Gesamt",
-    "sendOrder": "Bestellung senden",
-    "orderSuccess": "Bestellung erfolgreich gesendet!",
-    "orderError": "Bestellung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
-    "quantity": "Menge",
-    "size": "Größe",
-    "price": "Preis",
-    "searchProducts": "Alle Produkte durchsuchen...",
-    "noResults": "Keine Produkte gefunden.",
-    "myOrder": "Meine Bestellung",
-    "emptyCart": "Ihr Warenkorb ist leer",
-    "basePrice": "Grundpreis"
+  "auth": {
+    "logout": "Abmelden"
   },
   "admin": {
     "title": "Admin-Panel",
-    "manageUsers": "Benutzer verwalten",
-    "manageProducts": "Produkte verwalten",
-    "manageOrders": "Bestellungen verwalten",
-    "manageCategories": "Kategorien verwalten",
+    "home": "Startseite",
+    "manageUsers": "Benutzerverwaltung",
+    "manageProducts": "Produktverwaltung",
+    "manageOrders": "Bestellungsverwaltung",
     "reports": "Berichte",
-    "welcome": "Willkommen im Admin-Panel",
-    "selectSection": "Wählen Sie einen Bereich aus der Seitenleiste",
-    "logout": "Abmelden",
-    "deleteProductConfirm": "Sind Sie sicher, dass Sie dieses Produkt löschen möchten?",
-    "users": {
-      "title": "Benutzerverwaltung",
-      "addUser": "Benutzer hinzufügen",
-      "editUser": "Benutzer bearbeiten",
-      "deleteUser": "Benutzer löschen",
-      "userName": "Benutzername",
-      "userEmail": "E-Mail",
-      "userRole": "Rolle",
-      "userStatus": "Status",
-      "lastLogin": "Letzte Anmeldung",
-      "createDate": "Erstellt am",
-      "searchUsers": "Benutzer suchen...",
-      "noUsers": "Keine Benutzer gefunden",
-      "active": "Aktiv",
-      "inactive": "Inaktiv",
-      "admin": "Administrator",
-      "user": "Benutzer",
-      "saveChanges": "Änderungen speichern",
-      "deleteConfirm": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?"
+    "manageInvoices": "Rechnungen",
+    "category": "Kategorie",
+    "contactNumber": "Kontaktnummer",
+    "companyName": "Firmenname",
+    "address": "Adresse",
+    "addNewUser": "Neuen Benutzer hinzufügen",
+    "home_section": {
+      "dashboard": "Dashboard",
+      "pendingOrders": "Ausstehende Bestellungen",
+      "items": "Artikel",
+      "salesChart": "Verkaufsdiagramm",
+      "todoList": "Aufgabenliste",
+      "newToDoPlaceHolder": "Neue Aufgabe eingeben",
+      "salesOverTime": "Verkäufe über Zeit",
+      "monthlySales": "Monatliche Verkäufe",
+      "add": "Hinzufügen",
+      "noPendingOrders": "Keine ausstehenden Bestellungen",
+      "noTodos": "Keine Aufgaben vorhanden"
     },
     "products": {
       "title": "Produktverwaltung",
+      "addNew": "Neues Produkt hinzufügen",
+      "name": "Produktname",
+      "icon": "Produktsymbol",
+      "chooseFile": "Datei auswählen",
+      "variant": "Produktvariante",
+      "editProduct": "Produkt bearbeiten",
+      "deleteProduct": "Produkt löschen",
+      "category": "Kategorie",
+      "selectCategory": "Kategorie auswählen",
       "addProduct": "Produkt hinzufügen",
       "editProduct": "Produkt bearbeiten",
       "deleteProduct": "Produkt löschen",
@@ -86,7 +74,71 @@
       "tryDifferentSearch": "Versuchen Sie einen anderen Suchbegriff oder eine andere Kategorie",
       "addFirstProduct": "Klicken Sie auf 'Produkt hinzufügen', um Ihr erstes Produkt hinzuzufügen",
       "saveChanges": "Änderungen speichern",
-      "manageCategories": "Kategorien"
+      "manageCategories": "Kategorien",
+      "addCategory": "Kategorie hinzufügen",
+      "newCategoryPlaceholder": "Neue Kategorie"
+    },
+    "invoices": {
+      "title": "Rechnungen",
+      "date": "Rechnungsdatum",
+      "company": "Firma",
+      "email": "E-Mail",
+      "Total": "Gesamt",
+      "status": "Status",
+      "actions": "Aktion",
+      "view": "Ansehen",
+      "close": "Schließen",
+      "markAsPaid": "Als bezahlt markieren",
+      "markAsUnpaid": "Als unbezahlt markieren",
+      "markAsCancelled": "Als storniert markieren",
+      "markAsActive": "Als aktiv markieren",
+      "statuses": {
+        "pending": "Ausstehend",
+        "paid": "Bezahlt",
+        "cancelled": "Storniert"
+      },
+      "pending": "Ausstehend",
+      "details": "Details",
+      "customerDetails": "Kundendetails",
+      "items": "Artikel",
+      "item": "Artikel",
+      "quantity": "Menge",
+      "price": "Preis",
+      "total": "Gesamt",
+      "download": "Herunterladen",
+      "print": "Drucken",
+      "thankYou": "Vielen Dank",
+      "searchPlaceholder": "Firma suchen",
+      "noResults": "Keine Ergebnisse"
+    },
+    "notifications": {
+      "newOrders": "Neue Bestellungen",
+      "noNewOrders": "Keine neuen Bestellungen"
+    },
+    "users": {
+      "title": "Benutzerverwaltung",
+      "addUser": "Benutzer hinzufügen",
+      "editUser": "Benutzer bearbeiten",
+      "deleteUser": "Benutzer löschen",
+      "userName": "Benutzername",
+      "email": "E-Mail",
+      "company": "Firma",
+      "contact": "Kontakt",
+      "role": "Rolle",
+      "actions": "Aktionen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "searchPlaceholder": "Benutzer suchen",
+      "userStatus": "Status",
+      "lastLogin": "Letzte Anmeldung",
+      "createDate": "Erstellt am",
+      "noUsers": "Keine Benutzer gefunden",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "admin": "Administrator",
+      "user": "Benutzer",
+      "saveChanges": "Änderungen speichern",
+      "deleteConfirm": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?"
     },
     "orders": {
       "title": "Bestellungsverwaltung",
@@ -103,13 +155,18 @@
       "markPending": "Als ausstehend markieren",
       "viewDetails": "Details anzeigen",
       "orderDetails": "Bestelldetails",
+      "createInvoice": "Rechnung erstellen",
       "close": "Schließen",
       "items": "Artikel",
       "productName": "Produktname",
       "size": "Größe",
       "quantity": "Menge",
       "price": "Preis",
-      "subtotal": "Zwischensumme"
+      "subtotal": "Zwischensumme",
+      "statuses": {
+        "pending": "Ausstehend",
+        "completed": "Abgeschlossen"
+      }
     }
   },
   "orders": {
@@ -139,7 +196,12 @@
     "price": "Preis",
     "pending": "Ausstehend",
     "completed": "Abgeschlossen",
-    "viewDetails": "Details anzeigen"
+    "viewDetails": "Details anzeigen",
+    "statuses": {
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "cancelled": "Storniert"
+    }
   },
   "common": {
     "logout": "Abmelden",
@@ -150,7 +212,8 @@
     "add": "Hinzufügen",
     "remove": "Entfernen",
     "back": "Zurück",
-    "reports": "Berichte"
+    "reports": "Berichte",
+    "close": "Schließen"
   },
   "reports": {
     "dashboard": "Berichte-Dashboard",
@@ -167,5 +230,29 @@
     "totalRevenue": "Gesamtumsatz",
     "selectUser": "Benutzer auswählen",
     "selectProduct": "Produkt auswählen"
+  },
+  "products": {
+    "categories": "Menü-Kategorien",
+    "backToCategories": "Zurück zu Kategorien",
+    "orderSummary": "Bestellübersicht",
+    "items": "Artikel",
+    "emptyOrder": "Ihre Bestellung ist leer",
+    "total": "Gesamt",
+    "sendOrder": "Bestellung senden",
+    "orderSuccess": "Bestellung erfolgreich gesendet!",
+    "orderError": "Bestellung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "quantity": "Menge",
+    "size": "Größe",
+    "price": "Preis",
+    "searchProducts": "Alle Produkte durchsuchen...",
+    "noResults": "Keine Produkte gefunden.",
+    "myOrder": "Meine Bestellung",
+    "emptyCart": "Ihr Warenkorb ist leer",
+    "basePrice": "Grundpreis"
+  },
+  "categories": {
+    "categoryA": "Kategorie A",
+    "categoryB": "Kategorie B",
+    "categoryC": "Kategorie C"
   }
 }

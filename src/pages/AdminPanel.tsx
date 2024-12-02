@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function AdminPanel() {
   const { logout } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const [newOrders, setNewOrders] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -111,7 +111,7 @@ export default function AdminPanel() {
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
-            <div className="absolute left-0 top-0 h-full w-80 bg-white/90 backdrop-blur-lg shadow-xl transform transition-transform duration-200 ease-in-out">
+            <div className="absolute left-0 top-0 h-full w-72 bg-white/90 backdrop-blur-lg shadow-xl transform transition-transform duration-200 ease-in-out">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h1 className="text-2xl font-bold text-gray-800">{t('admin.title')}</h1>
@@ -132,80 +132,83 @@ export default function AdminPanel() {
                   <Link
                     to="/admin"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                       location.pathname === '/admin' || location.pathname === '/admin/'
                         ? 'bg-blue-600/10 text-blue-600'
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <HomeIcon className="w-5 h-5 mr-3" />
-                    {t('admin.home')}
+                    <HomeIcon className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.home')}</div>
                   </Link>
                   <Link
                     to="/admin/users"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                       location.pathname.includes('/admin/users')
                         ? 'bg-blue-600/10 text-blue-600'
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <Users className="w-5 h-5 mr-3" />
-                    {t('admin.manageUsers')}
+                    <Users className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.manageUsers')}</div>
                   </Link>
                   <Link
                     to="/admin/products"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                       location.pathname.includes('/admin/products')
                         ? 'bg-blue-600/10 text-blue-600'
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <Coffee className="w-5 h-5 mr-3" />
-                    {t('admin.manageProducts')}
+                    <Coffee className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.manageProducts')}</div>
                   </Link>
                   <Link
                     to="/admin/orders"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                       location.pathname.includes('/admin/orders')
                         ? 'bg-blue-600/10 text-blue-600'
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <ShoppingBag className="w-5 h-5 mr-3" />
-                    {t('admin.manageOrders')}
+                    <ShoppingBag className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.manageOrders')}</div>
                   </Link>
                   <Link
                     to="/admin/invoices"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                       location.pathname.includes('/admin/invoices')
                         ? 'bg-blue-600/10 text-blue-600'
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <Receipt className="w-5 h-5 mr-3" />
-                    {t('admin.manageInvoices')}
+                    <Receipt className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.invoices.title')}</div>
                   </Link>
                   <Link
                     to="/admin/reports"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                       location.pathname.includes('/admin/reports')
                         ? 'bg-blue-600/10 text-blue-600'
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <FileText className="w-5 h-5 mr-3" />
-                    {t('admin.reports')}
+                    <FileText className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.reports')}</div>
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
                     className="w-full flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-blue-600/5 hover:text-blue-600 transition-all duration-200"
                   >
-                    <LogOut className="w-5 h-5 mr-3" />
+                    <LogOut className="w-5 h-5 mr-3 flex-shrink-0" />
                     {t('auth.logout')}
                   </button>
                 </nav>
@@ -230,8 +233,8 @@ export default function AdminPanel() {
         </div>
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block w-64 flex-shrink-0 h-full overflow-y-auto">
-          <div className="backdrop-blur-md bg-white/70 rounded-xl p-6 m-4 sticky top-4 border border-white/20 shadow-lg">
+        <div className="hidden lg:block w-72 flex-shrink-0 h-full overflow-y-auto">
+          <div className={`backdrop-blur-md bg-white/70 rounded-xl p-6 mx-4 mt-16 sticky top-16 border border-white/20 shadow-lg ${i18n.language === 'sq' ? '' : 'pb-24'}`}>
             <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('admin.title')}</h1>
             <div className="px-4 mt-6 mb-6">
               <LanguageSelector />
@@ -239,69 +242,69 @@ export default function AdminPanel() {
             <nav className="space-y-2">
               <Link
                 to="/admin"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname === '/admin' || location.pathname === '/admin/'
                     ? 'bg-indigo-600/10 text-indigo-600'
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <HomeIcon className="w-5 h-5 mr-3" />
-                {t('admin.home')}
+                <HomeIcon className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.home')}</div>
               </Link>
               <Link
                 to="/admin/users"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname.includes('/admin/users')
                     ? 'bg-indigo-600/10 text-indigo-600'
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <Users className="w-5 h-5 mr-3" />
-                {t('admin.manageUsers')}
+                <Users className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.manageUsers')}</div>
               </Link>
               <Link
                 to="/admin/products"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname.includes('/admin/products')
                     ? 'bg-indigo-600/10 text-indigo-600'
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <Coffee className="w-5 h-5 mr-3" />
-                {t('admin.manageProducts')}
+                <Coffee className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.manageProducts')}</div>
               </Link>
               <Link
                 to="/admin/orders"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname.includes('/admin/orders')
                     ? 'bg-indigo-600/10 text-indigo-600'
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <ShoppingBag className="w-5 h-5 mr-3" />
-                {t('admin.manageOrders')}
+                <ShoppingBag className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.manageOrders')}</div>
               </Link>
               <Link
                 to="/admin/invoices"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname.includes('/admin/invoices')
                     ? 'bg-indigo-600/10 text-indigo-600'
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <Receipt className="w-5 h-5 mr-3" />
-                {t('admin.manageInvoices')}
+                <Receipt className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.invoices.title')}</div>
               </Link>
               <Link
                 to="/admin/reports"
-                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname.includes('/admin/reports')
                     ? 'bg-indigo-600/10 text-indigo-600'
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <FileText className="w-5 h-5 mr-3" />
-                {t('admin.reports')}
+                <FileText className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.reports')}</div>
               </Link>
             </nav>
             <div className="px-4 mt-6">

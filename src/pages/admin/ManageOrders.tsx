@@ -62,10 +62,9 @@ export default function ManageOrders() {
         };
       }) as Order[];
 
+      // Sort orders only by date, newest first
       ordersData.sort((a, b) => {
-        const dateA = new Date(a.orderDate).getTime();
-        const dateB = new Date(b.orderDate).getTime();
-        return dateB - dateA;
+        return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
       });
 
       setOrders(ordersData);

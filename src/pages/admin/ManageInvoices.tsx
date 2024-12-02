@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { collection, query, getDocs, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, Timestamp, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -19,7 +19,7 @@ interface Invoice {
   createdAt: Timestamp;
   orderDate: string | Timestamp;
   items: any[];
-  status: string;
+  status: 'pending' | 'paid' | 'cancelled';
 }
 
 export default function ManageInvoices() {
@@ -32,29 +32,28 @@ export default function ManageInvoices() {
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const fetchInvoices = async () => {
+      setLoading(true);
+      try {
+        const invoicesRef = collection(db, 'invoices');
+        const q = query(invoicesRef, orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const fetchedInvoices = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          status: doc.data().status || 'pending' // Set default status if not present
+        })) as Invoice[];
+        setInvoices(fetchedInvoices);
+      } catch (error) {
+        console.error('Error fetching invoices:', error);
+        setError(t('admin.invoices.fetchError'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchInvoices();
   }, []);
-
-  const fetchInvoices = async () => {
-    try {
-      setLoading(true);
-      const invoicesRef = collection(db, 'invoices');
-      const q = query(invoicesRef, orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
-      
-      const fetchedInvoices = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Invoice[];
-
-      setInvoices(fetchedInvoices);
-    } catch (err) {
-      console.error('Error fetching invoices:', err);
-      setError(t('admin.invoices.fetchError'));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handlePrint = useReactToPrint({
     content: () => invoiceRef.current,
@@ -83,6 +82,28 @@ export default function ManageInvoices() {
       invoice.invoiceNumber?.toLowerCase().includes(searchLower)
     );
   });
+
+  const handleUpdateStatus = async (invoiceId: string, newStatus: 'paid' | 'cancelled') => {
+    try {
+      const invoiceRef = doc(db, 'invoices', invoiceId);
+      await updateDoc(invoiceRef, {
+        status: newStatus
+      });
+      
+      // Update local state to reflect the change
+      setInvoices(invoices.map(invoice => 
+        invoice.id === invoiceId 
+          ? { ...invoice, status: newStatus }
+          : invoice
+      ));
+    } catch (error) {
+      console.error('Error updating invoice status:', error);
+    }
+  };
+
+  const handleViewInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+  };
 
   if (loading) {
     return (
@@ -181,27 +202,76 @@ export default function ManageInvoices() {
                     <td className="px-3 py-4 text-sm text-gray-800 whitespace-nowrap">
                       €{invoice.total.toFixed(2)}
                     </td>
-                    <td className="px-3 py-4 text-sm whitespace-nowrap">
+                    <td className="px-4 py-2 whitespace-nowrap text-xs">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                          ${
-                            invoice.status === 'paid'
-                              ? 'bg-green-100 text-green-800'
-                              : invoice.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          invoice.status === 'paid'
+                            ? 'bg-green-100 text-green-800'
+                            : invoice.status === 'cancelled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
                       >
-                        {invoice.status}
+                        {t(`admin.invoices.statuses.${invoice.status}`)}
                       </span>
                     </td>
-                    <td className="px-3 py-4 text-sm text-right space-x-2 whitespace-nowrap">
-                      <button
-                        onClick={() => setSelectedInvoice(invoice)}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        {t('admin.invoices.view')}
-                      </button>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs">
+                      <div className="flex items-center space-x-1.5">
+                        <button
+                          onClick={() => selectedInvoice?.id === invoice.id ? setSelectedInvoice(null) : handleViewInvoice(invoice)}
+                          className={`inline-flex items-center px-2 py-1 rounded transition-colors duration-200 text-xs ${
+                            selectedInvoice?.id === invoice.id
+                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                          }`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            {selectedInvoice?.id === invoice.id ? (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            ) : (
+                              <>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </>
+                            )}
+                          </svg>
+                          {t(selectedInvoice?.id === invoice.id ? 'admin.invoices.close' : 'admin.invoices.view')}
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(invoice.id, invoice.status === 'paid' ? 'pending' : 'paid')}
+                          className={`inline-flex items-center px-2 py-1 rounded transition-colors duration-200 text-xs ${
+                            invoice.status === 'paid'
+                              ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            {invoice.status === 'paid' ? (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            ) : (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            )}
+                          </svg>
+                          {t(invoice.status === 'paid' ? 'admin.invoices.markAsUnpaid' : 'admin.invoices.markAsPaid')}
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(invoice.id, invoice.status === 'cancelled' ? 'pending' : 'cancelled')}
+                          className={`inline-flex items-center px-2 py-1 rounded transition-colors duration-200 text-xs ${
+                            invoice.status === 'cancelled'
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                              : 'bg-red-100 text-red-700 hover:bg-red-200'
+                          }`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            {invoice.status === 'cancelled' ? (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            ) : (
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            )}
+                          </svg>
+                          {t(invoice.status === 'cancelled' ? 'admin.invoices.markAsActive' : 'admin.invoices.markAsCancelled')}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
