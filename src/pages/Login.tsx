@@ -8,7 +8,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login, error, clearError, loading } = useAuth();
   const { t } = useTranslation();
@@ -16,7 +16,7 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      await login(username, password);
     } catch (error) {
       // Error is handled by the AuthContext
     }
@@ -53,28 +53,20 @@ export default function Login() {
         <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
           <div className="space-y-4 sm:space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-1 ml-1">
-                {t('login.email')}
+              <label htmlFor="username" className="block text-sm font-medium text-white">
+                {t('login.usernameOrEmail')}
               </label>
-              <div className="relative flex items-center">
-                <div className="absolute left-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder={t('login.email')}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 bg-white/80 border border-white/50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                placeholder={t('login.usernameOrEmailPlaceholder')}
+              />
             </div>
 
             <div>

@@ -76,7 +76,9 @@
       "saveChanges": "Änderungen speichern",
       "manageCategories": "Kategorien",
       "addCategory": "Kategorie hinzufügen",
-      "newCategoryPlaceholder": "Neue Kategorie"
+      "newCategoryPlaceholder": "Neue Kategorie",
+      "vatRate": "Mehrwertsteuersatz",
+      "selectVatRate": "Mehrwertsteuersatz auswählen"
     },
     "invoices": {
       "title": "Rechnungen",
@@ -238,6 +240,10 @@
     "items": "Artikel",
     "emptyOrder": "Ihre Bestellung ist leer",
     "total": "Gesamt",
+    "subtotal": "Zwischensumme",
+    "vat": "MwSt",
+    "vat7": "MwSt 7%",
+    "vat19": "MwSt 19%",
     "sendOrder": "Bestellung senden",
     "orderSuccess": "Bestellung erfolgreich gesendet!",
     "orderError": "Fehler beim Senden der Bestellung. Bitte versuchen Sie es erneut.",

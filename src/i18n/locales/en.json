@@ -17,6 +17,10 @@
     "items": "items",
     "emptyOrder": "Your order is empty",
     "total": "Total",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "vat7": "VAT 7%",
+    "vat19": "VAT 19%",
     "sendOrder": "Send Order",
     "orderSuccess": "Order sent successfully!",
     "orderError": "Failed to send order. Please try again.",
@@ -125,7 +129,9 @@
       "saveChanges": "Save Changes",
       "manageCategories": "Categories",
       "addCategory": "Add Category",
-      "newCategoryPlaceholder": "New Category"
+      "newCategoryPlaceholder": "New Category",
+      "vatRate": "VAT Rate",
+      "selectVatRate": "Select VAT Rate"
     },
     "orders": {
       "title": "Order Management",

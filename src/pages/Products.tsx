@@ -41,7 +41,8 @@ export default function Products() {
     variantId: string,
     size: string,
     price: number,
-    newQuantity: number
+    newQuantity: number,
+    vatRate: 7 | 19
   ) => {
     if (newQuantity < 0) return;
 
@@ -50,31 +51,43 @@ export default function Products() {
         item => item.productId === productId && item.variantId === variantId
       );
 
-      const newItems = [...prevItems];
-
-      if (existingItemIndex >= 0) {
+      if (existingItemIndex > -1) {
+        const updatedItems = [...prevItems];
         if (newQuantity === 0) {
-          newItems.splice(existingItemIndex, 1);
+          updatedItems.splice(existingItemIndex, 1);
         } else {
-          newItems[existingItemIndex] = {
-            ...newItems[existingItemIndex],
-            quantity: newQuantity
+          const total = price * newQuantity;
+          const vatAmount = (total * vatRate) / 100;
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity: newQuantity,
+            total,
+            vatAmount,
           };
         }
+        localStorage.setItem('cartItems', JSON.stringify(updatedItems));
+        return updatedItems;
       } else if (newQuantity > 0) {
-        newItems.push({
-          productId,
-          productName,
-          variantId,
-          size,
-          quantity: newQuantity,
-          price
-        });
+        const total = price * newQuantity;
+        const vatAmount = (total * vatRate) / 100;
+        const newItems = [
+          ...prevItems,
+          {
+            productId,
+            productName,
+            variantId,
+            size,
+            quantity: newQuantity,
+            price,
+            total,
+            vatRate,
+            vatAmount,
+          },
+        ];
+        localStorage.setItem('cartItems', JSON.stringify(newItems));
+        return newItems;
       }
-
-      // Save to localStorage
-      localStorage.setItem('cartItems', JSON.stringify(newItems));
-      return newItems;
+      return prevItems;
     });
   };
 
@@ -86,8 +99,26 @@ export default function Products() {
     });
   };
 
-  const calculateTotal = () => {
-    return orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const calculateTotals = () => {
+    let subtotal = 0;
+    let vat7Total = 0;
+    let vat19Total = 0;
+
+    orderItems.forEach(item => {
+      subtotal += item.total;
+      if (item.vatRate === 7) {
+        vat7Total += item.vatAmount;
+      } else {
+        vat19Total += item.vatAmount;
+      }
+    });
+
+    return {
+      subtotal,
+      vat7Total,
+      vat19Total,
+      total: subtotal + vat7Total + vat19Total
+    };
   };
 
   const handleSendOrder = async () => {
@@ -193,7 +224,28 @@ export default function Products() {
                   <div className="mt-6 space-y-4">
                     <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
                       <span className="font-semibold">{t('products.total')}:</span>
-                      <span className="font-semibold">€{calculateTotal().toFixed(2)}</span>
+                      <span className="font-semibold">€{calculateTotals().total.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="border-t pt-4 mt-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>{t('products.subtotal')}</span>
+                          <span>€{calculateTotals().subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>{t('products.vat7')}</span>
+                          <span>€{calculateTotals().vat7Total.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>{t('products.vat19')}</span>
+                          <span>€{calculateTotals().vat19Total.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold pt-2 border-t">
+                          <span>{t('products.total')}</span>
+                          <span>€{calculateTotals().total.toFixed(2)}</span>
+                        </div>
+                      </div>
                     </div>
                     
                     <button
@@ -376,6 +428,7 @@ export default function Products() {
                                       <div className="flex items-center gap-8">
                                         <span className="text-gray-700 font-medium w-12">{variant.size}</span>
                                         <p className="text-lg font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                        <span className="text-sm text-gray-500">{t('products.vat')} {product.vatRate}%</span>
                                       </div>
                                       <div className="flex items-center gap-2 ml-auto">
                                         <button
@@ -387,7 +440,8 @@ export default function Products() {
                                               safeVariantId,
                                               variant.size,
                                               variant.prices[userData.category],
-                                              newQuantity
+                                              newQuantity,
+                                              product.vatRate
                                             );
                                           }}
                                           className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium"
@@ -405,7 +459,8 @@ export default function Products() {
                                               safeVariantId,
                                               variant.size,
                                               variant.prices[userData.category],
-                                              newQuantity
+                                              newQuantity,
+                                              product.vatRate
                                             );
                                           }}
                                           className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20 text-lg font-medium"
@@ -431,24 +486,26 @@ export default function Products() {
                 </div>
               ) : (
                 // Categories Grid
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
                   {categories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className="glass-panel p-6 rounded-xl text-left hover:scale-102 hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
+                      className="glass-panel p-6 rounded-xl text-left hover:scale-102 hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20 min-h-[100px] w-full"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                           {category.imageUrl ? (
                             <img src={category.imageUrl} alt={category.name} className="w-full h-full object-cover" />
                           ) : (
-                            <Coffee className="w-6 h-6 text-blue-600" />
+                            <Coffee className="w-8 h-8 text-blue-600" />
                           )}
                         </div>
-                        <h2 className="text-xl font-semibold text-gray-800">
-                          {category.name}
-                        </h2>
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-xl font-semibold text-gray-800 whitespace-pre-wrap break-words">
+                            {category.name}
+                          </h2>
+                        </div>
                       </div>
                     </button>
                   ))}
@@ -497,6 +554,7 @@ export default function Products() {
                                 <div className="flex items-center gap-8">
                                   <span className="text-gray-700 font-medium w-12">{variant.size}</span>
                                   <p className="text-lg font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                  <span className="text-sm text-gray-500">{t('products.vat')} {product.vatRate}%</span>
                                 </div>
                                 <div className="flex items-center gap-2 ml-auto">
                                   <button
@@ -508,7 +566,8 @@ export default function Products() {
                                         safeVariantId,
                                         variant.size,
                                         variant.prices[userData.category],
-                                        newQuantity
+                                        newQuantity,
+                                        product.vatRate
                                       );
                                     }}
                                     className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium"
@@ -526,7 +585,8 @@ export default function Products() {
                                         safeVariantId,
                                         variant.size,
                                         variant.prices[userData.category],
-                                        newQuantity
+                                        newQuantity,
+                                        product.vatRate
                                       );
                                     }}
                                     className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20 text-lg font-medium"
@@ -602,35 +662,45 @@ export default function Products() {
                       ))}
                     </div>
 
-                    <div className="border-t border-gray-200 pt-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-lg font-medium text-gray-800">
-                          {t('products.total')}
-                        </span>
-                        <span className="text-lg font-bold text-gray-800">
-                          €{calculateTotal().toFixed(2)}
-                        </span>
+                    <div className="border-t pt-4 mt-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>{t('products.subtotal')}</span>
+                          <span>€{calculateTotals().subtotal.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>{t('products.vat7')}</span>
+                          <span>€{calculateTotals().vat7Total.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>{t('products.vat19')}</span>
+                          <span>€{calculateTotals().vat19Total.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-semibold pt-2 border-t">
+                          <span>{t('products.total')}</span>
+                          <span>€{calculateTotals().total.toFixed(2)}</span>
+                        </div>
                       </div>
-
-                      <button
-                        onClick={handleSendOrder}
-                        disabled={sending || orderItems.length === 0}
-                        className="w-full flex justify-center items-center px-4 py-2 rounded-lg
-                          bg-blue-600 text-white font-medium
-                          hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                          disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm
-                          transition-colors duration-200"
-                      >
-                        {sending ? (
-                          <LoadingSpinner />
-                        ) : (
-                          <>
-                            <Send className="w-5 h-5 mr-2" />
-                            {t('products.sendOrder')}
-                          </>
-                        )}
-                      </button>
                     </div>
+
+                    <button
+                      onClick={handleSendOrder}
+                      disabled={sending || orderItems.length === 0}
+                      className="w-full flex justify-center items-center px-4 py-2 rounded-lg
+                        bg-blue-600 text-white font-medium
+                        hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                        disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm
+                        transition-colors duration-200"
+                    >
+                      {sending ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <>
+                          <Send className="w-5 h-5 mr-2" />
+                          {t('products.sendOrder')}
+                        </>
+                      )}
+                    </button>
                   </>
                 )}
               </div>

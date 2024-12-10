@@ -25,6 +25,7 @@ export default function ManageProducts() {
     name: '',
     category: '',
     icon: '',
+    vatRate: 19 as 7 | 19,
     variants: [{
       id: `${Date.now()}-0`,
       size: '',
@@ -59,6 +60,7 @@ export default function ManageProducts() {
         name: formData.name,
         category: formData.category,
         icon: formData.icon,
+        vatRate: formData.vatRate,
         variants: formData.variants.map((variant, index) => ({
           id: variant.id || `variant-${timestamp}-${index}`,
           size: variant.size,
@@ -142,6 +144,7 @@ export default function ManageProducts() {
       name: product.name,
       category: product.category,
       icon: product.icon,
+      vatRate: product.vatRate,
       variants: product.variants.map((v) => ({
         size: v.size,
         prices: { ...v.prices },
@@ -155,6 +158,7 @@ export default function ManageProducts() {
       name: '',
       category: '',
       icon: '',
+      vatRate: 19,
       variants: [{
         id: `${Date.now()}-0`,
         size: '',
@@ -440,6 +444,21 @@ export default function ManageProducts() {
                     >
                       {t('admin.products.chooseFile')}
                     </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('admin.products.vatRate')}
+                    </label>
+                    <select
+                      value={formData.vatRate}
+                      onChange={(e) => setFormData({ ...formData, vatRate: parseInt(e.target.value) as 7 | 19 })}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                      required
+                    >
+                      <option value={7}>7%</option>
+                      <option value={19}>19%</option>
+                    </select>
                   </div>
 
                   {/* Variants Section */}

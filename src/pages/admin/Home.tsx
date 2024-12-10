@@ -4,6 +4,7 @@ import { collection, query, where, getDocs, orderBy, limit, addDoc, deleteDoc, d
 import { db } from '../../config/firebase';
 import { Order, Todo } from '../../types';
 import { Bar } from 'react-chartjs-2';
+import { useNavigate } from 'react-router-dom';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,6 +28,7 @@ ChartJS.register(
 
 export default function Home() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [pendingOrders, setPendingOrders] = useState<Order[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoText, setNewTodoText] = useState('');
@@ -225,7 +227,8 @@ export default function Home() {
                 {pendingOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="p-4 backdrop-blur-sm bg-white/50 rounded-lg border border-white/10 transition-all duration-200 hover:bg-white/60"
+                    onClick={() => navigate(`/admin/orders?orderId=${order.id}`)}
+                    className="p-4 backdrop-blur-sm bg-white/50 rounded-lg border border-white/10 transition-all duration-200 hover:bg-white/60 cursor-pointer hover:shadow-md"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>

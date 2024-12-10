@@ -21,37 +21,51 @@ export const useOrders = () => {
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const sendOrderEmail = async (orderItems: OrderItem[], userData: any, orderId: string) => {
     try {
-      const total = orderItems.reduce((sum, item) => 
-        sum + (Number(item.price) * Number(item.quantity)), 0);
+      const totals = orderItems.reduce((acc, item) => {
+        const subtotal = Number(item.price) * Number(item.quantity);
+        const vatAmount = (subtotal * item.vatRate) / 100;
+        return {
+          subtotal: acc.subtotal + subtotal,
+          vat7Total: acc.vat7Total + (item.vatRate === 7 ? vatAmount : 0),
+          vat19Total: acc.vat19Total + (item.vatRate === 19 ? vatAmount : 0),
+        };
+      }, { subtotal: 0, vat7Total: 0, vat19Total: 0 });
       
-      const orderDetailsString = orderItems.map(item => 
-        `${item.productName} - ${item.size} - Quantity: ${item.quantity} - Price: €${Number(item.price).toFixed(2)} - Subtotal: €${(Number(item.price) * Number(item.quantity)).toFixed(2)}`
-      ).join('\n');
+      const total = totals.subtotal + totals.vat7Total + totals.vat19Total;
+
+      const orderDetailsString = orderItems.map(item => {
+        const subtotal = Number(item.price) * Number(item.quantity);
+        const vatAmount = (subtotal * item.vatRate) / 100;
+        return `${item.productName} - ${item.size} - Quantity: ${item.quantity} - Price: €${Number(item.price).toFixed(2)} - Subtotal: €${subtotal.toFixed(2)} - VAT ${item.vatRate}%: €${vatAmount.toFixed(2)}`;
+      }).join('\n');
 
       const templateParams = {
         to_email: import.meta.env.VITE_ADMIN_EMAIL,
-              from_name: userData.companyName,
+        from_name: userData.companyName,
         company_name: userData.companyName,
         contact_number: userData.contactNumber || 'Not provided',
         address: userData.address || 'Not provided',
         email: userData.email || 'Not provided',
         category: userData.category,
         order_details: orderDetailsString,
+        subtotal: `€${totals.subtotal.toFixed(2)}`,
+        vat_7: `€${totals.vat7Total.toFixed(2)}`,
+        vat_19: `€${totals.vat19Total.toFixed(2)}`,
         total_amount: `€${total.toFixed(2)}`,
         order_id: orderId
-  };
+      };
 
       const response = await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         templateParams,
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-  );
+      );
 
       if (response.status === 200) {
         console.log('Order email sent successfully!');
         return true;
-}
+      }
     } catch (error) {
       console.error('Error sending order email:', error);
       // Don't throw here to prevent order failure due to email issues
@@ -64,6 +78,18 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Order cannot be empty');
       }
 
+      const totals = items.reduce((acc, item) => {
+        const subtotal = Number(item.price) * Number(item.quantity);
+        const vatAmount = (subtotal * item.vatRate) / 100;
+        return {
+          subtotal: acc.subtotal + subtotal,
+          vat7Total: acc.vat7Total + (item.vatRate === 7 ? vatAmount : 0),
+          vat19Total: acc.vat19Total + (item.vatRate === 19 ? vatAmount : 0),
+        };
+      }, { subtotal: 0, vat7Total: 0, vat19Total: 0 });
+
+      const total = totals.subtotal + totals.vat7Total + totals.vat19Total;
+
       const orderData = {
         items: items.map(item => ({
           productId: item.productId,
@@ -72,7 +98,9 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
           size: item.size,
           quantity: Number(item.quantity),
           price: Number(item.price),
-          total: Number(item.quantity) * Number(item.price)
+          total: Number(item.quantity) * Number(item.price),
+          vatRate: item.vatRate,
+          vatAmount: (Number(item.quantity) * Number(item.price) * item.vatRate) / 100
         })),
         userId: userData.id,
         userEmail: userData.email,
@@ -81,7 +109,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         contactNumber: userData.contactNumber || '',
         category: userData.category,
         status: 'pending',
-        total: items.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0),
+        subtotal: totals.subtotal,
+        vat7Total: totals.vat7Total,
+        vat19Total: totals.vat19Total,
+        total,
         createdAt: serverTimestamp(),
         orderDate: serverTimestamp()
       };

@@ -4,6 +4,7 @@ export interface Product {
   category: string;
   variants: ProductVariant[];
   icon: string;
+  vatRate: 7 | 19;
 }
 
 export interface ProductVariant {
@@ -36,6 +37,8 @@ export interface OrderItem {
   quantity: number;
   price: number;
   total: number;
+  vatRate: 7 | 19;
+  vatAmount: number;
 }
 
 export interface Order {
@@ -49,6 +52,9 @@ export interface Order {
   status: 'pending' | 'completed';
   total: number;
   orderDate: string;
+  vat7Total: number;
+  vat19Total: number;
+  subtotal: number;
 }
 
 export interface Category {

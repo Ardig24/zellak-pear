@@ -7,11 +7,12 @@ import {
   onAuthStateChanged
 } from 'firebase/auth';
 import { auth, db } from '../config/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 interface UserData {
   email: string;
+  username: string;
   isAdmin: boolean;
   companyName: string;
   category: 'A' | 'B' | 'C';
@@ -24,8 +25,8 @@ interface AuthContextType {
   userData: UserData | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, userData: Omit<UserData, 'isAdmin'>) => Promise<void>;
+  login: (usernameOrEmail: string, password: string) => Promise<void>;
+  register: (email: string, username: string, password: string, userData: Omit<UserData, 'isAdmin' | 'email' | 'username'>) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -69,45 +70,90 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const register = async (email: string, password: string, userData: Omit<UserData, 'isAdmin'>) => {
+  const register = async (
+    email: string,
+    username: string,
+    password: string,
+    userData: Omit<UserData, 'isAdmin' | 'email' | 'username'>
+  ) => {
     try {
       setError(null);
+      
+      // Check if username already exists
+      const usernameQuery = query(collection(db, 'usernames'), where('username', '==', username.toLowerCase()));
+      const usernameSnapshot = await getDocs(usernameQuery);
+      
+      if (!usernameSnapshot.empty) {
+        throw new Error('Username already taken');
+      }
+
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       
+      // Store the user data
       await setDoc(doc(db, 'users', user.uid), {
         ...userData,
         email: user.email,
+        username: username.toLowerCase(),
         isAdmin: false,
         createdAt: new Date().toISOString()
       });
 
-      // Don't navigate after registration
+      // Store username mapping
+      await setDoc(doc(db, 'usernames', username.toLowerCase()), {
+        uid: user.uid,
+        username: username.toLowerCase()
+      });
+
     } catch (err: any) {
       setError(err.message);
       throw err;
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (usernameOrEmail: string, password: string) => {
     try {
       setError(null);
       setLoading(true);
       
-      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      let loginEmail = usernameOrEmail;
+
+      // Check if input is not an email (no @ symbol)
+      if (!usernameOrEmail.includes('@')) {
+        // Try to find email by username
+        const usernameQuery = query(collection(db, 'usernames'), where('username', '==', usernameOrEmail.toLowerCase()));
+        const usernameSnapshot = await getDocs(usernameQuery);
+        
+        if (usernameSnapshot.empty) {
+          throw new Error('User not found');
+        }
+
+        // Get the user document
+        const userDoc = await getDoc(doc(db, 'users', usernameSnapshot.docs[0].data().uid));
+        if (!userDoc.exists()) {
+          throw new Error('User data not found');
+        }
+
+        const userData = userDoc.data() as UserData;
+        loginEmail = userData.email;
+      }
       
+      // Login with email and password
+      const { user } = await signInWithEmailAndPassword(auth, loginEmail, password);
+      
+      // Get user data
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
         throw new Error('User data not found');
       }
 
-      const data = userDoc.data() as UserData;
-      setUserData(data);
+      const userData = userDoc.data() as UserData;
+      setUserData(userData);
       
-      // Store minimal session data
-      sessionStorage.setItem('isLoggedIn', 'true');
-
-      // Navigate based on admin status
-      navigate(data.isAdmin ? '/admin' : '/products');
+      if (userData.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err.message);
       throw err;

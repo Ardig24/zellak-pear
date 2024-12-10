@@ -130,16 +130,31 @@ export default function Reports() {
 
       // Format the orders to include proper dates
       const formattedOrders = productOrders.map((order: any) => {
-        const orderDate = order.orderDate ? new Date(order.orderDate) : new Date();
-        // Verify if the date is valid, if not use current date
-        const validDate = isNaN(orderDate.getTime()) ? new Date() : orderDate;
+        let orderDate;
+        
+        // Try to parse the orderDate in multiple formats
+        if (order.orderDate) {
+          if (order.orderDate instanceof Date) {
+            orderDate = order.orderDate;
+          } else if (order.orderDate.seconds) {
+            // Handle Firestore Timestamp
+            orderDate = new Date(order.orderDate.seconds * 1000);
+          } else if (typeof order.orderDate === 'string') {
+            orderDate = new Date(order.orderDate);
+          }
+        }
+
+        // If date is invalid or undefined, use current date
+        if (!orderDate || isNaN(orderDate.getTime())) {
+          orderDate = new Date();
+        }
         
         return {
           ...order,
-          orderDate: validDate.toISOString(),
+          orderDate: orderDate.toISOString(),
           items: order.items.map((item: any) => ({
             ...item,
-            date: validDate.toISOString()
+            date: orderDate.toISOString()
           }))
         };
       });

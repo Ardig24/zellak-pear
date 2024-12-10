@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../config/firebase';
-import { collection, query, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, query, getDocs, doc, setDoc, deleteDoc, where } from 'firebase/firestore';
 import { auth } from '../../config/firebase';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import { createUser } from '../../api/createUser';
 
 interface UserData {
   id: string;
   email: string;
+  username: string;
   category: 'A' | 'B' | 'C';
   companyName: string;
   address?: string;
@@ -33,16 +34,16 @@ export default function ManageUsers() {
     contactNumber: '',
     role: 'user',
   });
-  const { t } = useTranslation();
-
   const [formData, setFormData] = useState({
     email: '',
+    username: '',
     password: '',
     category: 'A' as 'A' | 'B' | 'C',
     companyName: '',
     address: '',
     contactNumber: '',
   });
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchUsers();
@@ -74,39 +75,50 @@ export default function ManageUsers() {
         // Update existing user
         await setDoc(doc(db, 'users', editingUser.id), {
           email: formData.email,
+          username: formData.username.toLowerCase(),
           category: formData.category,
           companyName: formData.companyName,
           address: formData.address,
           contactNumber: formData.contactNumber,
-          isAdmin: false,
           updatedAt: new Date().toISOString()
         }, { merge: true });
       } else {
-        // Create new user with Firebase Auth
-        const { user } = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        // Check if username already exists
+        const usernameQuery = query(collection(db, 'usernames'), where('username', '==', formData.username.toLowerCase()));
+        const usernameSnapshot = await getDocs(usernameQuery);
         
-        // Store additional user data in Firestore
-        await setDoc(doc(db, 'users', user.uid), {
+        if (!usernameSnapshot.empty) {
+          throw new Error('Username already taken');
+        }
+
+        // Create new user
+        const { uid } = await createUser(formData.email, formData.password);
+
+        // Store user data
+        await setDoc(doc(db, 'users', uid), {
           email: formData.email,
+          username: formData.username.toLowerCase(),
           category: formData.category,
           companyName: formData.companyName,
           address: formData.address,
           contactNumber: formData.contactNumber,
           isAdmin: false,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         });
 
-        // Sign out the newly created user to maintain admin session
-        await auth.signOut();
-        
-        // Re-authenticate the admin (assuming you have the admin credentials stored)
-        // This step might be needed depending on your authentication flow
-        // You might want to handle this in your AuthContext
+        // Store username mapping
+        await setDoc(doc(db, 'usernames', formData.username.toLowerCase()), {
+          uid: uid,
+          username: formData.username.toLowerCase()
+        });
       }
 
-      await fetchUsers();
       resetForm();
+      setIsAddingUser(false);
+      setEditingUser(null);
+      await fetchUsers();
     } catch (err: any) {
+      console.error('Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -131,6 +143,7 @@ export default function ManageUsers() {
     setEditingUser(user);
     setFormData({
       email: user.email,
+      username: user.username,
       password: '', // Password field is empty when editing
       category: user.category,
       companyName: user.companyName,
@@ -143,6 +156,7 @@ export default function ManageUsers() {
   const resetForm = () => {
     setFormData({
       email: '',
+      username: '',
       password: '',
       category: 'A',
       companyName: '',
@@ -173,7 +187,8 @@ export default function ManageUsers() {
   const filteredUsers = users.filter(user =>
     user.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.contactNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+    user.contactNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -215,6 +230,9 @@ export default function ManageUsers() {
                     {t('admin.users.email')}
                   </th>
                   <th className="px-2 py-2 text-left font-medium text-gray-900">
+                    {t('admin.users.username')}
+                  </th>
+                  <th className="px-2 py-2 text-left font-medium text-gray-900">
                     {t('admin.users.company')}
                   </th>
                   <th className="px-2 py-2 text-left font-medium text-gray-900">
@@ -233,6 +251,9 @@ export default function ManageUsers() {
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors duration-200">
                     <td className="px-2 py-2">
                       <div className="truncate max-w-[200px]">{user.email}</div>
+                    </td>
+                    <td className="px-2 py-2">
+                      <div className="truncate max-w-[150px]">{user.username}</div>
                     </td>
                     <td className="px-2 py-2">
                       <div className="truncate max-w-[150px]">{user.companyName}</div>
@@ -283,7 +304,7 @@ export default function ManageUsers() {
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <div className="font-medium text-gray-900">{user.email}</div>
-                    <div className="text-sm text-gray-600">{user.companyName}</div>
+                    <div className="text-sm text-gray-600">{user.username}</div>
                   </div>
                   <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
                     user.category === 'A' 
@@ -344,42 +365,58 @@ export default function ManageUsers() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
-                        {t('login.email')}
+                      <label className="block text-sm font-medium text-gray-700">
+                        {t('admin.users.email')}
                       </label>
                       <input
                         type="email"
+                        name="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
                         required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        {t('admin.users.username')}
+                      </label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                        required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                     </div>
                     {!editingUser && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1">
+                        <label className="block text-sm font-medium text-gray-700">
                           {t('login.password')}
                         </label>
                         <input
                           type="password"
+                          name="password"
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
                           required={!editingUser}
                           minLength={6}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
                         {t('admin.category')}
                       </label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' | 'C' })}
-                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         required
                       >
                         <option value="A">{t('categories.categoryA')}</option>
@@ -388,37 +425,40 @@ export default function ManageUsers() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
                         {t('admin.companyName')}
                       </label>
                       <input
                         type="text"
+                        name="companyName"
                         value={formData.companyName}
                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
                         required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
                         {t('admin.contactNumber')}
                       </label>
                       <input
                         type="tel"
+                        name="contactNumber"
                         value={formData.contactNumber}
                         onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-1">
+                      <label className="block text-sm font-medium text-gray-700">
                         {t('admin.address')}
                       </label>
                       <input
                         type="text"
+                        name="address"
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       />
                     </div>
                   </div>

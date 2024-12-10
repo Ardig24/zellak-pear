@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag, Receipt, Bell } from 'lucide-react';
+import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag as ShoppingBagIcon, Bell } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -8,7 +8,6 @@ import Home from './admin/Home';
 import ManageUsers from './admin/ManageUsers';
 import ManageProducts from './admin/ManageProducts';
 import ManageOrders from './admin/ManageOrders';
-import ManageInvoices from './admin/ManageInvoices';
 import Reports from '../components/Reports';
 import LanguageSelector from '../components/LanguageSelector';
 import { useAuth } from '../contexts/AuthContext';
@@ -174,20 +173,8 @@ export default function AdminPanel() {
                         : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
                     }`}
                   >
-                    <ShoppingBag className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <ShoppingBagIcon className="w-5 h-5 mr-3 flex-shrink-0" />
                     <div className="break-words">{t('admin.manageOrders')}</div>
-                  </Link>
-                  <Link
-                    to="/admin/invoices"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
-                      location.pathname.includes('/admin/invoices')
-                        ? 'bg-blue-600/10 text-blue-600'
-                        : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
-                    }`}
-                  >
-                    <Receipt className="w-5 h-5 mr-3 flex-shrink-0" />
-                    <div className="break-words">{t('admin.invoices.title')}</div>
                   </Link>
                   <Link
                     to="/admin/reports"
@@ -281,19 +268,8 @@ export default function AdminPanel() {
                     : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
                 }`}
               >
-                <ShoppingBag className="w-5 h-5 mr-3 flex-shrink-0" />
+                <ShoppingBagIcon className="w-5 h-5 mr-3 flex-shrink-0" />
                 <div className="break-words">{t('admin.manageOrders')}</div>
-              </Link>
-              <Link
-                to="/admin/invoices"
-                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
-                  location.pathname.includes('/admin/invoices')
-                    ? 'bg-indigo-600/10 text-indigo-600'
-                    : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
-                }`}
-              >
-                <Receipt className="w-5 h-5 mr-3 flex-shrink-0" />
-                <div className="break-words">{t('admin.invoices.title')}</div>
               </Link>
               <Link
                 to="/admin/reports"
@@ -379,7 +355,6 @@ export default function AdminPanel() {
               <Route path="/users" element={<ManageUsers />} />
               <Route path="/products" element={<ManageProducts />} />
               <Route path="/orders" element={<ManageOrders />} />
-              <Route path="/invoices" element={<ManageInvoices />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
