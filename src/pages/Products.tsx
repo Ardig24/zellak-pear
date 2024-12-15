@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { OrderItem } from '../types';
 import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList, Coffee } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { Link, useLocation } from 'react-router-dom';
 import LanguageSelector from '../components/LanguageSelector';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import Toast from '../components/Toast';
 
 export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -20,6 +21,7 @@ export default function Products() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCart, setShowCart] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   
   const { products, categories } = useProducts();
   const { userData, logout } = useAuth();
@@ -122,19 +124,29 @@ export default function Products() {
   };
 
   const handleSendOrder = async () => {
-    if (!userData || orderItems.length === 0) return;
+    if (orderItems.length === 0) {
+      setToast({ message: t('products.noItemsInCart'), type: 'error' });
+      return;
+    }
+
+    if (!userData) {
+      setToast({ message: t('products.notLoggedIn'), type: 'error' });
+      return;
+    }
+
+    setSending(true);
+    setError(null);
 
     try {
-      setSending(true);
-      setError(null);
-      
       await sendOrder(orderItems, userData);
-      
-      setOrderItems([]); // Clear cart
-      localStorage.removeItem('cartItems'); // Clear localStorage
-      alert(t('products.orderSuccess'));
-    } catch (err: any) {
-      setError(err.message || t('products.orderError'));
+      setOrderItems([]);
+      localStorage.removeItem('cartItems');
+      setToast({ message: t('products.orderSentSuccess'), type: 'success' });
+      setShowCart(false);
+    } catch (error) {
+      console.error('Failed to send order:', error);
+      setError(t('products.orderSendError'));
+      setToast({ message: t('products.orderSendError'), type: 'error' });
     } finally {
       setSending(false);
     }
@@ -371,6 +383,15 @@ export default function Products() {
 
       {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
 
+      {/* Toast */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+
       {/* Search Bar */}
       <div className="max-w-7xl mx-auto px-4 pt-6">
         <div className="relative mb-6">
@@ -423,14 +444,14 @@ export default function Products() {
                                   return (
                                     <div 
                                       key={`${product.id}-${safeVariantId}`}
-                                      className="flex items-center justify-between bg-white/50 p-3 rounded-lg max-w-3xl"
+                                      className="flex flex-row items-center justify-between bg-white/50 p-2 rounded-lg max-w-3xl space-y-2 sm:space-y-0"
                                     >
-                                      <div className="flex items-center gap-8">
-                                        <span className="text-gray-700 font-medium w-12">{variant.size}</span>
-                                        <p className="text-lg font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
-                                        <span className="text-sm text-gray-500">{t('products.vat')} {product.vatRate}%</span>
+                                      <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
+                                        <span className="text-sm font-medium w-8">{variant.size}</span>
+                                        <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                        <span className="text-xs text-gray-500">{t('products.vat')} {product.vatRate}%</span>
                                       </div>
-                                      <div className="flex items-center gap-2 ml-auto">
+                                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                                         <button
                                           onClick={() => {
                                             const newQuantity = Math.max(0, currentQuantity - 1);
@@ -537,7 +558,7 @@ export default function Products() {
 
                       {/* Product Details */}
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-3">{product.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
                         <div className="grid gap-2">
                           {product.variants.map((variant, index) => {
                             const safeVariantId = variant.id || `${product.id}-variant-${index}`;
@@ -549,14 +570,14 @@ export default function Products() {
                             return (
                               <div 
                                 key={`${product.id}-${safeVariantId}`}
-                                className="flex items-center justify-between bg-white/50 p-3 rounded-lg max-w-3xl"
+                                className="flex flex-row items-center justify-between bg-white/50 p-2 rounded-lg max-w-3xl space-y-2 sm:space-y-0"
                               >
-                                <div className="flex items-center gap-8">
-                                  <span className="text-gray-700 font-medium w-12">{variant.size}</span>
-                                  <p className="text-lg font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
-                                  <span className="text-sm text-gray-500">{t('products.vat')} {product.vatRate}%</span>
+                                <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
+                                  <span className="text-sm font-medium w-8">{variant.size}</span>
+                                  <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                  <span className="text-xs text-gray-500">{t('products.vat')} {product.vatRate}%</span>
                                 </div>
-                                <div className="flex items-center gap-2 ml-auto">
+                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                                   <button
                                     onClick={() => {
                                       const newQuantity = Math.max(0, currentQuantity - 1);

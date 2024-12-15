@@ -4,8 +4,10 @@
     "subtitle": "Hyni në llogarinë tuaj",
     "email": "Email",
     "password": "Fjalëkalimi",
-    "signIn": "Hyni në llogari",
-    "invalidCredentials": "Kredencialet e pavlefshme"
+    "signIn": "Hyni",
+    "invalidCredentials": "Kredencialet e pavlefshme",
+    "usernameOrEmailPlaceholder": "Emri i përdoruesit ose Email",
+    "usernameOrEmail": "Emri i përdoruesit ose Email"
   },
   "auth": {
     "logout": "Dilni"
@@ -28,7 +30,23 @@
     "myOrder": "Porosia Ime",
     "emptyCart": "Shporta juaj është e zbrazët",
     "basePrice": "Çmimi Bazë",
-    "remove": "Hiq"
+    "remove": "Hiq",
+    "title": "Produktet",
+    "searchProducts": "Kërko produktet...",
+    "categories": "Kategoritë",
+    "myOrder": "Porosia Ime",
+    "backToCategories": "Kthehu tek Kategoritë",
+    "quantity": "Sasia",
+    "total": "Totali",
+    "subtotal": "Nëntotali",
+    "vat": "TVSH",
+    "vat7": "TVSH 7%",
+    "vat19": "TVSH 19%",
+    "sendOrder": "Dërgo Porosinë",
+    "noItemsInCart": "Nuk ka artikuj në shportë",
+    "notLoggedIn": "Duhet të jeni të kyçur për të dërguar një porosi",
+    "orderSentSuccess": "Porosia u dërgua me sukses!",
+    "orderSendError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri."
   },
   "admin": {
     "title": "Paneli i Administratorit",
@@ -127,10 +145,11 @@
     },
     "users": {
       "title": "Menaxhimi i Përdoruesve",
-      "addUser": "Shto Përdorues të Ri",
+      "addUser": "Shto Përdorues",
       "editUser": "Ndrysho Përdoruesin",
       "deleteUser": "Fshi Përdoruesin",
       "userName": "Emri i Përdoruesit",
+      "username": "Emri i Përdoruesit",
       "email": "Email",
       "company": "Kompania",
       "contact": "Kontakti",
@@ -195,7 +214,7 @@
     "myOrders": "Porositë e Mia",
     "noOrders": "Nuk keni bërë ende asnjë porosi",
     "orderHistory": "Historiku i Porosive",
-    "cancelOrder": "Anulo Porosinë",
+    "cancel": "Anulo Porosinë",
     "cannotCancel": "Nuk mund të anulohet (limiti 15 min kaloi)",
     "cancelSuccess": "Porosia u anulua me sukses",
     "cancelError": "Anulimi i porosisë dështoi",

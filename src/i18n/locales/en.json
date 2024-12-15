@@ -5,7 +5,9 @@
     "email": "Email",
     "password": "Password",
     "signIn": "Sign In",
-    "invalidCredentials": "Invalid credentials"
+    "invalidCredentials": "Invalid credentials",
+    "usernameOrEmailPlaceholder": "Username or E-mail",
+    "usernameOrEmail": "Username or E-mail"
   },
   "auth": {
     "logout": "Logout"
@@ -29,10 +31,14 @@
     "price": "Price",
     "searchProducts": "Search all products...",
     "noResults": "No products found.",
-    "myOrder": "My Order",
+    "myOrder": "Shopping Cart",
     "emptyCart": "Your cart is empty",
     "basePrice": "Base Price",
-    "remove": "Remove"
+    "remove": "Remove",
+    "noItemsInCart": "No items in cart",
+    "orderSentSuccess": "Order was sent successfully!",
+    "orderSendError": "Failed to send order. Please try again.",
+    "notLoggedIn": "You must be logged in to send an order"
   },
   "admin": {
     "title": "Admin Panel",
@@ -71,6 +77,7 @@
       "editUser": "Edit User",
       "deleteUser": "Delete User",
       "userName": "User Name",
+      "username": "Username",
       "email": "E-mail",
       "company": "Company",
       "contact": "Contact",
@@ -200,7 +207,7 @@
     "myOrders": "My Orders",
     "noOrders": "You haven't made any orders yet",
     "orderHistory": "Order History",
-    "cancelOrder": "Cancel Order",
+    "cancel": "Cancel Order",
     "cannotCancel": "Cannot cancel (15 min limit passed)",
     "cancelSuccess": "Order cancelled successfully",
     "cancelError": "Failed to cancel order",

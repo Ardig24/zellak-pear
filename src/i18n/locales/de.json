@@ -1,11 +1,13 @@
 {
   "login": {
     "title": "Willkommen zurück",
-    "subtitle": "Melden Sie sich in Ihrem Konto an",
+    "subtitle": "Melden Sie sich bei Ihrem Konto an",
     "email": "E-Mail",
     "password": "Passwort",
     "signIn": "Anmelden",
-    "invalidCredentials": "Ungültige Anmeldedaten"
+    "invalidCredentials": "Ungültige Anmeldeinformationen",
+    "usernameOrEmailPlaceholder": "Benutzername oder E-Mail",
+    "usernameOrEmail": "Benutzername oder E-Mail"
   },
   "auth": {
     "logout": "Abmelden"
@@ -123,6 +125,7 @@
       "editUser": "Benutzer bearbeiten",
       "deleteUser": "Benutzer löschen",
       "userName": "Benutzername",
+      "username": "Benutzername",
       "email": "E-Mail",
       "company": "Firma",
       "contact": "Kontakt",
@@ -176,7 +179,7 @@
     "myOrders": "Meine Bestellungen",
     "noOrders": "Sie haben noch keine Bestellungen aufgegeben",
     "orderHistory": "Bestellverlauf",
-    "cancelOrder": "Bestellung stornieren",
+    "cancel": "Bestellung stornieren",
     "cannotCancel": "Kann nicht storniert werden (15 Min. Limit überschritten)",
     "cancelSuccess": "Bestellung erfolgreich storniert",
     "cancelError": "Stornierung der Bestellung fehlgeschlagen",
@@ -234,28 +237,23 @@
     "selectProduct": "Produkt auswählen"
   },
   "products": {
-    "categories": "Menü-Kategorien",
-    "backToCategories": "Zurück zu den Kategorien",
-    "orderSummary": "Bestellübersicht",
-    "items": "Artikel",
-    "emptyOrder": "Ihre Bestellung ist leer",
+    "title": "Produkte",
+    "searchProducts": "Produkte suchen...",
+    "categories": "Kategorien",
+    "myOrder": "Warenkorb",
+    "backToCategories": "Zurück zu Kategorien",
+    "emptyCart": "Dein Warenkorb ist leer.",
+    "quantity": "Menge",
     "total": "Gesamt",
     "subtotal": "Zwischensumme",
     "vat": "MwSt",
     "vat7": "MwSt 7%",
     "vat19": "MwSt 19%",
     "sendOrder": "Bestellung senden",
-    "orderSuccess": "Bestellung erfolgreich gesendet!",
-    "orderError": "Fehler beim Senden der Bestellung. Bitte versuchen Sie es erneut.",
-    "quantity": "Menge",
-    "size": "Größe",
-    "price": "Preis",
-    "searchProducts": "Alle Produkte durchsuchen...",
-    "noResults": "Keine Produkte gefunden.",
-    "myOrder": "Meine Bestellung",
-    "emptyCart": "Ihr Warenkorb ist leer",
-    "basePrice": "Grundpreis",
-    "remove": "Entfernen"
+    "noItemsInCart": "Keine Artikel im Warenkorb",
+    "notLoggedIn": "Sie müssen angemeldet sein, um eine Bestellung aufzugeben",
+    "orderSentSuccess": "Bestellung wurde erfolgreich gesendet!",
+    "orderSendError": "Bestellung konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
   },
   "categories": {
     "categoryA": "Kategorie A",

@@ -53,9 +53,10 @@ export default function NewOrderHistory() {
       
       // Sort orders by date, newest first
       ordersData.sort((a, b) => {
-        const dateA = new Date(a.orderDate).getTime();
-        const dateB = new Date(b.orderDate).getTime();
-        return dateB - dateA;
+        // Handle Firebase Timestamp objects
+        const dateA = a.orderDate?.toDate?.() || new Date(a.orderDate);
+        const dateB = b.orderDate?.toDate?.() || new Date(b.orderDate);
+        return dateB.getTime() - dateA.getTime();
       });
 
       setOrders(ordersData);
@@ -89,13 +90,22 @@ export default function NewOrderHistory() {
   };
 
   const formatDate = (date: any) => {
-    return new Date(date).toLocaleString(i18n.language, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (!date) return '';
+    
+    // Handle Firebase Timestamp objects
+    const dateObj = date?.toDate?.() || new Date(date);
+    
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) return '';
+    
+    // Format as DD/MM/YYYY HH:mm
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const year = dateObj.getFullYear();
+    const hours = dateObj.getHours().toString().padStart(2, '0');
+    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+    
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
   const getStatusStyle = (status: string) => {
