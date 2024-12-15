@@ -239,6 +239,8 @@
   "products": {
     "title": "Produkte",
     "searchProducts": "Produkte suchen...",
+    "orderSummary": "Bestellübersicht",
+    "remove": "Entfernen",
     "categories": "Kategorien",
     "myOrder": "Warenkorb",
     "backToCategories": "Zurück zu Kategorien",
