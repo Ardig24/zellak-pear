@@ -78,7 +78,7 @@ export default function AdminPanel() {
       <div className="flex h-screen overflow-hidden" style={meshGradientStyle}>
         {/* Mobile Header */}
         <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-          <div className="backdrop-blur-md bg-green-500/70 border-b border-white/20 shadow-sm p-4">
+          <div className="backdrop-blur-md bg-white/70 border-b border-white/20 shadow-sm p-4">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
