@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface UserData {
-  email: string;
   username: string;
   isAdmin: boolean;
   companyName: string;
@@ -26,8 +25,8 @@ interface AuthContextType {
   userData: UserData | null;
   loading: boolean;
   error: string | null;
-  login: (usernameOrEmail: string, password: string) => Promise<void>;
-  register: (email: string, username: string, password: string, userData: Omit<UserData, 'isAdmin' | 'email' | 'username'>) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string, userData: Omit<UserData, 'isAdmin' | 'username'>) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
 }
@@ -55,10 +54,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setCurrentUser(user);
       if (user) {
         try {
+          // First try to get user data by UID
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const data = userDoc.data() as UserData;
             setUserData(data);
+          } else {
+            // If this is the admin@zellak.de user, migrate it to username-based auth
+            if (user.email === 'admin@zellak.de') {
+              const adminData = {
+                username: 'admin',
+                isAdmin: true,
+                companyName: 'Zellak Admin',
+                category: 'A' as const,
+                createdAt: new Date().toISOString()
+              };
+              
+              // Store admin data
+              await setDoc(doc(db, 'users', user.uid), adminData);
+              
+              // Store username mapping
+              await setDoc(doc(db, 'usernames', 'admin'), {
+                uid: user.uid,
+                username: 'admin'
+              });
+              
+              setUserData(adminData);
+            }
           }
         } catch (err) {
           console.error('Error fetching user data:', err);
@@ -73,10 +95,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = async (
-    email: string,
     username: string,
     password: string,
-    userData: Omit<UserData, 'isAdmin' | 'email' | 'username'>
+    userData: Omit<UserData, 'isAdmin' | 'username'>
   ) => {
     try {
       setError(null);
@@ -89,16 +110,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Username already taken');
       }
 
+      // Create a placeholder email for Firebase auth
+      const email = `${username.toLowerCase()}@placeholder.com`;
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       
       // Store the user data
-      await setDoc(doc(db, 'users', user.uid), {
+      const newUserData = {
         ...userData,
-        email: user.email,
         username: username.toLowerCase(),
         isAdmin: false,
         createdAt: new Date().toISOString()
-      });
+      };
+      
+      await setDoc(doc(db, 'users', user.uid), newUserData);
 
       // Store username mapping
       await setDoc(doc(db, 'usernames', username.toLowerCase()), {
@@ -106,51 +130,82 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         username: username.toLowerCase()
       });
 
+      setUserData(newUserData);
+
     } catch (err: any) {
       setError(err.message);
       throw err;
     }
   };
 
-  const login = async (usernameOrEmail: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
       setError(null);
       setLoading(true);
       
-      let loginEmail = usernameOrEmail;
-
-      // Check if input is not an email (no @ symbol)
-      if (!usernameOrEmail.includes('@')) {
-        // Try to find email by username
-        const usernameQuery = query(collection(db, 'usernames'), where('username', '==', usernameOrEmail.toLowerCase()));
-        const usernameSnapshot = await getDocs(usernameQuery);
-        
-        if (usernameSnapshot.empty) {
-          setError(t('login.invalidUsernameOrPassword'));
-          throw new Error('User not found');
+      // Special case for admin login during migration
+      if (username.toLowerCase() === 'admin') {
+        try {
+          // First try the old admin email
+          const { user } = await signInWithEmailAndPassword(auth, 'admin@zellak.de', password);
+          
+          // Get or create admin user data
+          let userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (!userDoc.exists()) {
+            const adminData = {
+              username: 'admin',
+              isAdmin: true,
+              companyName: 'Zellak Admin',
+              category: 'A' as const,
+              createdAt: new Date().toISOString()
+            };
+            
+            // Store admin data
+            await setDoc(doc(db, 'users', user.uid), adminData);
+            
+            // Store username mapping
+            await setDoc(doc(db, 'usernames', 'admin'), {
+              uid: user.uid,
+              username: 'admin'
+            });
+            
+            setUserData(adminData);
+          } else {
+            setUserData(userDoc.data() as UserData);
+          }
+          
+          navigate('/admin');
+          return;
+        } catch (adminErr) {
+          // If old admin login fails, continue with normal flow
+          console.log('Admin migration login failed, trying normal flow');
         }
-
-        // Get the user document
-        const userDoc = await getDoc(doc(db, 'users', usernameSnapshot.docs[0].data().uid));
-        if (!userDoc.exists()) {
-          setError(t('login.invalidUsernameOrPassword'));
-          throw new Error('User data not found');
-        }
-
-        const userData = userDoc.data() as UserData;
-        loginEmail = userData.email;
       }
+      
+      // Normal username-based login flow
+      const usernameQuery = query(collection(db, 'usernames'), where('username', '==', username.toLowerCase()));
+      const usernameSnapshot = await getDocs(usernameQuery);
+      
+      if (usernameSnapshot.empty) {
+        setError('Invalid username or password');
+        throw new Error('User not found');
+      }
+
+      const uid = usernameSnapshot.docs[0].data().uid;
+      
+      // Get the user document
+      const userDoc = await getDoc(doc(db, 'users', uid));
+      if (!userDoc.exists()) {
+        setError('Invalid username or password');
+        throw new Error('User data not found');
+      }
+
+      // Use the placeholder email format for login
+      const loginEmail = `${username.toLowerCase()}@placeholder.com`;
       
       // Login with email and password
       const { user } = await signInWithEmailAndPassword(auth, loginEmail, password);
       
-      // Get user data
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists()) {
-        setError(t('login.invalidUsernameOrPassword'));
-        throw new Error('User data not found');
-      }
-
       const userData = userDoc.data() as UserData;
       setUserData(userData);
       
@@ -160,7 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         navigate('/');
       }
     } catch (err: any) {
-      setError(t('login.invalidUsernameOrPassword'));
+      setError('Invalid username or password');
       throw err;
     } finally {
       setLoading(false);
@@ -172,9 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signOut(auth);
       setCurrentUser(null);
       setUserData(null);
-      // Clear session data
       sessionStorage.clear();
-      // Use navigate instead of location.href to prevent full page reload
       navigate('/login', { replace: true });
     } catch (err: any) {
       setError(err.message);

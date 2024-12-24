@@ -8,11 +8,22 @@ export interface Order {
 }
 
 export interface OrderItem {
-  id: string;
+  productId: string;
   productName: string;
+  variantId: string;
+  size: string;
   quantity: number;
   price: number;
-  size?: string;
+  vatRate?: 7 | 19;
+}
+
+export interface ProductVariant {
+  id?: string;
+  size: string;
+  prices: {
+    [key: string]: number;
+  };
+  inStock?: boolean;
 }
 
 export interface Todo {

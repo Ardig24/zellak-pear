@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag as ShoppingBagIcon, Bell } from 'lucide-react';
+import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag as ShoppingBagIcon, Bell, Tag, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -8,9 +8,11 @@ import Home from './admin/Home';
 import ManageUsers from './admin/ManageUsers';
 import ManageProducts from './admin/ManageProducts';
 import ManageOrders from './admin/ManageOrders';
+import ManageCategories from './admin/ManageCategories';
 import Reports from '../components/Reports';
 import LanguageSelector from '../components/LanguageSelector';
 import { useAuth } from '../contexts/AuthContext';
+import CompanyInfo from './admin/CompanyInfo';
 
 export default function AdminPanel() {
   const { logout } = useAuth();
@@ -165,6 +167,18 @@ export default function AdminPanel() {
                     <div className="break-words">{t('admin.manageProducts')}</div>
                   </Link>
                   <Link
+                    to="/admin/categories"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
+                      location.pathname.includes('/admin/categories')
+                        ? 'bg-blue-600/10 text-blue-600'
+                        : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
+                    }`}
+                  >
+                    <Tag className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.manageCategories')}</div>
+                  </Link>
+                  <Link
                     to="/admin/orders"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
@@ -188,12 +202,24 @@ export default function AdminPanel() {
                     <FileText className="w-5 h-5 mr-3 flex-shrink-0" />
                     <div className="break-words">{t('admin.reports')}</div>
                   </Link>
+                  <Link
+                    to="/admin/company-info"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
+                      location.pathname.includes('/admin/company-info')
+                        ? 'bg-blue-600/10 text-blue-600'
+                        : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
+                    }`}
+                  >
+                    <Building2 className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('adminPanel.companyInfo')}</div>
+                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center px-4 py-3 rounded-lg text-gray-600 hover:bg-blue-600/5 hover:text-blue-600 transition-all duration-200"
+                    className="w-full flex items-center px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200"
                   >
                     <LogOut className="w-5 h-5 mr-3 flex-shrink-0" />
                     {t('auth.logout')}
@@ -261,6 +287,17 @@ export default function AdminPanel() {
                 <div className="break-words">{t('admin.manageProducts')}</div>
               </Link>
               <Link
+                to="/admin/categories"
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
+                  location.pathname.includes('/admin/categories')
+                    ? 'bg-indigo-600/10 text-indigo-600'
+                    : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
+                }`}
+              >
+                <Tag className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.manageCategories')}</div>
+              </Link>
+              <Link
                 to="/admin/orders"
                 className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname.includes('/admin/orders')
@@ -281,6 +318,17 @@ export default function AdminPanel() {
               >
                 <FileText className="w-5 h-5 mr-3 flex-shrink-0" />
                 <div className="break-words">{t('admin.reports')}</div>
+              </Link>
+              <Link
+                to="/admin/company-info"
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
+                  location.pathname.includes('/admin/company-info')
+                    ? 'bg-indigo-600/10 text-indigo-600'
+                    : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
+                }`}
+              >
+                <Building2 className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('adminPanel.companyInfo')}</div>
               </Link>
             </nav>
             <div className="px-4 mt-6">
@@ -354,8 +402,10 @@ export default function AdminPanel() {
               <Route index element={<Home />} />
               <Route path="/users" element={<ManageUsers />} />
               <Route path="/products" element={<ManageProducts />} />
+              <Route path="/categories" element={<ManageCategories />} />
               <Route path="/orders" element={<ManageOrders />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/company-info" element={<CompanyInfo />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </div>

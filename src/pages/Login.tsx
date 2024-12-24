@@ -54,7 +54,7 @@ export default function Login() {
           <div className="space-y-4 sm:space-y-5">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-white">
-                {t('login.usernameOrEmail')}
+                Username
               </label>
               <input
                 id="username"
@@ -65,13 +65,13 @@ export default function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 bg-white/80 border border-white/50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-                placeholder={t('login.usernameOrEmailPlaceholder')}
+                placeholder="Enter your username"
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-white mb-1 ml-1">
-                {t('login.password')}
+                Password
               </label>
               <div className="relative flex items-center">
                 <div className="absolute left-3 flex items-center pointer-events-none">
@@ -85,7 +85,7 @@ export default function Login() {
                   type="password"
                   required
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder={t('login.password')}
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}

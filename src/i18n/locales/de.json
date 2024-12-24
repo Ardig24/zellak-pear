@@ -19,8 +19,8 @@
     "orderSummary": "Bestellübersicht",
     "items": "Artikel",
     "emptyOrder": "Ihre Bestellung ist leer",
-    "total": "Gesamt (Brutto)",
-    "subtotal": "Zwischensumme (Netto)",
+    "total": "Gesamt",
+    "subtotal": "Zwischensumme",
     "vat": "MwSt",
     "vat7": "MwSt 7%",
     "vat19": "MwSt 19%",
@@ -208,7 +208,35 @@
     "notifications": {
       "newOrders": "Neue Bestellungen",
       "noNewOrders": "Keine neuen Bestellungen"
+    },
+    "adminPanel": {
+      "companyInfo": "Unternehmensinformationen"
     }
+  },
+  "companyInfo": {
+    "title": "Unternehmensinformationen",
+    "addCategory": "Kategorie hinzufügen",
+    "categoryName": "Kategoriename",
+    "addItem": "Element hinzufügen",
+    "editItem": "Element bearbeiten",
+    "deleteCategory": "Kategorie löschen",
+    "deleteItem": "Element löschen",
+    "confirmDeleteCategory": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten? Alle darin enthaltenen Elemente werden gelöscht.",
+    "confirmDeleteItem": "Sind Sie sicher, dass Sie dieses Element löschen möchten?",
+    "serviceName": "Dienstname",
+    "serviceNamePlaceholder": "z.B. Namecheap Hosting",
+    "username": "Benutzername / E-Mail",
+    "usernamePlaceholder": "Benutzername oder E-Mail eingeben",
+    "password": "Passwort",
+    "passwordPlaceholder": "Passwort eingeben",
+    "renewalDate": "Verlängerungsdatum",
+    "autoRenew": "Dienst wird automatisch verlängert",
+    "autoRenewEnabled": "Automatische Verlängerung aktiviert",
+    "notes": "Zusätzliche Notizen",
+    "notesPlaceholder": "Geben Sie zusätzliche Informationen oder Notizen ein",
+    "renewalTracking": "Erneuerungsverfolgung",
+    "noRenewal": "Keine Erneuerung erforderlich",
+    "hasRenewal": "Dienst benötigt Erneuerungsverfolgung"
   },
   "orders": {
     "title": "Bestellverlauf",

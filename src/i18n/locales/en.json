@@ -208,7 +208,35 @@
     "notifications": {
       "newOrders": "New Orders",
       "noNewOrders": "No new Orders"
+    },
+    "adminPanel": {
+      "companyInfo": "Company Information"
     }
+  },
+  "companyInfo": {
+    "title": "Company Information",
+    "addCategory": "Add Category",
+    "categoryName": "Category Name",
+    "addItem": "Add Item",
+    "editItem": "Edit Item",
+    "deleteCategory": "Delete Category",
+    "deleteItem": "Delete Item",
+    "confirmDeleteCategory": "Are you sure you want to delete this category? All items within it will be deleted.",
+    "confirmDeleteItem": "Are you sure you want to delete this item?",
+    "serviceName": "Service Name",
+    "serviceNamePlaceholder": "e.g., Namecheap Hosting",
+    "username": "Username / Email",
+    "usernamePlaceholder": "Enter username or email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "renewalDate": "Renewal Date",
+    "autoRenew": "Service is automatically renewed",
+    "autoRenewEnabled": "Auto-renewal enabled",
+    "notes": "Additional Notes",
+    "notesPlaceholder": "Enter any additional information or notes",
+    "renewalTracking": "Renewal Tracking",
+    "noRenewal": "No renewal needed",
+    "hasRenewal": "Service needs renewal tracking"
   },
   "orders": {
     "title": "Order History",

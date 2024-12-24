@@ -6,7 +6,7 @@
     "password": "Fjalëkalimi",
     "signIn": "Hyni",
     "invalidCredentials": "Kredencialet e pavlefshme",
-    "invalidUsernameOrPassword": "Emri ose Fjalëkalimi i gabuar",
+    "invalidUsernameOrPassword": "Emri i përdoruesit ose fjalëkalimi i pavlefshëm",
     "usernameOrEmailPlaceholder": "Emri i përdoruesit ose Email",
     "usernameOrEmail": "Emri i përdoruesit ose Email"
   },
@@ -19,8 +19,8 @@
     "orderSummary": "Përmbledhja e Porosisë",
     "items": "artikuj",
     "emptyOrder": "Porosia juaj është e zbrazët",
-    "total": "Totali (Brutto)",
-    "subtotal": "Neto",
+    "total": "Totali",
+    "subtotal": "Nëntotali",
     "vat": "TVSH",
     "vat7": "TVSH 7%",
     "vat19": "TVSH 19%",
@@ -117,7 +117,7 @@
       "name": "Emri i Produktit",
       "productName": "Emri i Produktit",
       "icon": "Ikona e Produktit",
-      "chooseFile": "Zgjidhni Skedarin",
+      "chooseFile": "Zgjidhni Foton",
       "variant": "Varianti i Produktit",
       "category": "Kategoria",
       "selectCategory": "Zgjidhni kategorinë",
@@ -171,7 +171,7 @@
       "invoicePreview": "Pamja paraprake e Faturës",
       "viewDetails": "Shiko Detajet",
       "close": "Mbyll",
-      "subtotal": "Netto"
+      "subtotal": "Nëntotali"
     },
     "invoices": {
       "title": "Faturat",
@@ -208,6 +208,37 @@
     "notifications": {
       "newOrders": "Porosi të Reja",
       "noNewOrders": "Nuk ka Porosi të Reja"
+    },
+    "adminPanel": {
+      "companyInfo": "Informacioni i Kompanisë"
+    },
+    "companyInfo": {
+      "title": "Informacioni i Kompanisë",
+      "addCategory": "Shto Kategori",
+      "categoryName": "Emri i Kategorisë",
+      "addItem": "Shto Element",
+      "editItem": "Ndrysho Elementin",
+      "deleteCategory": "Fshi Kategorinë",
+      "deleteItem": "Fshi Elementin",
+      "confirmDeleteCategory": "A jeni të sigurt që dëshironi ta fshini këtë kategori? Të gjitha elementet brenda saj do të fshihen.",
+      "confirmDeleteItem": "A jeni të sigurt që dëshironi ta fshini këtë element?",
+      "serviceName": "Emri i Shërbimit",
+      "serviceNamePlaceholder": "p.sh. Namecheap Hosting",
+      "username": "Emri i përdoruesit / Email",
+      "usernamePlaceholder": "Shkruani emrin e përdoruesit ose emailin",
+      "password": "Fjalëkalimi",
+      "passwordPlaceholder": "Shkruani fjalëkalimin",
+      "renewalDate": "Data e Rinovimit",
+      "autoRenew": "Shërbimi rinovohet automatikisht",
+      "autoRenewEnabled": "Rinovimi automatik aktiv",
+      "notes": "Shënime Shtesë",
+      "notesPlaceholder": "Shkruani informacione ose shënime shtesë",
+      "itemTitle": "Titulli",
+      "itemValue": "Vlera",
+      "isPassword": "Kjo është një fjalëkalim",
+      "renewalTracking": "Gjurmimi i Rinovimit",
+      "noRenewal": "Nuk ka nevojë për rinovim",
+      "hasRenewal": "Shërbimi ka nevojë për gjurmim të rinovimit"
     }
   },
   "orders": {

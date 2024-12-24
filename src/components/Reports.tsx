@@ -42,6 +42,10 @@ export default function Reports() {
   const [selectedProduct, setSelectedProduct] = useState<string>('');
   const [reportType, setReportType] = useState<'user' | 'product'>('user');
   const [reportData, setReportData] = useState<any>(null);
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0], // Last month
+    endDate: new Date().toISOString().split('T')[0] // Today
+  });
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -87,17 +91,71 @@ export default function Reports() {
         throw new Error('User email not found');
       }
 
-      const ordersQuery = query(collection(db, 'orders'), where('userEmail', '==', userEmail));
-      const ordersSnapshot = await getDocs(ordersQuery);
-      const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Get all orders first
+      const ordersSnapshot = await getDocs(collection(db, 'orders'));
+      const allOrders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      const totalOrders = orders.length;
-      const totalSpent = orders.reduce((sum, order: any) => sum + order.total, 0);
-      const orderHistory = orders.map((order: any) => ({
-        date: order.orderDate,
-        amount: order.total,
-        items: order.items
-      }));
+      // Filter orders by user email and date range
+      const startDate = new Date(dateRange.startDate);
+      const endDate = new Date(dateRange.endDate);
+      endDate.setHours(23, 59, 59, 999);
+
+      console.log('Filtering orders for user:', userEmail);
+      console.log('Date range:', startDate, ' to ', endDate);
+      console.log('All orders:', allOrders);
+
+      const filteredOrders = allOrders.filter((order: any) => {
+        if (!order.userEmail || !order.orderDate) return false;
+        
+        let orderDate;
+        if (order.orderDate instanceof Date) {
+          orderDate = order.orderDate;
+        } else if (order.orderDate.seconds) {
+          orderDate = new Date(order.orderDate.seconds * 1000);
+        } else if (typeof order.orderDate === 'string') {
+          orderDate = new Date(order.orderDate);
+        }
+
+        if (!orderDate || isNaN(orderDate.getTime())) return false;
+
+        return (
+          order.userEmail === userEmail &&
+          orderDate >= startDate &&
+          orderDate <= endDate
+        );
+      });
+
+      console.log('Filtered orders:', filteredOrders);
+
+      const totalOrders = filteredOrders.length;
+      const totalSpent = filteredOrders.reduce((sum, order: any) => {
+        return sum + (typeof order.total === 'number' ? order.total : 0);
+      }, 0);
+
+      const orderHistory = filteredOrders
+        .map((order: any) => {
+          let orderDate;
+          if (order.orderDate instanceof Date) {
+            orderDate = order.orderDate;
+          } else if (order.orderDate.seconds) {
+            orderDate = new Date(order.orderDate.seconds * 1000);
+          } else if (typeof order.orderDate === 'string') {
+            orderDate = new Date(order.orderDate);
+          } else {
+            orderDate = new Date();
+          }
+
+          return {
+            date: orderDate,
+            amount: order.total || 0,
+            items: Array.isArray(order.items) ? order.items : []
+          };
+        })
+        .sort((a, b) => b.date.getTime() - a.date.getTime()) // Sort by date descending (newest first)
+        .map(order => ({
+          ...order,
+          date: order.date.toISOString() // Convert back to ISO string after sorting
+        }));
 
       setReportData({
         totalOrders,
@@ -121,73 +179,68 @@ export default function Reports() {
         throw new Error('Product not found');
       }
 
+      // Get all orders
       const ordersSnapshot = await getDocs(collection(db, 'orders'));
-      const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const allOrders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Filter orders that contain the product and have valid items array
-      const productOrders = orders.filter((order: any) => {
-        if (!order.items || !Array.isArray(order.items)) return false;
-        return order.items.some((item: any) => 
-          item && item.productId === productId && 
-          typeof item.quantity === 'number' && 
-          typeof item.price === 'number'
-        );
-      });
+      console.log('All orders for product report:', allOrders);
 
-      if (productOrders.length === 0) {
-        setReportData({
-          totalSold: 0,
-          revenue: 0,
-          orders: []
-        });
-        return;
-      }
+      // Filter and process orders
+      const processedOrders = allOrders
+        .filter((order: any) => {
+          // First check if order has valid date and items
+          if (!order.orderDate || !order.items || !Array.isArray(order.items)) {
+            return false;
+          }
 
-      const totalSold = productOrders.reduce((sum, order: any) => {
-        const item = order.items.find((item: any) => item.productId === productId);
-        return sum + (item?.quantity || 0);
-      }, 0);
-
-      const revenue = productOrders.reduce((sum, order: any) => {
-        const item = order.items.find((item: any) => item.productId === productId);
-        return sum + ((item?.price || 0) * (item?.quantity || 0));
-      }, 0);
-
-      // Format the orders to include proper dates
-      const formattedOrders = productOrders.map((order: any) => {
-        let orderDate;
-        
-        // Try to parse the orderDate in multiple formats
-        if (order.orderDate) {
+          // Check if order contains the product
+          return order.items.some((item: any) => item && item.productId === productId);
+        })
+        .map((order: any) => {
+          // Parse the date
+          let orderDate;
           if (order.orderDate instanceof Date) {
             orderDate = order.orderDate;
           } else if (order.orderDate.seconds) {
-            // Handle Firestore Timestamp
             orderDate = new Date(order.orderDate.seconds * 1000);
           } else if (typeof order.orderDate === 'string') {
             orderDate = new Date(order.orderDate);
+          } else {
+            orderDate = new Date();
           }
-        }
 
-        // If date is invalid or undefined, use current date
-        if (!orderDate || isNaN(orderDate.getTime())) {
-          orderDate = new Date();
-        }
-        
-        return {
+          // Find the specific product in the order
+          const productItem = order.items.find((item: any) => item.productId === productId);
+
+          return {
+            date: orderDate,
+            quantity: productItem?.quantity || 0,
+            price: productItem?.price || 0,
+            total: (productItem?.quantity || 0) * (productItem?.price || 0)
+          };
+        })
+        .filter((order) => {
+          // Filter by date range
+          const startDate = new Date(dateRange.startDate);
+          const endDate = new Date(dateRange.endDate);
+          endDate.setHours(23, 59, 59, 999);
+          
+          return order.date >= startDate && order.date <= endDate;
+        })
+        .sort((a, b) => b.date.getTime() - a.date.getTime()) // Sort by date descending
+        .map(order => ({
           ...order,
-          orderDate: orderDate.toISOString(),
-          items: order.items.map((item: any) => ({
-            ...item,
-            date: orderDate.toISOString()
-          }))
-        };
-      });
+          date: order.date.toISOString() // Convert date back to string for display
+        }));
+
+      // Calculate totals
+      const totalSold = processedOrders.reduce((sum, order) => sum + order.quantity, 0);
+      const revenue = processedOrders.reduce((sum, order) => sum + order.total, 0);
 
       setReportData({
         totalSold,
         revenue,
-        orders: formattedOrders
+        orders: processedOrders
       });
     } catch (err) {
       console.error('Error fetching product report:', err);
@@ -233,6 +286,35 @@ export default function Reports() {
           >
             {t('reports.productReport')}
           </button>
+        </div>
+
+        {/* Date Range Selection */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-4 mb-4">
+          <div className="flex-1">
+            <label className="block text-sm text-gray-600 mb-1">
+              {t('reports.startDate')}
+            </label>
+            <input
+              type="date"
+              value={dateRange.startDate}
+              onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+              max={dateRange.endDate}
+              className="w-full p-3 rounded-lg text-gray-700 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm text-gray-600 mb-1">
+              {t('reports.endDate')}
+            </label>
+            <input
+              type="date"
+              value={dateRange.endDate}
+              onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+              min={dateRange.startDate}
+              max={new Date().toISOString().split('T')[0]}
+              className="w-full p-3 rounded-lg text-gray-700 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+            />
+          </div>
         </div>
 
         {/* Selection Dropdown */}
@@ -365,24 +447,21 @@ export default function Reports() {
               <div className="block sm:hidden">
                 <h4 className="text-lg font-bold mb-4 text-gray-800">{t('reports.orderHistory')}</h4>
                 <div className="space-y-4">
-                  {reportData.orders.map((order: any, index: number) => {
-                    const item = order.items.find((item: any) => item.productId === selectedProduct);
-                    return (
-                      <div key={index} className="bg-gray-100 p-4 rounded-lg space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">
-                            {formatDate(order.orderDate)}
-                          </span>
-                          <span className="font-medium text-gray-800">
-                            €{item.price.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-800">
-                          {t('reports.quantity')}: {item.quantity}
-                        </div>
+                  {reportData.orders.map((order: any, index: number) => (
+                    <div key={index} className="bg-gray-100 p-4 rounded-lg space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
+                          {formatDate(order.date)}
+                        </span>
+                        <span className="font-medium text-gray-800">
+                          €{order.price.toFixed(2)}
+                        </span>
                       </div>
-                    );
-                  })}
+                      <div className="text-sm text-gray-800">
+                        {t('reports.quantity')}: {order.quantity}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -399,22 +478,19 @@ export default function Reports() {
                       </tr>
                     </thead>
                     <tbody>
-                      {reportData.orders.map((order: any, index: number) => {
-                        const item = order.items.find((item: any) => item.productId === selectedProduct);
-                        return (
-                          <tr key={index} className="hover:bg-gray-100 transition-colors duration-200">
-                            <td className="px-4 py-3 text-gray-800">
-                              {formatDate(order.orderDate)}
-                            </td>
-                            <td className="px-4 py-3 text-gray-800">
-                              {item.quantity}
-                            </td>
-                            <td className="px-4 py-3 text-gray-800">
-                              €{item.price.toFixed(2)}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {reportData.orders.map((order: any, index: number) => (
+                        <tr key={index} className="hover:bg-gray-100 transition-colors duration-200">
+                          <td className="px-4 py-3 text-gray-800">
+                            {formatDate(order.date)}
+                          </td>
+                          <td className="px-4 py-3 text-gray-800">
+                            {order.quantity}
+                          </td>
+                          <td className="px-4 py-3 text-gray-800">
+                            €{order.price.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>

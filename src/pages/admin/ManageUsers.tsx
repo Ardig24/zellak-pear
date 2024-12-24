@@ -10,7 +10,6 @@ import { createUser } from '../../api/createUser';
 
 interface UserData {
   id: string;
-  email: string;
   username: string;
   category: 'A' | 'B';
   companyName: string;
@@ -35,7 +34,6 @@ export default function ManageUsers() {
     role: 'user',
   });
   const [formData, setFormData] = useState({
-    email: '',
     username: '',
     password: '',
     category: 'A' as 'A' | 'B',
@@ -74,7 +72,6 @@ export default function ManageUsers() {
       if (editingUser) {
         // Update existing user
         await setDoc(doc(db, 'users', editingUser.id), {
-          email: formData.email,
           username: formData.username.toLowerCase(),
           category: formData.category,
           companyName: formData.companyName,
@@ -92,33 +89,38 @@ export default function ManageUsers() {
         }
 
         // Create new user
-        const { uid } = await createUser(formData.email, formData.password);
+        const { uid } = await createUser(formData.username, formData.password);
 
         // Store user data
         await setDoc(doc(db, 'users', uid), {
-          email: formData.email,
           username: formData.username.toLowerCase(),
           category: formData.category,
           companyName: formData.companyName,
           address: formData.address,
           contactNumber: formData.contactNumber,
           isAdmin: false,
-          createdAt: new Date().toISOString(),
+          createdAt: new Date().toISOString()
         });
 
         // Store username mapping
         await setDoc(doc(db, 'usernames', formData.username.toLowerCase()), {
-          uid: uid,
+          uid,
           username: formData.username.toLowerCase()
         });
       }
 
-      resetForm();
       setIsAddingUser(false);
       setEditingUser(null);
+      setFormData({
+        username: '',
+        password: '',
+        category: 'A',
+        companyName: '',
+        address: '',
+        contactNumber: '',
+      });
       await fetchUsers();
     } catch (err: any) {
-      console.error('Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -142,7 +144,6 @@ export default function ManageUsers() {
   const startEdit = (user: UserData) => {
     setEditingUser(user);
     setFormData({
-      email: user.email,
       username: user.username,
       password: '', // Password field is empty when editing
       category: user.category,
@@ -155,7 +156,6 @@ export default function ManageUsers() {
 
   const resetForm = () => {
     setFormData({
-      email: '',
       username: '',
       password: '',
       category: 'A',
@@ -186,7 +186,6 @@ export default function ManageUsers() {
 
   const filteredUsers = users.filter(user =>
     user.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.contactNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -227,9 +226,6 @@ export default function ManageUsers() {
               <thead>
                 <tr>
                   <th className="px-2 py-2 text-left font-medium text-gray-900">
-                    {t('admin.users.email')}
-                  </th>
-                  <th className="px-2 py-2 text-left font-medium text-gray-900">
                     {t('admin.users.username')}
                   </th>
                   <th className="px-2 py-2 text-left font-medium text-gray-900">
@@ -249,9 +245,6 @@ export default function ManageUsers() {
               <tbody className="divide-y divide-gray-200">
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors duration-200">
-                    <td className="px-2 py-2">
-                      <div className="truncate max-w-[200px]">{user.email}</div>
-                    </td>
                     <td className="px-2 py-2">
                       <div className="truncate max-w-[150px]">{user.username}</div>
                     </td>
@@ -301,8 +294,7 @@ export default function ManageUsers() {
               >
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <div className="font-medium text-gray-900">{user.email}</div>
-                    <div className="text-sm text-gray-600">{user.username}</div>
+                    <div className="font-medium text-gray-900">{user.username}</div>
                   </div>
                   <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
                     user.category === 'A' 
@@ -364,21 +356,7 @@ export default function ManageUsers() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        {t('admin.users.email')}
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('admin.users.username')}
+                        Username
                       </label>
                       <input
                         type="text"
@@ -386,13 +364,14 @@ export default function ManageUsers() {
                         value={formData.username}
                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                         required
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
+
                     {!editingUser && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          {t('login.password')}
+                          Password
                         </label>
                         <input
                           type="password"
@@ -400,8 +379,7 @@ export default function ManageUsers() {
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                           required={!editingUser}
-                          minLength={6}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         />
                       </div>
                     )}
@@ -429,7 +407,7 @@ export default function ManageUsers() {
                         value={formData.companyName}
                         onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                         required
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
                     <div>
@@ -441,7 +419,7 @@ export default function ManageUsers() {
                         name="contactNumber"
                         value={formData.contactNumber}
                         onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
                     <div>
@@ -453,7 +431,7 @@ export default function ManageUsers() {
                         name="address"
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
                   </div>

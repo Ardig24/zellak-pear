@@ -30,6 +30,7 @@ export default function NewOrderHistory() {
   const { currentUser } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const userData = useAuth().userData;
 
   useEffect(() => {
     // Set default language to German
@@ -37,12 +38,12 @@ export default function NewOrderHistory() {
   }, []);
 
   useEffect(() => {
-    if (!currentUser?.email) return;
+    if (!currentUser?.email || !userData?.username) return;
 
     const ordersRef = collection(db, 'orders');
     const q = query(
       ordersRef,
-      where('userEmail', '==', currentUser.email)
+      where('userEmail', '==', `${userData.username.toLowerCase()}@placeholder.com`)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -63,7 +64,7 @@ export default function NewOrderHistory() {
     });
 
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [currentUser, userData]);
 
   const handleCancelOrder = async (orderId: string) => {
     try {
