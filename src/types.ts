@@ -41,6 +41,12 @@ export interface OrderItem {
   vatAmount: number;
 }
 
+export interface OrderTotals {
+  subtotal: number;
+  vat7Total: number;
+  vat19Total: number;
+}
+
 export interface Order {
   id: string;
   items: OrderItem[];
@@ -52,9 +58,16 @@ export interface Order {
   status: 'pending' | 'completed';
   total: number;
   orderDate: string;
-  vat7Total: number;
-  vat19Total: number;
-  subtotal: number;
+  totals: OrderTotals;
+}
+
+export interface UserData {
+  username: string;
+  companyName: string;
+  address?: string;
+  contactNumber?: string;
+  email?: string;
+  category?: string;
 }
 
 export interface Category {

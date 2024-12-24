@@ -1,16 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
 import { db } from '../config/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { OrderItem } from '../types';
+import { OrderItem, OrderTotals, UserData } from '../types';
 import { useAuth } from './AuthContext';
-
-interface UserData {
-  username: string;
-  companyName: string;
-  address?: string;
-  contactNumber?: string;
-  category?: string;
-}
+import { generatePDF } from '../api/generatePDF';
 
 interface OrderContextType {
   items: OrderItem[];
@@ -19,12 +12,6 @@ interface OrderContextType {
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
   sendOrder: (orderItems: OrderItem[], userData: UserData) => Promise<void>;
-}
-
-interface OrderTotals {
-  subtotal: number;
-  vat7Total: number;
-  vat19Total: number;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -91,6 +78,9 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Preparing to send email with items:', orderItems);
 
+      // Generate PDF
+      const pdfBase64 = await generatePDF(orderId, orderItems, totals, total, userData);
+      
       const url = 'https://api.brevo.com/v3/smtp/email';
       
       // Format the email parameters
@@ -99,11 +89,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         category: userData.category || '',
         company_name: userData.companyName || '',
         contact_number: userData.contactNumber || 'Not provided',
-        email: currentUser?.email || 'Not provided',
+        username: userData.username || 'Not provided',
         order_id: orderId,
         products: orderItems.map(item => ({
           price: Number(item.price).toFixed(2),
-          product_name: `${item.productName} - ${item.size}`,
+          product_name: item.productName,
           quantity: item.quantity,
           subtotal: (Number(item.price) * Number(item.quantity)).toFixed(2)
         })),
@@ -124,7 +114,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
           name: "Zellak Bestellungen",
           email: "zellak.bestellungen@gmail.com"
         },
-        subject: `New Order #${orderId}`
+        subject: `Neue Bestellung von ${userData.username}`,
+        attachment: [{
+          name: `order-${orderId}.pdf`,
+          content: pdfBase64
+        }]
       };
 
       console.log('Sending email with parameters:', JSON.stringify(emailParams, null, 2));
@@ -154,7 +148,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       console.error('Error sending order confirmation email:', error);
       console.log('Environment variables:', {
         adminEmail: import.meta.env.VITE_ADMIN_EMAIL,
-        templateId: 2,
         hasApiKey: !!import.meta.env.VITE_BREVO_API_KEY
       });
       throw error;
