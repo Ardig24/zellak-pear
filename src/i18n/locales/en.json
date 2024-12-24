@@ -6,6 +6,7 @@
     "password": "Password",
     "signIn": "Sign In",
     "invalidCredentials": "Invalid credentials",
+    "invalidUsernameOrPassword": "Invalid Username or Password",
     "usernameOrEmailPlaceholder": "Username or E-mail",
     "usernameOrEmail": "Username or E-mail"
   },
@@ -18,8 +19,8 @@
     "orderSummary": "Order Summary",
     "items": "items",
     "emptyOrder": "Your order is empty",
-    "total": "Total",
-    "subtotal": "Subtotal",
+    "total": "Total (Brutto)",
+    "subtotal": "Subtotal (Netto)",
     "vat": "VAT",
     "vat7": "VAT 7%",
     "vat19": "VAT 19%",
@@ -38,7 +39,8 @@
     "noItemsInCart": "No items in cart",
     "orderSentSuccess": "Order was sent successfully!",
     "orderSendError": "Failed to send order. Please try again.",
-    "notLoggedIn": "You must be logged in to send an order"
+    "notLoggedIn": "You must be logged in to send an order",
+    "outOfStock": "Out of Stock"
   },
   "admin": {
     "title": "Admin Panel",
@@ -49,6 +51,12 @@
     "companyName": "Company Name",
     "address": "Address",
     "addNewUser": "Add New User",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "priceA": "Price A",
+    "priceB": "Price B",
+    "categoryA": "Category A",
+    "categoryB": "Category B",
     "home_section": {
       "dashboard": "Dashboard",
       "pendingOrders": "Pending Orders",
@@ -73,7 +81,7 @@
     "deleteProductConfirm": "Are you sure you want to delete this product?",
     "users": {
       "title": "User Management",
-      "addUser": "Add User",
+      "addNewUser": "Add User",
       "editUser": "Edit User",
       "deleteUser": "Delete User",
       "userName": "User Name",

@@ -216,7 +216,7 @@ export default function ManageOrders() {
                               <span className={`px-3 py-1 text-sm font-bold rounded-full ${
                                 order.status === 'completed' 
                                   ? 'bg-green-200 text-green-800' 
-                                  : 'bg-yellow-200 text-yellow-800'
+                                  : 'bg-red-200 text-red-800'
                               }`}>
                                 {t(`orders.${order.status}`)}
                               </span>
@@ -248,8 +248,8 @@ export default function ManageOrders() {
                             }}
                             className={`w-full px-4 py-2 rounded-lg transition-all duration-200 ${
                               order.status === 'pending'
-                                ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
-                                : 'bg-white border border-yellow-500 text-yellow-700 hover:bg-yellow-50'
+                                ? 'bg-white border border-red-500 text-red-700 hover:bg-red-50'
+                                : 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
                             }`}
                           >
                             {order.status === 'pending' 
@@ -309,10 +309,10 @@ export default function ManageOrders() {
                                 €{order.total.toFixed(2)}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-3 py-1 inline-flex text-sm leading-5 font-bold rounded-full ${
-                                  order.status === 'completed' 
-                                    ? 'bg-green-200 text-green-800' 
-                                    : 'bg-yellow-200 text-yellow-800'
+                                <span className={`px-3 py-1 text-sm font-bold rounded-full ${
+                                  order.status === 'completed'
+                                    ? 'bg-green-200 text-green-800'
+                                    : 'bg-red-200 text-red-800'
                                 }`}>
                                   {t(`orders.${order.status}`)}
                                 </span>
@@ -328,8 +328,8 @@ export default function ManageOrders() {
                                   }}
                                   className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                                     order.status === 'pending'
-                                      ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
-                                      : 'bg-white border border-yellow-500 text-yellow-700 hover:bg-yellow-50'
+                                      ? 'bg-white border border-red-500 text-red-700 hover:bg-red-50'
+                                      : 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
                                   }`}
                                 >
                                   {order.status === 'pending'
@@ -430,8 +430,8 @@ export default function ManageOrders() {
                               }}
                               className={`flex-1 py-2 rounded-lg ${
                                 selectedOrder.status === 'pending'
-                                  ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
-                                  : 'bg-white border border-yellow-500 text-yellow-700 hover:bg-yellow-50'
+                                  ? 'bg-white border border-red-500 text-red-700 hover:bg-red-50'
+                                  : 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
                               }`}
                             >
                               {selectedOrder.status === 'pending'

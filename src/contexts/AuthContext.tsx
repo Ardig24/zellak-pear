@@ -9,6 +9,7 @@ import {
 import { auth, db } from '../config/firebase';
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface UserData {
   email: string;
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -124,12 +126,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const usernameSnapshot = await getDocs(usernameQuery);
         
         if (usernameSnapshot.empty) {
+          setError(t('login.invalidUsernameOrPassword'));
           throw new Error('User not found');
         }
 
         // Get the user document
         const userDoc = await getDoc(doc(db, 'users', usernameSnapshot.docs[0].data().uid));
         if (!userDoc.exists()) {
+          setError(t('login.invalidUsernameOrPassword'));
           throw new Error('User data not found');
         }
 
@@ -143,6 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Get user data
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
+        setError(t('login.invalidUsernameOrPassword'));
         throw new Error('User data not found');
       }
 
@@ -155,7 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         navigate('/');
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(t('login.invalidUsernameOrPassword'));
       throw err;
     } finally {
       setLoading(false);

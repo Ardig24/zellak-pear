@@ -29,7 +29,8 @@ export default function ManageProducts() {
     variants: [{
       id: `${Date.now()}-0`,
       size: '',
-      prices: { A: 0, B: 0, C: 0 }
+      prices: { A: 0, B: 0 },
+      inStock: true
     }],
   });
 
@@ -66,9 +67,9 @@ export default function ManageProducts() {
           size: variant.size,
           prices: {
             A: Number(variant.prices.A),
-            B: Number(variant.prices.B),
-            C: Number(variant.prices.C)
-          }
+            B: Number(variant.prices.B)
+          },
+          inStock: variant.inStock ?? true
         }))
       };
 
@@ -104,7 +105,8 @@ export default function ManageProducts() {
         {
           id: `${Date.now()}-${formData.variants.length}`,
           size: '',
-          prices: { A: 0, B: 0, C: 0 }
+          prices: { A: 0, B: 0 },
+          inStock: true
         }
       ],
     });
@@ -113,7 +115,7 @@ export default function ManageProducts() {
   const updateVariant = (index: number, field: string, value: string | number) => {
     const newVariants = [...formData.variants];
     if (field.startsWith('price')) {
-      const category = field.split('.')[1] as 'A' | 'B' | 'C';
+      const category = field.split('.')[1] as 'A' | 'B';
       const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
       newVariants[index] = {
         ...newVariants[index],
@@ -121,6 +123,11 @@ export default function ManageProducts() {
           ...newVariants[index].prices,
           [category]: numericValue,
         },
+      };
+    } else if (field === 'inStock') {
+      newVariants[index] = {
+        ...newVariants[index],
+        inStock: value as boolean,
       };
     } else {
       newVariants[index] = {
@@ -147,7 +154,8 @@ export default function ManageProducts() {
       vatRate: product.vatRate,
       variants: product.variants.map((v) => ({
         size: v.size,
-        prices: { ...v.prices },
+        prices: { A: v.prices.A, B: v.prices.B },
+        inStock: v.inStock
       })),
     });
     setIsAddingProduct(true);
@@ -162,7 +170,8 @@ export default function ManageProducts() {
       variants: [{
         id: `${Date.now()}-0`,
         size: '',
-        prices: { A: 0, B: 0, C: 0 }
+        prices: { A: 0, B: 0 },
+        inStock: true
       }],
     });
     setIsAddingProduct(false);
@@ -335,17 +344,37 @@ export default function ManageProducts() {
               
               {/* Product Variants */}
               <div className="space-y-2">
-                {product.variants.map((variant) => (
+                {product.variants.map((variant, index) => (
                   <div
                     key={variant.id}
                     className="bg-gray-50 p-2 rounded-lg border border-gray-100"
                   >
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-700">{variant.size}</span>
-                      <div className="flex gap-2 text-sm">
-                        <span className="text-gray-600">A: €{variant.prices.A}</span>
-                        <span className="text-gray-600">B: €{variant.prices.B}</span>
-                        <span className="text-gray-600">C: €{variant.prices.C}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{variant.size}</span>
+                        <div className="flex gap-2 text-sm">
+                          <span className="text-gray-600">A: €{variant.prices.A}</span>
+                          <span className="text-gray-600">B: €{variant.prices.B}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            const newVariants = [...product.variants];
+                            newVariants[index] = {
+                              ...variant,
+                              inStock: !variant.inStock
+                            };
+                            updateProduct(product.id, { ...product, variants: newVariants });
+                          }}
+                          className={`px-3 py-1 text-sm font-medium rounded-full ${
+                            variant.inStock
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                              : 'bg-red-100 text-red-800 hover:bg-red-200'
+                          }`}
+                        >
+                          {variant.inStock ? t('admin.inStock') : t('admin.outOfStock')}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -510,23 +539,40 @@ export default function ManageProducts() {
                               required
                             />
                           </div>
-                          <div className="grid grid-cols-3 gap-2">
-                            {['A', 'B', 'C'].map((category) => (
-                              <div key={category}>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  {t('admin.products.price')} {category}
-                                </label>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  value={variant.prices[category as 'A' | 'B' | 'C']}
-                                  onChange={(e) => updateVariant(index, `price.${category}`, e.target.value)}
-                                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 bg-white"
-                                  required
-                                />
-                              </div>
-                            ))}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.priceA')}</label>
+                              <input
+                                type="number"
+                                value={variant.prices.A}
+                                onChange={(e) => updateVariant(index, 'price.A', e.target.value)}
+                                className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                                step="0.01"
+                                min="0"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">{t('admin.priceB')}</label>
+                              <input
+                                type="number"
+                                value={variant.prices.B}
+                                onChange={(e) => updateVariant(index, 'price.B', e.target.value)}
+                                className="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                                step="0.01"
+                                min="0"
+                              />
+                            </div>
+                          </div>
+                          <div className="mt-2">
+                            <label className="inline-flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={variant.inStock}
+                                onChange={(e) => updateVariant(index, 'inStock', e.target.checked)}
+                                className="form-checkbox h-4 w-4 text-blue-600"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">{t('admin.inStock')}</span>
+                            </label>
                           </div>
                         </div>
                       </div>

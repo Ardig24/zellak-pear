@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { OrderItem } from '../types';
-import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList, Coffee } from 'lucide-react';
+import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList, Coffee, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useProducts } from '../contexts/ProductsContext';
@@ -99,6 +99,18 @@ export default function Products() {
       localStorage.setItem('cartItems', JSON.stringify(newItems));
       return newItems;
     });
+  };
+
+  const updateQuantity = (productId: string, variantId: string, newQuantity: number) => {
+    handleQuantityChange(
+      productId,
+      orderItems.find(item => item.productId === productId && item.variantId === variantId)?.productName || '',
+      variantId,
+      orderItems.find(item => item.productId === productId && item.variantId === variantId)?.size || '',
+      orderItems.find(item => item.productId === productId && item.variantId === variantId)?.price || 0,
+      newQuantity,
+      orderItems.find(item => item.productId === productId && item.variantId === variantId)?.vatRate || 7
+    );
   };
 
   const calculateTotals = () => {
@@ -213,22 +225,48 @@ export default function Products() {
                 </div>
               ) : (
                 <>
-                  <div className="space-y-4">
+                  <div className="grid gap-4">
                     {orderItems.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                        <div>
-                          <p className="font-medium">{item.productName}</p>
-                          <p className="text-sm text-gray-500">{item.size}</p>
-                          <p className="text-sm text-gray-600">
-                            {t('products.quantity')}: {item.quantity} × €{item.price}
-                          </p>
+                      <div key={`${item.productId}-${item.variantId}`} 
+                           className="bg-white rounded-lg shadow p-4 relative">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-lg font-medium text-gray-900">{item.productName}</h3>
+                            <p className="text-gray-600 text-sm mt-1">{item.size}</p>
+                            <div className="mt-3 flex items-center gap-3">
+                              <div className="flex items-center bg-gray-100 rounded-lg">
+                                <button
+                                  onClick={() => updateQuantity(item.productId, item.variantId, Math.max(0, item.quantity - 1))}
+                                  className="px-3 py-1 text-gray-600 hover:text-gray-800 text-lg font-medium"
+                                >
+                                  -
+                                </button>
+                                <span className="px-3 py-1 text-lg font-semibold text-gray-800">{item.quantity}</span>
+                                <button
+                                  onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
+                                  className="px-3 py-1 text-gray-600 hover:text-gray-800 text-lg font-medium"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-end gap-2">
+                            <button
+                              onClick={() => removeItem(item.productId, item.variantId)}
+                              className="text-red-500 hover:text-red-600 transition-colors"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                            <div className="text-right mt-2">
+                              <div className="text-sm text-gray-500">€{item.price.toFixed(2)} per item</div>
+                              <div className="text-lg font-medium text-blue-600 mt-1">€{(item.price * item.quantity).toFixed(2)}</div>
+                              <div className="text-xs text-gray-500 mt-1">incl. {item.vatRate}% VAT: €{item.vatAmount.toFixed(2)}</div>
+                            </div>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => removeItem(item.productId, item.variantId)}
-                          className="text-red-500 hover:text-red-700 p-2"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
                       </div>
                     ))}
                   </div>
@@ -422,17 +460,17 @@ export default function Products() {
                         {categoryProducts.map((product) => (
                           <div
                             key={product.id}
-                            className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
+                            className="glass-panel p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                           >
                             {product.icon && (
                               <img
                                 src={product.icon}
                                 alt={product.name}
-                                className="w-16 h-16 object-cover rounded-lg mb-4"
+                                className="w-16 h-16 object-cover rounded-lg shadow-sm"
                               />
                             )}
                             <div>
-                              <h3 className="text-lg font-semibold text-gray-800 mb-3">{product.name}</h3>
+                              <h3 className="text-lg font-medium text-gray-800 mb-3">{product.name}</h3>
                               <div className="space-y-2">
                                 {product.variants.map((variant, index) => {
                                   const safeVariantId = variant.id || `${product.id}-variant-${index}`;
@@ -444,50 +482,85 @@ export default function Products() {
                                   return (
                                     <div 
                                       key={`${product.id}-${safeVariantId}`}
-                                      className="flex flex-row items-center justify-between bg-white/50 p-2 rounded-lg max-w-3xl space-y-2 sm:space-y-0"
+                                      className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white/50 p-2 rounded-lg gap-2"
                                     >
-                                      <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                                        <span className="text-sm font-medium w-8">{variant.size}</span>
-                                        <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                                        <span className="text-sm font-medium">{variant.size}</span>
                                         <span className="text-xs text-gray-500">{t('products.vat')} {product.vatRate}%</span>
+                                        {variant.inStock === false && (
+                                          <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
+                                            {t('products.outOfStock')}
+                                          </span>
+                                        )}
                                       </div>
-                                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                        <button
-                                          onClick={() => {
-                                            const newQuantity = Math.max(0, currentQuantity - 1);
-                                            handleQuantityChange(
-                                              product.id,
-                                              product.name,
-                                              safeVariantId,
-                                              variant.size,
-                                              variant.prices[userData.category],
-                                              newQuantity,
-                                              product.vatRate
-                                            );
-                                          }}
-                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium"
-                                          disabled={currentQuantity === 0}
-                                        >
-                                          -
-                                        </button>
-                                        <span className="w-8 text-center font-medium text-gray-800 text-lg">{currentQuantity}</span>
-                                        <button
-                                          onClick={() => {
-                                            const newQuantity = currentQuantity + 1;
-                                            handleQuantityChange(
-                                              product.id,
-                                              product.name,
-                                              safeVariantId,
-                                              variant.size,
-                                              variant.prices[userData.category],
-                                              newQuantity,
-                                              product.vatRate
-                                            );
-                                          }}
-                                          className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20 text-lg font-medium"
-                                        >
-                                          +
-                                        </button>
+                                      <div className="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
+                                        <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category].toFixed(2)}</p>
+                                        <div className="flex items-center gap-2">
+                                          <button
+                                            onClick={() => {
+                                              const newQuantity = Math.max(0, currentQuantity - 1);
+                                              handleQuantityChange(
+                                                product.id,
+                                                product.name,
+                                                safeVariantId,
+                                                variant.size,
+                                                variant.prices[userData.category],
+                                                newQuantity,
+                                                product.vatRate
+                                              );
+                                            }}
+                                            className={`glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium ${
+                                              variant.inStock === false ? 'opacity-50 cursor-not-allowed' : ''
+                                            }`}
+                                            disabled={currentQuantity === 0 || variant.inStock === false}
+                                          >
+                                            -
+                                          </button>
+                                          <input
+                                            type="number"
+                                            value={currentQuantity}
+                                            onChange={(e) => {
+                                              if (variant.inStock === false) return;
+                                              const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
+                                              handleQuantityChange(
+                                                product.id,
+                                                product.name,
+                                                safeVariantId,
+                                                variant.size,
+                                                variant.prices[userData.category],
+                                                newQuantity,
+                                                product.vatRate
+                                              );
+                                            }}
+                                            className={`w-16 text-center font-medium text-gray-800 text-lg bg-white/50 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                                              variant.inStock === false ? 'opacity-50 cursor-not-allowed' : ''
+                                            }`}
+                                            min="0"
+                                            disabled={variant.inStock === false}
+                                          />
+                                          <button
+                                            onClick={() => {
+                                              const newQuantity = currentQuantity + 1;
+                                              handleQuantityChange(
+                                                product.id,
+                                                product.name,
+                                                safeVariantId,
+                                                variant.size,
+                                                variant.prices[userData.category],
+                                                newQuantity,
+                                                product.vatRate
+                                              );
+                                            }}
+                                            className={`glass-button w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm text-lg font-medium ${
+                                              variant.inStock === false
+                                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                : 'bg-blue-500/10 text-blue-600 hover:bg-blue-500/20'
+                                            } transition-colors border border-white/20`}
+                                            disabled={variant.inStock === false}
+                                          >
+                                            +
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
                                   );
@@ -512,7 +585,7 @@ export default function Products() {
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className="glass-panel p-6 rounded-xl text-left hover:scale-102 hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20 min-h-[100px] w-full"
+                      className="glass-panel p-6 rounded-lg text-left hover:scale-102 hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20 min-h-[100px] w-full"
                     >
                       <div className="flex items-start space-x-4">
                         <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -538,7 +611,7 @@ export default function Products() {
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="glass-panel p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
+                    className="glass-panel p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                   >
                     <div className="flex gap-6">
                       {/* Product Image */}
@@ -570,50 +643,85 @@ export default function Products() {
                             return (
                               <div 
                                 key={`${product.id}-${safeVariantId}`}
-                                className="flex flex-row items-center justify-between bg-white/50 p-2 rounded-lg max-w-3xl space-y-2 sm:space-y-0"
+                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white/50 p-2 rounded-lg gap-2"
                               >
-                                <div className="flex flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
-                                  <span className="text-sm font-medium w-8">{variant.size}</span>
-                                  <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category]}</p>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                                  <span className="text-sm font-medium">{variant.size}</span>
                                   <span className="text-xs text-gray-500">{t('products.vat')} {product.vatRate}%</span>
+                                  {variant.inStock === false && (
+                                    <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
+                                      {t('products.outOfStock')}
+                                    </span>
+                                  )}
                                 </div>
-                                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                  <button
-                                    onClick={() => {
-                                      const newQuantity = Math.max(0, currentQuantity - 1);
-                                      handleQuantityChange(
-                                        product.id,
-                                        product.name,
-                                        safeVariantId,
-                                        variant.size,
-                                        variant.prices[userData.category],
-                                        newQuantity,
-                                        product.vatRate
-                                      );
-                                    }}
-                                    className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium"
-                                    disabled={currentQuantity === 0}
-                                  >
-                                    -
-                                  </button>
-                                  <span className="w-8 text-center font-medium text-gray-800 text-lg">{currentQuantity}</span>
-                                  <button
-                                    onClick={() => {
-                                      const newQuantity = currentQuantity + 1;
-                                      handleQuantityChange(
-                                        product.id,
-                                        product.name,
-                                        safeVariantId,
-                                        variant.size,
-                                        variant.prices[userData.category],
-                                        newQuantity,
-                                        product.vatRate
-                                      );
-                                    }}
-                                    className="glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 backdrop-blur-sm text-blue-600 hover:bg-blue-500/20 transition-colors border border-white/20 text-lg font-medium"
-                                  >
-                                    +
-                                  </button>
+                                <div className="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
+                                  <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category].toFixed(2)}</p>
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => {
+                                        const newQuantity = Math.max(0, currentQuantity - 1);
+                                        handleQuantityChange(
+                                          product.id,
+                                          product.name,
+                                          safeVariantId,
+                                          variant.size,
+                                          variant.prices[userData.category],
+                                          newQuantity,
+                                          product.vatRate
+                                        );
+                                      }}
+                                      className={`glass-button w-8 h-8 rounded-lg flex items-center justify-center bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white/80 transition-colors border border-white/20 text-lg font-medium ${
+                                        variant.inStock === false ? 'opacity-50 cursor-not-allowed' : ''
+                                      }`}
+                                      disabled={currentQuantity === 0 || variant.inStock === false}
+                                    >
+                                      -
+                                    </button>
+                                    <input
+                                      type="number"
+                                      value={currentQuantity}
+                                      onChange={(e) => {
+                                        if (variant.inStock === false) return;
+                                        const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
+                                        handleQuantityChange(
+                                          product.id,
+                                          product.name,
+                                          safeVariantId,
+                                          variant.size,
+                                          variant.prices[userData.category],
+                                          newQuantity,
+                                          product.vatRate
+                                        );
+                                      }}
+                                      className={`w-16 text-center font-medium text-gray-800 text-lg bg-white/50 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
+                                        variant.inStock === false ? 'opacity-50 cursor-not-allowed' : ''
+                                      }`}
+                                      min="0"
+                                      disabled={variant.inStock === false}
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        const newQuantity = currentQuantity + 1;
+                                        handleQuantityChange(
+                                          product.id,
+                                          product.name,
+                                          safeVariantId,
+                                          variant.size,
+                                          variant.prices[userData.category],
+                                          newQuantity,
+                                          product.vatRate
+                                        );
+                                      }}
+                                      className={`glass-button w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm text-lg font-medium ${
+                                        variant.inStock === false
+                                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                          : 'bg-blue-500/10 text-blue-600 hover:bg-blue-500/20'
+                                      } transition-colors border border-white/20`}
+                                      disabled={variant.inStock === false}
+                                    >
+                                      +
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -655,29 +763,46 @@ export default function Products() {
                   <>
                     <div className="space-y-4 mb-6">
                       {orderItems.map((item, index) => (
-                        <div
-                          key={`${item.productId}-${item.variantId}-${index}`}
-                          className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
-                        >
-                          <div className="flex-1">
-                            <h3 className="text-sm font-medium text-gray-800">
-                              {item.productName}
-                            </h3>
-                            <p className="text-sm text-gray-600">{item.size}</p>
-                            <p className="text-sm text-gray-600">
-                              {t('products.quantity')}: {item.quantity}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-gray-800">
-                              €{(item.price * item.quantity).toFixed(2)}
-                            </p>
-                            <button
-                              onClick={() => removeItem(item.productId, item.variantId)}
-                              className="text-red-600 hover:text-red-700 text-sm"
-                            >
-                              {t('products.remove')}
-                            </button>
+                        <div key={`${item.productId}-${item.variantId}`} 
+                             className="bg-white rounded-lg shadow-sm p-4 mb-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <p className="text-gray-800 font-medium text-lg">{item.productName}</p>
+                                  <p className="text-sm text-gray-600">{item.size}</p>
+                                </div>
+                                <button
+                                  onClick={() => removeItem(item.productId, item.variantId)}
+                                  className="text-red-500 hover:text-red-600 transition-colors"
+                                  aria-label="Remove item"
+                                >
+                                  <Trash2 className="w-5 h-5" />
+                                </button>
+                              </div>
+                              <div className="mt-3 flex items-center gap-3">
+                                <div className="flex items-center bg-gray-100 rounded-lg">
+                                  <button
+                                    onClick={() => updateQuantity(item.productId, item.variantId, Math.max(0, item.quantity - 1))}
+                                    className="px-3 py-1 text-gray-600 hover:text-gray-800 text-lg font-medium"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="px-3 py-1 text-lg font-semibold text-gray-800">{item.quantity}</span>
+                                  <button
+                                    onClick={() => updateQuantity(item.productId, item.variantId, item.quantity + 1)}
+                                    className="px-3 py-1 text-gray-600 hover:text-gray-800 text-lg font-medium"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right flex flex-col gap-1">
+                              <div className="text-sm text-gray-500">€{item.price.toFixed(2)} per item</div>
+                              <div className="text-lg font-medium text-blue-600">€{(item.price * item.quantity).toFixed(2)}</div>
+                              <div className="text-xs text-gray-500">incl. {item.vatRate}% VAT: €{item.vatAmount.toFixed(2)}</div>
+                            </div>
                           </div>
                         </div>
                       ))}

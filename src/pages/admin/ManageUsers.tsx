@@ -12,7 +12,7 @@ interface UserData {
   id: string;
   email: string;
   username: string;
-  category: 'A' | 'B' | 'C';
+  category: 'A' | 'B';
   companyName: string;
   address?: string;
   contactNumber?: string;
@@ -38,7 +38,7 @@ export default function ManageUsers() {
     email: '',
     username: '',
     password: '',
-    category: 'A' as 'A' | 'B' | 'C',
+    category: 'A' as 'A' | 'B',
     companyName: '',
     address: '',
     contactNumber: '',
@@ -265,9 +265,7 @@ export default function ManageUsers() {
                       <span className={`inline-flex items-center whitespace-nowrap px-2 py-0.5 text-xs font-medium rounded-full ${
                         user.category === 'A' 
                           ? 'bg-green-100 text-green-800'
-                          : user.category === 'B'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-purple-100 text-purple-800'
+                          : 'bg-blue-100 text-blue-800'
                       }`}>
                         {t(`categories.category${user.category}`)}
                       </span>
@@ -309,9 +307,7 @@ export default function ManageUsers() {
                   <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
                     user.category === 'A' 
                       ? 'bg-green-100 text-green-800'
-                      : user.category === 'B'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-purple-100 text-purple-800'
+                      : 'bg-blue-100 text-blue-800'
                   }`}>
                     {t(`categories.category${user.category}`)}
                   </span>
@@ -415,13 +411,12 @@ export default function ManageUsers() {
                       </label>
                       <select
                         value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' | 'C' })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value as 'A' | 'B' })}
+                        className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         required
                       >
-                        <option value="A">{t('categories.categoryA')}</option>
-                        <option value="B">{t('categories.categoryB')}</option>
-                        <option value="C">{t('categories.categoryC')}</option>
+                        <option value="A">{t('admin.categoryA')}</option>
+                        <option value="B">{t('admin.categoryB')}</option>
                       </select>
                     </div>
                     <div>

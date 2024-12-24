@@ -7,6 +7,31 @@ import ErrorMessage from './ErrorMessage';
 import { User, Product } from '../types';
 import { useTranslation } from 'react-i18next';
 
+// Utility function to format date as DD/MM/YYYY
+const formatDate = (date: Date | string | { seconds: number } | undefined): string => {
+  if (!date) return 'N/A';
+  
+  let dateObj: Date;
+  
+  if (date instanceof Date) {
+    dateObj = date;
+  } else if (typeof date === 'object' && 'seconds' in date) {
+    dateObj = new Date(date.seconds * 1000);
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date);
+  } else {
+    return 'N/A';
+  }
+
+  if (isNaN(dateObj.getTime())) return 'N/A';
+
+  return dateObj.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
 export default function Reports() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -277,7 +302,7 @@ export default function Reports() {
                     <div key={index} className="bg-gray-100 p-4 rounded-lg space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">
-                          {new Date(order.date).toLocaleDateString()}
+                          {formatDate(order.date)}
                         </span>
                         <span className="font-medium text-gray-800">
                           €{order.amount.toFixed(2)}
@@ -307,7 +332,7 @@ export default function Reports() {
                       {reportData.orderHistory.map((order: any, index: number) => (
                         <tr key={index} className="hover:bg-gray-100 transition-colors duration-200">
                           <td className="px-4 py-3 text-gray-800">
-                            {new Date(order.date).toLocaleDateString()}
+                            {formatDate(order.date)}
                           </td>
                           <td className="px-4 py-3 text-gray-800">
                             €{order.amount.toFixed(2)}
@@ -346,7 +371,7 @@ export default function Reports() {
                       <div key={index} className="bg-gray-100 p-4 rounded-lg space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">
-                            {new Date(order.orderDate).toLocaleDateString()}
+                            {formatDate(order.orderDate)}
                           </span>
                           <span className="font-medium text-gray-800">
                             €{item.price.toFixed(2)}
@@ -379,7 +404,7 @@ export default function Reports() {
                         return (
                           <tr key={index} className="hover:bg-gray-100 transition-colors duration-200">
                             <td className="px-4 py-3 text-gray-800">
-                              {new Date(order.orderDate).toLocaleDateString()}
+                              {formatDate(order.orderDate)}
                             </td>
                             <td className="px-4 py-3 text-gray-800">
                               {item.quantity}
