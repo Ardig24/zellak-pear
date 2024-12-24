@@ -19,8 +19,8 @@
     "orderSummary": "Order Summary",
     "items": "items",
     "emptyOrder": "Your order is empty",
-    "total": "Total (Brutto)",
-    "subtotal": "Subtotal (Netto)",
+    "total": "Total",
+    "subtotal": "Subtotal",
     "vat": "VAT",
     "vat7": "VAT 7%",
     "vat19": "VAT 19%",
@@ -238,6 +238,10 @@
     "pending": "Pending",
     "completed": "Completed",
     "viewDetails": "View Details"
+  },
+  "app": {
+    "newVersion": "A new version is available",
+    "reload": "Update Now"
   },
   "common": {
     "logout": "Logout",
