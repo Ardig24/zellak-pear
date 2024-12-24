@@ -5,6 +5,7 @@ import { Plus, Pencil, X, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 export default function ManageCategories() {
   const { categories, addCategory, updateCategory, deleteCategory, loading, error, clearError } = useProducts();
@@ -12,6 +13,8 @@ export default function ManageCategories() {
   const categoryImageInputRef = useRef<HTMLInputElement>(null);
   const [categoryImageFile, setCategoryImageFile] = useState<File | null>(null);
   const [editingCategory, setEditingCategory] = useState<{ id: string; name: string; imageUrl?: string } | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const { t } = useTranslation();
 
   const handleCategoryImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,9 +64,14 @@ export default function ManageCategories() {
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    if (window.confirm(t('admin.deleteCategoryConfirm'))) {
+    setCategoryToDelete(categoryId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (categoryToDelete) {
       try {
-        await deleteCategory(categoryId);
+        await deleteCategory(categoryToDelete);
       } catch (err: any) {
         console.error('Error deleting category:', err);
       }
@@ -193,6 +201,13 @@ export default function ManageCategories() {
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={t('admin.deleteCategoryTitle')}
+        message={t('admin.deleteCategoryConfirm')}
+      />
     </div>
   );
 }

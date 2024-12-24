@@ -5,6 +5,7 @@ import { Plus, Pencil, X, Settings, ChevronDown, ChevronUp, Trash2 } from 'lucid
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 export default function ManageProducts() {
   const { products, categories, addProduct, updateProduct, deleteProduct, addCategory, updateCategory, deleteCategory, loading, error, clearError } = useProducts();
@@ -87,10 +88,18 @@ export default function ManageProducts() {
     }
   };
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
   const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm(t('admin.deleteProductConfirm'))) {
+    setProductToDelete(productId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (productToDelete) {
       try {
-        await deleteProduct(productId);
+        await deleteProduct(productToDelete);
       } catch (err: any) {
         console.error('Error deleting product:', err);
       }
@@ -752,6 +761,13 @@ export default function ManageProducts() {
           </div>
         )}
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={t('admin.deleteProductTitle')}
+        message={t('admin.deleteProductConfirm')}
+      />
     </div>
   );
 }

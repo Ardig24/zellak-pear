@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import ConfirmationModal from '../../components/ConfirmationModal';
 import { createUser } from '../../api/createUser';
 
 interface UserData {
@@ -41,6 +42,8 @@ export default function ManageUsers() {
     address: '',
     contactNumber: '',
   });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -127,17 +130,21 @@ export default function ManageUsers() {
     }
   };
 
-  const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm(t('admin.deleteUserConfirm'))) return;
+  const handleDeleteUser = (userId: string) => {
+    setUserToDelete(userId);
+    setIsDeleteModalOpen(true);
+  };
 
-    try {
-      setLoading(true);
-      await deleteDoc(doc(db, 'users', userId));
-      await fetchUsers();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  const confirmDelete = async () => {
+    if (userToDelete) {
+      try {
+        const userRef = doc(db, 'users', userToDelete);
+        await deleteDoc(userRef);
+        setUsers(users.filter(user => user.id !== userToDelete));
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        setError('Failed to delete user');
+      }
     }
   };
 
@@ -456,6 +463,13 @@ export default function ManageUsers() {
               </div>
             </div>
           )}
+          <ConfirmationModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={confirmDelete}
+            title={t('admin.deleteUserTitle')}
+            message={t('admin.deleteUserConfirm')}
+          />
         </div>
       </div>
     </div>

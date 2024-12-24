@@ -17,6 +17,8 @@ function ProtectedRoute({ children, adminOnly = false }: { children: React.React
 }
 
 function App() {
+  const { currentUser } = useAuth();
+  
   return (
     <>
       <UpdateNotification />
@@ -47,7 +49,27 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/products" />} />
+          <Route 
+            path="/" 
+            element={
+              currentUser ? (
+                <Navigate to="/products" />
+              ) : (
+                <Navigate to="/login" />
+              )
+            } 
+          />
+          {/* Catch all route - redirect to login if not authenticated */}
+          <Route 
+            path="*" 
+            element={
+              currentUser ? (
+                <Navigate to="/products" />
+              ) : (
+                <Navigate to="/login" />
+              )
+            } 
+          />
         </Routes>
       </div>
     </>

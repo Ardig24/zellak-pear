@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import { Trash2 } from 'lucide-react';
+import ConfirmationModal from '../../components/ConfirmationModal';
 
 interface OrderItem {
   productName: string;
@@ -31,6 +33,8 @@ export default function ManageOrders() {
   const [error, setError] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'pending' | 'completed'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
 
@@ -142,7 +146,7 @@ export default function ManageOrders() {
     }
   }, [searchParams, orders]);
 
-  const handleStatusChange = async (orderId: string, newStatus: 'pending' | 'completed') => {
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
       const orderRef = doc(db, 'orders', orderId);
       await updateDoc(orderRef, {
@@ -150,6 +154,23 @@ export default function ManageOrders() {
       });
     } catch (error) {
       console.error('Error updating order status:', error);
+    }
+  };
+
+  const handleDeleteOrder = (orderId: string) => {
+    setOrderToDelete(orderId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (orderToDelete) {
+      try {
+        const orderRef = doc(db, 'orders', orderToDelete);
+        await deleteDoc(orderRef);
+        // Order will be automatically removed from the list due to the snapshot listener
+      } catch (error) {
+        console.error('Error deleting order:', error);
+      }
     }
   };
 
@@ -238,24 +259,36 @@ export default function ManageOrders() {
                             </div>
                           </div>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStatusChange(
-                                order.id, 
-                                order.status === 'pending' ? 'completed' : 'pending'
-                              );
-                            }}
-                            className={`w-full px-4 py-2 rounded-lg transition-all duration-200 ${
-                              order.status === 'pending'
-                                ? 'bg-white border border-red-500 text-red-700 hover:bg-red-50'
-                                : 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
-                            }`}
-                          >
-                            {order.status === 'pending' 
-                              ? t('admin.orders.markCompleted')
-                              : t('admin.orders.markPending')}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStatusChange(
+                                  order.id,
+                                  order.status === 'pending' ? 'completed' : 'pending'
+                                );
+                              }}
+                              className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                                order.status === 'pending'
+                                  ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
+                                  : 'bg-white border border-orange-500 text-orange-700 hover:bg-orange-50'
+                              }`}
+                            >
+                              {order.status === 'pending'
+                                ? t('admin.orders.markCompleted')
+                                : t('admin.orders.markPending')}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteOrder(order.id);
+                              }}
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                              title={t('orders.deleteOrder')}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -318,24 +351,36 @@ export default function ManageOrders() {
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleStatusChange(
-                                      order.id,
-                                      order.status === 'pending' ? 'completed' : 'pending'
-                                    );
-                                  }}
-                                  className={`px-4 py-2 rounded-lg transition-all duration-200 ${
-                                    order.status === 'pending'
-                                      ? 'bg-white border border-red-500 text-red-700 hover:bg-red-50'
-                                      : 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
-                                  }`}
-                                >
-                                  {order.status === 'pending'
-                                    ? t('admin.orders.markCompleted')
-                                    : t('admin.orders.markPending')}
-                                </button>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStatusChange(
+                                        order.id,
+                                        order.status === 'pending' ? 'completed' : 'pending'
+                                      );
+                                    }}
+                                    className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                                      order.status === 'pending'
+                                        ? 'bg-white border border-green-500 text-green-700 hover:bg-green-50'
+                                        : 'bg-white border border-orange-500 text-orange-700 hover:bg-orange-50'
+                                    }`}
+                                  >
+                                    {order.status === 'pending'
+                                      ? t('admin.orders.markCompleted')
+                                      : t('admin.orders.markPending')}
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteOrder(order.id);
+                                    }}
+                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                    title={t('orders.deleteOrder')}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -449,6 +494,13 @@ export default function ManageOrders() {
           )}
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={t('orders.deleteOrderTitle')}
+        message={t('orders.deleteOrderConfirm')}
+      />
     </div>
   );
 }
