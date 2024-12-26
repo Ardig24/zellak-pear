@@ -65,7 +65,7 @@ export default function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 bg-white/80 border border-white/50 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-                placeholder="Enter your username"
+                placeholder="Benutzername"
               />
             </div>
 
@@ -85,7 +85,7 @@ export default function Login() {
                   type="password"
                   required
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Enter your password"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}

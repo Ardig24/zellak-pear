@@ -9,8 +9,10 @@ import LanguageSelector from '../components/LanguageSelector';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import Toast from '../components/Toast';
+import { useTranslation } from 'react-i18next';
 
 export default function Products() {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>(() => {
     const savedItems = localStorage.getItem('cartItems');
@@ -166,12 +168,12 @@ export default function Products() {
 
   const handleSendOrder = async () => {
     if (orderItems.length === 0) {
-      setToast({ message: 'No items in cart', type: 'error' });
+      setToast({ message: t('products.noItemsInCart'), type: 'error' });
       return;
     }
 
     if (!userData) {
-      setToast({ message: 'Not logged in', type: 'error' });
+      setToast({ message: t('products.notLoggedIn'), type: 'error' });
       return;
     }
 
@@ -182,12 +184,12 @@ export default function Products() {
       await sendOrder(orderItems, userData);
       setOrderItems([]);
       localStorage.removeItem('cartItems');
-      setToast({ message: 'Order sent successfully', type: 'success' });
+      setToast({ message: t('products.orderSentSuccessfully'), type: 'success' });
       setShowCart(false);
     } catch (error) {
       console.error('Failed to send order:', error);
-      setError('Failed to send order');
-      setToast({ message: 'Failed to send order', type: 'error' });
+      setError(t('products.failedToSendOrder'));
+      setToast({ message: t('products.failedToSendOrder'), type: 'error' });
     } finally {
       setSending(false);
     }
@@ -233,7 +235,7 @@ export default function Products() {
           <div className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white/70 backdrop-blur-md shadow-xl transform transition-transform duration-300 ease-out">
             <div className="p-4 border-b border-white/20">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold">My Order</h2>
+                <h2 className="text-lg font-semibold">{t('products.myOrder')}</h2>
                 <button onClick={() => setShowCart(false)} className="text-gray-500 hover:text-gray-700">
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -246,7 +248,7 @@ export default function Products() {
               {orderItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8">
                   <ShoppingCart className="w-16 h-16 text-gray-300 mb-4" />
-                  <p className="text-gray-500">Your cart is empty</p>
+                  <p className="text-gray-500">{t('products.cart.empty')}</p>
                 </div>
               ) : (
                 <>
@@ -281,14 +283,14 @@ export default function Products() {
                             <button
                               onClick={() => removeItem(item.productId, item.variantId)}
                               className="text-red-500 hover:text-red-600 transition-colors"
-                              aria-label="Remove item"
+                              aria-label={t('products.remove')}
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
                             <div className="text-right mt-2">
-                              <div className="text-sm text-gray-500">€{item.price.toFixed(2)} per item</div>
+                              <div className="text-sm text-gray-500">{t('products.pricePerItem', { price: item.price.toFixed(2) })}</div>
                               <div className="text-sm font-medium text-blue-600 mt-1">€{(item.price * item.quantity).toFixed(2)}</div>
-                              <div className="text-xs text-gray-500">+ {item.vatRate}% VAT will be added</div>
+                              <div className="text-xs text-gray-500">{t('products.vatWillBeAdded', { rate: item.vatRate })}</div>
                             </div>
                           </div>
                         </div>
@@ -298,26 +300,26 @@ export default function Products() {
                   
                   <div className="mt-6 space-y-4">
                     <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                      <span className="font-semibold">Total:</span>
+                      <span className="font-semibold">{t('products.total')}:</span>
                       <span className="text-xl font-semibold text-blue-600">€{calculateTotals().total.toFixed(2)}</span>
                     </div>
                     
                     <div className="border-t pt-4 mt-4">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span>Subtotal</span>
+                          <span>{t('products.subtotal')}</span>
                           <span>€{calculateTotals().subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span>VAT 7%</span>
+                          <span>{t('products.vat7')}</span>
                           <span>€{calculateTotals().vat7Total.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span>VAT 19%</span>
+                          <span>{t('products.vat19')}</span>
                           <span>€{calculateTotals().vat19Total.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-semibold pt-2 border-t">
-                          <span>Total</span>
+                          <span>{t('products.total')}</span>
                           <span className="text-xl font-semibold text-blue-600">€{calculateTotals().total.toFixed(2)}</span>
                         </div>
                       </div>
@@ -336,7 +338,7 @@ export default function Products() {
                       ) : (
                         <Send className="w-5 h-5" />
                       )}
-                      Send Order
+                      {t('products.sendOrder')}
                     </button>
                   </div>
                 </>
@@ -351,20 +353,20 @@ export default function Products() {
         <div className="fixed inset-0 z-[70] flex items-center justify-center">
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowDeleteConfirmation(false)} />
           <div className="relative bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
-            <h3 className="text-lg font-semibold mb-4">Delete Order</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete the entire order?</p>
+            <h3 className="text-lg font-semibold mb-4">{t('products.deleteOrder')}</h3>
+            <p className="text-gray-600 mb-6">{t('products.deleteOrderConfirmation')}</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowDeleteConfirmation(false)}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
               >
-                Cancel
+                {t('products.cancel')}
               </button>
               <button
                 onClick={handleClearOrder}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-medium"
               >
-                Delete
+                {t('products.delete')}
               </button>
             </div>
           </div>
@@ -387,7 +389,7 @@ export default function Products() {
                 ? 'stroke-[2.5]' 
                 : 'stroke-2'
             }`} />
-            <span className="text-xs mt-1 font-medium">Categories</span>
+            <span className="text-xs mt-1 font-medium">{t('products.categories')}</span>
           </button>
 
           {/* Cart Button with Order Items Count */}
@@ -404,7 +406,7 @@ export default function Products() {
                 ? 'stroke-[2.5]' 
                 : 'stroke-2'
             }`} />
-            <span className="text-xs mt-1 font-medium">My Order</span>
+            <span className="text-xs mt-1 font-medium">{t('products.myOrder')}</span>
             {orderItems.length > 0 && (
               <span className="absolute -top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
                 {orderItems.length}
@@ -426,7 +428,7 @@ export default function Products() {
                 ? 'stroke-[2.5]'
                 : 'stroke-2'
             }`} />
-            <span className="text-xs mt-1 font-medium">My Orders</span>
+            <span className="text-xs mt-1 font-medium">{t('products.myOrders')}</span>
           </Link>
         </nav>
       </div>
@@ -442,7 +444,7 @@ export default function Products() {
                   className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5 mr-1" />
-                  Back to Categories
+                  {t('products.backToCategories')}
                 </button>
               )}
             </div>
@@ -453,7 +455,7 @@ export default function Products() {
                   className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   <ClipboardList className="w-5 h-5 mr-1" />
-                  My Orders
+                  {t('products.myOrders')}
                 </Link>
               </div>
               <LanguageSelector />
@@ -462,7 +464,7 @@ export default function Products() {
                 className="flex items-center text-red-600 hover:text-red-700 transition-colors"
               >
                 <LogOut className="w-5 h-5 mr-1" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">{t('products.logout')}</span>
               </button>
             </div>
           </div>
@@ -487,7 +489,7 @@ export default function Products() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search products"
+            placeholder={t('products.searchProducts')}
             className="w-full p-3 pl-10 border border-white/20 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all bg-white/70 backdrop-blur-sm"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -541,10 +543,10 @@ export default function Products() {
                                       >
                                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
                                           <span className="text-sm font-medium">{variant.size}</span>
-                                          <span className="text-xs text-gray-500">VAT {product.vatRate}%</span>
+                                          <span className="text-xs text-gray-500">{t('products.vat', { rate: product.vatRate })}</span>
                                           {variant.inStock === false && (
                                             <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
-                                              Out of stock
+                                              {t('products.outOfStock')}
                                             </span>
                                           )}
                                         </div>
@@ -630,7 +632,7 @@ export default function Products() {
                   ))}
                   {Object.keys(groupedProducts).length === 0 && (
                     <div className="text-center py-12">
-                      <p className="text-gray-500 text-lg">No results found</p>
+                      <p className="text-gray-500 text-lg">{t('products.noResultsFound')}</p>
                     </div>
                   )}
                 </div>
@@ -703,10 +705,10 @@ export default function Products() {
                               >
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
                                   <span className="text-sm font-medium">{variant.size}</span>
-                                  <span className="text-xs text-gray-500">VAT {product.vatRate}%</span>
+                                  <span className="text-xs text-gray-500">{t('products.vat', { rate: product.vatRate })}</span>
                                   {variant.inStock === false && (
                                     <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
-                                      Out of stock
+                                      {t('products.outOfStock')}
                                     </span>
                                   )}
                                 </div>
@@ -798,13 +800,13 @@ export default function Products() {
               <div className="glass-panel p-6 rounded-lg backdrop-blur-md bg-white/70 border border-white/20">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-gray-800">
-                    Order Summary
+                    {t('products.orderSummary')}
                   </h2>
                   {orderItems.length > 0 && (
                     <button
                       onClick={() => setShowDeleteConfirmation(true)}
                       className="text-red-500 hover:text-red-600 transition-colors"
-                      aria-label="Clear order"
+                      aria-label={t('products.clearOrder')}
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -814,7 +816,7 @@ export default function Products() {
                 {orderItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-500">
                     <ShoppingCart className="w-12 h-12 mb-4 text-gray-400" />
-                    <p>Your cart is empty</p>
+                    <p>{t('products.cart.empty')}</p>
                   </div>
                 ) : (
                   <>
@@ -832,7 +834,7 @@ export default function Products() {
                                 <button
                                   onClick={() => removeItem(item.productId, item.variantId)}
                                   className="text-red-500 hover:text-red-600 transition-colors"
-                                  aria-label="Remove item"
+                                  aria-label={t('products.remove')}
                                 >
                                   <Trash2 className="w-5 h-5" />
                                 </button>
@@ -856,9 +858,9 @@ export default function Products() {
                               </div>
                             </div>
                             <div className="text-right flex flex-col gap-1">
-                              <div className="text-sm text-gray-500">€{item.price.toFixed(2)} per item</div>
+                              <div className="text-sm text-gray-500">{t('products.pricePerItem', { price: item.price.toFixed(2) })}</div>
                               <div className="text-sm font-medium text-blue-600">€{(item.price * item.quantity).toFixed(2)}</div>
-                              <div className="text-xs text-gray-500">+ {item.vatRate}% VAT will be added</div>
+                              <div className="text-xs text-gray-500">{t('products.vatWillBeAdded', { rate: item.vatRate })}</div>
                             </div>
                           </div>
                         </div>
@@ -868,19 +870,19 @@ export default function Products() {
                     <div className="border-t pt-4 mt-4">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span>Subtotal</span>
+                          <span>{t('products.subtotal')}</span>
                           <span>€{calculateTotals().subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span>VAT 7%</span>
+                          <span>{t('products.vat7')}</span>
                           <span>€{calculateTotals().vat7Total.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span>VAT 19%</span>
+                          <span>{t('products.vat19')}</span>
                           <span>€{calculateTotals().vat19Total.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-semibold pt-2 border-t">
-                          <span>Total</span>
+                          <span>{t('products.total')}</span>
                           <span className="text-xl font-semibold text-blue-600">€{calculateTotals().total.toFixed(2)}</span>
                         </div>
                       </div>
@@ -900,7 +902,7 @@ export default function Products() {
                       ) : (
                         <>
                           <Send className="w-5 h-5 mr-2" />
-                          Send Order
+                          {t('products.sendOrder')}
                         </>
                       )}
                     </button>

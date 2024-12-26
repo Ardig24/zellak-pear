@@ -33,6 +33,7 @@
     "searchProducts": "Alle Produkte durchsuchen...",
     "noResults": "Keine Produkte gefunden.",
     "myOrder": "Warenkorb",
+    "myOrders": "Meine Bestellungen",
     "emptyCart": "Ihr Warenkorb ist leer",
     "basePrice": "Grundpreis",
     "remove": "Entfernen",
@@ -55,6 +56,22 @@
     "outOfStock": "Nicht auf Lager",
     "priceA": "Preis A",
     "priceB": "Preis B",
+    "searchAllProducts": "Alle Produkte durchsuchen...",
+    "addProduct": "Produkt hinzufügen",
+    "deleteProductTitle": "Produkt löschen",
+    "backToCategories": "Zurück zu den Kategorien",
+    "searchProducts": "Produkte in dieser Kategorie durchsuchen...",
+    "categoryNamePlaceholder": "Kategoriename",
+    "categoryName": "Kategoriename",
+    "addCategory": "Kategorie hinzufügen",
+    "categoryImage": "Kategoriebild",
+    "categories": "Kategorien",
+    "cancel": "Abbrechen",
+    "update": "Aktualisieren",
+    "editCategory": "Kategorie bearbeiten",
+    "deleteCategory": "Kategorie löschen",
+    "deleteCategoryTitle": "Kategorie löschen",
+    "deleteCategoryConfirm": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten? Alle Produkte darin werden gelöscht.",
     "categoryA": "Kategorie A",
     "categoryB": "Kategorie B",
     "home_section": {
@@ -76,7 +93,7 @@
     "manageCategories": "Kategorien verwalten",
     "reports": "Berichte",
     "welcome": "Willkommen im Admin-Panel",
-    "selectSection": "Wählen Sie einen Bereich aus dem Seitenmenü",
+    "selectSection": "Wählen Sie einen Bereich aus der Seitenleiste",
     "logout": "Abmelden",
     "deleteProductConfirm": "Sind Sie sicher, dass Sie dieses Produkt löschen möchten?",
     "users": {
@@ -221,7 +238,7 @@
     "editItem": "Element bearbeiten",
     "deleteCategory": "Kategorie löschen",
     "deleteItem": "Element löschen",
-    "confirmDeleteCategory": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten? Alle darin enthaltenen Elemente werden gelöscht.",
+    "confirmDeleteCategory": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten? Alle Elemente darin werden gelöscht.",
     "confirmDeleteItem": "Sind Sie sicher, dass Sie dieses Element löschen möchten?",
     "serviceName": "Dienstname",
     "serviceNamePlaceholder": "z.B. Namecheap Hosting",
@@ -233,10 +250,10 @@
     "autoRenew": "Dienst wird automatisch verlängert",
     "autoRenewEnabled": "Automatische Verlängerung aktiviert",
     "notes": "Zusätzliche Notizen",
-    "notesPlaceholder": "Geben Sie zusätzliche Informationen oder Notizen ein",
-    "renewalTracking": "Erneuerungsverfolgung",
-    "noRenewal": "Keine Erneuerung erforderlich",
-    "hasRenewal": "Dienst benötigt Erneuerungsverfolgung"
+    "notesPlaceholder": "Zusätzliche Informationen oder Notizen eingeben",
+    "renewalTracking": "Verlängerungsverfolgung",
+    "noRenewal": "Keine Verlängerung erforderlich",
+    "hasRenewal": "Dienst benötigt Verlängerungsverfolgung"
   },
   "orders": {
     "title": "Bestellverlauf",
@@ -247,6 +264,8 @@
     "cannotCancel": "Kann nicht storniert werden (15 Min. Limit überschritten)",
     "cancelSuccess": "Bestellung erfolgreich storniert",
     "cancelError": "Stornierung fehlgeschlagen",
+    "deleteOrderTitle": "Bestellung löschen",
+    "deleteOrderConfirm": "Sind Sie sicher, dass Sie diese Bestellung löschen möchten?",
     "timeLeft": "Verbleibende Zeit zum Stornieren:",
     "minutes": "Minuten",
     "seconds": "Sekunden",
@@ -267,6 +286,10 @@
     "completed": "Abgeschlossen",
     "viewDetails": "Details anzeigen"
   },
+  "app": {
+    "newVersion": "Eine neue Version ist verfügbar",
+    "reload": "Jetzt aktualisieren"
+  },
   "common": {
     "logout": "Abmelden",
     "cancel": "Abbrechen",
@@ -277,6 +300,7 @@
     "remove": "Entfernen",
     "back": "Zurück",
     "reports": "Berichte",
+    "confirm": "Bestätigen",
     "close": "Schließen"
   },
   "reports": {
