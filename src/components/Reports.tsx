@@ -78,7 +78,7 @@ export default function Reports() {
     setLoading(true);
     setError(null);
     try {
-      // Get the user's email first
+      // Get the user details first
       const userDocRef = doc(db, 'users', userId);
       const userDocSnap = await getDoc(userDocRef);
       
@@ -86,26 +86,21 @@ export default function Reports() {
         throw new Error('User not found');
       }
 
-      const userEmail = userDocSnap.data().email;
-      if (!userEmail) {
-        throw new Error('User email not found');
-      }
-
       // Get all orders first
       const ordersSnapshot = await getDocs(collection(db, 'orders'));
       const allOrders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Filter orders by user email and date range
+      // Filter orders by userId and date range
       const startDate = new Date(dateRange.startDate);
       const endDate = new Date(dateRange.endDate);
       endDate.setHours(23, 59, 59, 999);
 
-      console.log('Filtering orders for user:', userEmail);
+      console.log('Filtering orders for userId:', userId);
       console.log('Date range:', startDate, ' to ', endDate);
       console.log('All orders:', allOrders);
 
       const filteredOrders = allOrders.filter((order: any) => {
-        if (!order.userEmail || !order.orderDate) return false;
+        if (!order.userId || !order.orderDate) return false;
         
         let orderDate;
         if (order.orderDate instanceof Date) {
@@ -119,7 +114,7 @@ export default function Reports() {
         if (!orderDate || isNaN(orderDate.getTime())) return false;
 
         return (
-          order.userEmail === userEmail &&
+          order.userId === userId &&
           orderDate >= startDate &&
           orderDate <= endDate
         );

@@ -7,7 +7,11 @@ import {
   doc, 
   setDoc, 
   deleteDoc,
-  where 
+  where,
+  writeBatch,
+  addDoc,
+  orderBy,
+  limit
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { Product, Category } from '../types';
@@ -17,13 +21,16 @@ interface ProductsContextType {
   categories: Category[];
   loading: boolean;
   error: string | null;
-  addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
+  addProduct: (product: Omit<Product, 'id' | 'order'>) => Promise<{ id: string; } & Product | null>;
   updateProduct: (id: string, product: Omit<Product, 'id'>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   addCategory: (category: Omit<Category, 'id'> & { imageUrl?: File | string }) => Promise<void>;
   updateCategory: (id: string, category: Omit<Category, 'id'> & { imageUrl?: File | string }) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
+  reorderProducts: (fromIndex: number, toIndex: number) => Promise<void>;
+  reorderCategories: (startIndex: number, endIndex: number) => Promise<void>;
   clearError: () => void;
+  fetchCategories: () => Promise<void>;
 }
 
 const ProductsContext = createContext<ProductsContextType | null>(null);
@@ -49,31 +56,80 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProducts = async () => {
     try {
-      const productsQuery = query(collection(db, 'products'));
-      const snapshot = await getDocs(productsQuery);
-      const productsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Product[];
-      setProducts(productsData);
-    } catch (err: any) {
-      setError(err.message);
+      setLoading(true);
+      setError(null);
+      
+      const productsRef = collection(db, 'products');
+      const productsSnapshot = await getDocs(productsRef);
+      const fetchedProducts = productsSnapshot.docs.map(doc => {
+        try {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name || '',
+            category: data.category || '',
+            vatRate: data.vatRate || 19,
+            variants: data.variants || [],
+            order: data.order || 0,
+          } as Product;
+        } catch (err) {
+          console.error('Error processing product document:', doc.id, err);
+          return null;
+        }
+      }).filter(Boolean) as Product[];
+      
+      // Sort products by order field, fallback to name if order is not set
+      const sortedProducts = fetchedProducts.sort((a, b) => {
+        if (a.order !== undefined && b.order !== undefined) {
+          return a.order - b.order;
+        }
+        return a.name.localeCompare(b.name);
+      });
+
+      console.log('Fetched products:', sortedProducts);
+      setProducts(sortedProducts);
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch products');
+      setProducts([]); // Reset products on error
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const categoriesQuery = query(collection(db, 'categories'));
-      const snapshot = await getDocs(categoriesQuery);
-      const categoriesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Category[];
-      setCategories(categoriesData);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      const categoriesRef = collection(db, 'categories');
+      const categoriesSnapshot = await getDocs(categoriesRef);
+      const fetchedCategories = categoriesSnapshot.docs.map(doc => {
+        try {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name || '',
+            imageUrl: data.imageUrl || '',
+            order: data.order || 0,
+          } as Category;
+        } catch (err) {
+          console.error('Error processing category document:', doc.id, err);
+          return null;
+        }
+      }).filter(Boolean) as Category[];
+      
+      // Sort categories by order field, fallback to name if order is not set
+      const sortedCategories = fetchedCategories.sort((a, b) => {
+        if (a.order !== undefined && b.order !== undefined) {
+          return a.order - b.order;
+        }
+        return a.name.localeCompare(b.name);
+      });
+
+      console.log('Fetched categories:', sortedCategories);
+      setCategories(sortedCategories);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch categories');
+      setCategories([]); // Reset categories on error
     }
   };
 
@@ -130,28 +186,30 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addProduct = async (productData: Omit<Product, 'id'>) => {
+  const addProduct = async (product: Omit<Product, 'id' | 'order'>) => {
     try {
       setLoading(true);
-      const productRef = doc(collection(db, 'products'));
-      
-      // If icon is a File, upload it first
-      let iconUrl = productData.icon;
-      if (productData.icon instanceof File) {
-        iconUrl = await uploadImage(productData.icon, 'products');
-      }
+      setError(null);
 
-      const finalProductData = {
-        ...productData,
-        icon: iconUrl,
-        createdAt: new Date().toISOString()
+      // Get the highest order value from current products
+      const currentHighestOrder = products.reduce((max, p) => Math.max(max, p.order || 0), 0);
+
+      const newProduct = {
+        ...product,
+        order: currentHighestOrder + 1,
       };
 
-      await setDoc(productRef, finalProductData);
-      await fetchProducts();
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const docRef = await addDoc(collection(db, 'products'), newProduct);
+      const productWithId = { id: docRef.id, ...newProduct };
+
+      // Update local state immediately
+      setProducts(currentProducts => [...currentProducts, productWithId].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
+
+      return productWithId;
+    } catch (err) {
+      console.error('Error adding product:', err);
+      setError(err instanceof Error ? err.message : 'Error adding product');
+      return null;
     } finally {
       setLoading(false);
     }
@@ -221,14 +279,23 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
       }
 
+      // Get the highest order value from current categories
+      const currentHighestOrder = categories.reduce((max, c) => Math.max(max, c.order || 0), 0);
+
       const finalCategoryData = {
         name: categoryData.name,
         imageUrl,
+        order: currentHighestOrder + 1,
         createdAt: new Date().toISOString()
       };
 
       await setDoc(categoryRef, finalCategoryData);
-      await fetchCategories();
+
+      // Update local state immediately
+      const newCategory = { id: categoryRef.id, ...finalCategoryData };
+      setCategories(currentCategories => [...currentCategories, newCategory].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
+
+      return newCategory;
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -298,6 +365,68 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const reorderProducts = async (fromIndex: number, toIndex: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get current sorted products
+      const sortedProducts = [...products].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      
+      // Get the products being moved
+      const [movedProduct] = sortedProducts.splice(fromIndex, 1);
+      sortedProducts.splice(toIndex, 0, movedProduct);
+
+      // Update orders for all products
+      const updatedProducts = sortedProducts.map((product, index) => ({
+        ...product,
+        order: index
+      }));
+
+      // Batch update in Firebase
+      const batch = writeBatch(db);
+      updatedProducts.forEach(product => {
+        const productRef = doc(db, 'products', product.id);
+        batch.update(productRef, { order: product.order });
+      });
+      await batch.commit();
+
+      // Update local state immediately
+      setProducts(updatedProducts);
+    } catch (err) {
+      console.error('Error reordering products:', err);
+      setError(err instanceof Error ? err.message : 'Failed to reorder products');
+      // Refresh products to ensure consistency
+      await fetchProducts();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reorderCategories = async (startIndex: number, endIndex: number) => {
+    try {
+      const reorderedCategories = Array.from(categories);
+      const [removed] = reorderedCategories.splice(startIndex, 1);
+      reorderedCategories.splice(endIndex, 0, removed);
+
+      // Update order in state
+      setCategories(reorderedCategories);
+
+      // Update order in Firestore
+      const batch = writeBatch(db);
+      reorderedCategories.forEach((category, index) => {
+        const categoryRef = doc(db, 'categories', category.id);
+        batch.update(categoryRef, { order: index });
+      });
+      await batch.commit();
+    } catch (err) {
+      console.error('Error reordering categories:', err);
+      setError('Failed to reorder categories');
+      // Revert to original order
+      fetchCategories();
+    }
+  };
+
   const clearError = () => setError(null);
 
   const value = {
@@ -311,7 +440,10 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     addCategory,
     updateCategory,
     deleteCategory,
-    clearError
+    reorderProducts,
+    reorderCategories,
+    clearError,
+    fetchCategories
   };
 
   return (

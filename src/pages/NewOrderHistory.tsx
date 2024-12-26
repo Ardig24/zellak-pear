@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -65,17 +65,6 @@ export default function NewOrderHistory() {
 
     return () => unsubscribe();
   }, [currentUser, userData]);
-
-  const handleCancelOrder = async (orderId: string) => {
-    try {
-      const orderRef = doc(db, 'orders', orderId);
-      await updateDoc(orderRef, {
-        status: 'cancelled'
-      });
-    } catch (error) {
-      console.error('Error cancelling order:', error);
-    }
-  };
 
   const getStatusTranslation = (status: string) => {
     switch (status) {
@@ -182,19 +171,6 @@ export default function NewOrderHistory() {
                         {getStatusTranslation(order.status)}
                       </span>
                     </div>
-                    {order.status === 'pending' && (
-                      <div className="pt-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCancelOrder(order.id);
-                          }}
-                          className="w-full glass-button text-red-600 hover:text-red-700 font-medium py-2"
-                        >
-                          {t('orders.cancel')}
-                        </button>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -214,9 +190,6 @@ export default function NewOrderHistory() {
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         {t('orders.status')}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                        {t('orders.actions')}
                       </th>
                     </tr>
                   </thead>
@@ -238,19 +211,6 @@ export default function NewOrderHistory() {
                             {getStatusTranslation(order.status)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {order.status === 'pending' && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCancelOrder(order.id);
-                              }}
-                              className="glass-button text-red-600 hover:text-red-700 font-medium"
-                            >
-                              {t('orders.cancel')}
-                            </button>
-                          )}
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -262,8 +222,8 @@ export default function NewOrderHistory() {
 
         {/* Order Details Modal */}
         {selectedOrder && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="glass-panel rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white/95 backdrop-blur-md shadow-xl rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -276,7 +236,7 @@ export default function NewOrderHistory() {
                   </div>
                   <button
                     onClick={() => setSelectedOrder(null)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -286,7 +246,7 @@ export default function NewOrderHistory() {
 
                 <div className="space-y-4">
                   {selectedOrder.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b border-white/10 last:border-0">
+                    <div key={index} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
                       <div>
                         <p className="font-medium text-gray-800">{item.productName}</p>
                         <p className="text-sm text-gray-600">
@@ -300,7 +260,7 @@ export default function NewOrderHistory() {
                   ))}
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-white/10">
+                <div className="mt-6 pt-4 border-t border-gray-100">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-800">{t('orders.total')}</span>
                     <span className="text-lg font-bold text-gray-800">
@@ -312,7 +272,7 @@ export default function NewOrderHistory() {
                 <div className="mt-6">
                   <button
                     onClick={() => setSelectedOrder(null)}
-                    className="w-full glass-button bg-gray-600/90 hover:bg-gray-700/90 text-white py-2"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors duration-200"
                   >
                     {t('common.close')}
                   </button>

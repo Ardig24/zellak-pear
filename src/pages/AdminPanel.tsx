@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag as ShoppingBagIcon, Bell, Tag, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -24,45 +24,59 @@ export default function AdminPanel() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Get orders from the last 24 hours
+  // Memoize the orders query
+  const ordersQuery = useMemo(() => {
     const now = new Date();
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     
-    const ordersRef = collection(db, 'orders');
-    const q = query(
-      ordersRef,
+    return query(
+      collection(db, 'orders'),
       where('status', '==', 'pending'),
       where('orderDate', '>=', yesterday.toISOString())
     );
+  }, []);
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+  useEffect(() => {
+    let isSubscribed = true;
+    
+    const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
+      if (!isSubscribed) return;
+      
       const orders = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+      
       setNewOrders(orders);
       
       // Trigger animation when new orders arrive
       if (orders.length > 0) {
         setHasNewNotification(true);
-        setTimeout(() => setHasNewNotification(false), 1000);
+        const timer = setTimeout(() => {
+          if (isSubscribed) {
+            setHasNewNotification(false);
+          }
+        }, 1000);
+        return () => clearTimeout(timer);
       }
     });
 
-    return () => unsubscribe();
-  }, []);
+    return () => {
+      isSubscribed = false;
+      unsubscribe();
+    };
+  }, [ordersQuery]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await logout();
     } catch (error) {
       console.error('Logout failed:', error);
     }
-  };
+  }, [logout]);
 
-  // Add mesh gradient CSS
-  const meshGradientStyle = {
+  // Memoize mesh gradient style
+  const meshGradientStyle = useMemo(() => ({
     backgroundImage: `
       radial-gradient(at 40% 20%, hsla(210, 100%, 93%, 1) 0px, transparent 50%),
       radial-gradient(at 80% 0%, hsla(189, 100%, 91%, 1) 0px, transparent 50%),
@@ -72,8 +86,10 @@ export default function AdminPanel() {
       radial-gradient(at 80% 100%, hsla(242, 100%, 91%, 1) 0px, transparent 50%),
       radial-gradient(at 0% 0%, hsla(343, 100%, 92%, 1) 0px, transparent 50%)
     `,
-    backgroundColor: '#f1f5f9'
-  };
+    backgroundColor: '#f1f5f9',
+    willChange: 'transform',
+    transform: 'translateZ(0)'
+  }), []);
 
   return (
     <div className="min-h-screen app-page">

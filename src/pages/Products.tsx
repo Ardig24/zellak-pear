@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { OrderItem } from '../types';
 import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList, Coffee, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,7 +36,37 @@ export default function Products() {
     }
   };
 
-  const handleQuantityChange = (
+  const filteredProducts = useMemo(() => {
+    const filteredBySearch = products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    if (!selectedCategory) return filteredBySearch;
+    return filteredBySearch.filter(product => product.category === selectedCategory);
+  }, [products, searchTerm, selectedCategory]);
+
+  const filteredCategories = useMemo(() => {
+    if (!searchTerm) return categories;
+    return categories.filter(category =>
+      products.some(
+        product =>
+          product.category === category.id &&
+          product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [categories, products, searchTerm]);
+
+  const cartTotals = useMemo(() => {
+    return orderItems.reduce(
+      (acc, item) => ({
+        total: acc.total + item.total,
+        vatAmount: acc.vatAmount + item.vatAmount,
+      }),
+      { total: 0, vatAmount: 0 }
+    );
+  }, [orderItems]);
+
+  const handleQuantityChange = useCallback((
     productId: string,
     productName: string,
     variantId: string,
@@ -90,15 +120,15 @@ export default function Products() {
       }
       return prevItems;
     });
-  };
+  }, []);
 
-  const removeItem = (productId: string, variantId: string) => {
+  const removeItem = useCallback((productId: string, variantId: string) => {
     setOrderItems(prev => {
       const newItems = prev.filter(item => !(item.productId === productId && item.variantId === variantId));
       localStorage.setItem('cartItems', JSON.stringify(newItems));
       return newItems;
     });
-  };
+  }, []);
 
   const updateQuantity = (productId: string, variantId: string, newQuantity: number) => {
     handleQuantityChange(
@@ -169,15 +199,6 @@ export default function Products() {
   };
 
   if (!userData) return null;
-
-  // Filter products based on search term and selected category
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    if (selectedCategory) {
-      return product.category === selectedCategory && matchesSearch;
-    }
-    return matchesSearch;
-  });
 
   // Group products by category for search results
   const groupedProducts = filteredProducts.reduce((acc, product) => {
@@ -610,7 +631,7 @@ export default function Products() {
               ) : (
                 // Categories Grid
                 <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
-                  {categories.map((category) => (
+                  {filteredCategories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
