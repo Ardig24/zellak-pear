@@ -41,7 +41,11 @@
     "orderSentSuccess": "Porosia u dërgua me sukses!",
     "orderSendError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
     "notLoggedIn": "Duhet të jeni të kyçur për të dërguar një porosi",
-    "outOfStock": "Nuk ka në stok"
+    "logout": "Dilni",
+    "outOfStock": "Nuk ka në stok",
+    "cart": {
+      "empty": "Shporta është bosh"
+    }
   },
   "admin": {
     "title": "Paneli i Administratorit",
@@ -87,7 +91,7 @@
       "noPendingOrders": "Nuk ka porosi në pritje",
       "noTodos": "Nuk ka detyra të shtuara ende"
     },
-    "manageUsers": "Menaxho Klientët",
+    "manageUsers": "Klientët",
     "manageProducts": "Produktet",
     "manageOrders": "Porositë",
     "manageCategories": "Kategoritë",

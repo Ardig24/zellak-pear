@@ -41,7 +41,11 @@
     "orderSentSuccess": "Bestellung erfolgreich gesendet!",
     "orderSendError": "Bestellung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
     "notLoggedIn": "Sie müssen angemeldet sein, um eine Bestellung aufzugeben",
-    "outOfStock": "Nicht auf Lager"
+    "logout": "Abmelden",
+    "outOfStock": "Nicht auf Lager",
+    "cart": {
+      "empty": "Ihr Warenkorb ist leer"
+    }
   },
   "admin": {
     "title": "Admin-Panel",
