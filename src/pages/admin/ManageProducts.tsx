@@ -72,10 +72,23 @@ export default function ManageProducts() {
 
     try {
       const timestamp = Date.now();
+      let iconUrl = formData.icon;
+
+      // If formData.icon is a File object, upload it first
+      if (formData.icon instanceof File) {
+        try {
+          iconUrl = await uploadImage(formData.icon, 'products');
+        } catch (err) {
+          console.error('Error uploading image:', err);
+          // Continue with empty icon if upload fails
+          iconUrl = '';
+        }
+      }
+
       const productData = {
         name: formData.name,
         category: formData.category,
-        icon: formData.icon,
+        icon: iconUrl, // Use the uploaded image URL
         vatRate: formData.vatRate,
         variants: formData.variants.map((variant, index) => ({
           id: variant.id || `variant-${timestamp}-${index}`,

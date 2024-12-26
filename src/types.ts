@@ -2,9 +2,10 @@ export interface Product {
   id: string;
   name: string;
   category: string;
-  variants: ProductVariant[];
-  icon: string;
   vatRate: 7 | 19;
+  variants: ProductVariant[];
+  order: number;
+  icon?: string;
 }
 
 export interface ProductVariant {
@@ -74,4 +75,5 @@ export interface Category {
   id: string;
   name: string;
   imageUrl?: string;
+  order: number;
 }

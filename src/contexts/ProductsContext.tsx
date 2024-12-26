@@ -71,6 +71,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
             vatRate: data.vatRate || 19,
             variants: data.variants || [],
             order: data.order || 0,
+            icon: data.icon || '',  
           } as Product;
         } catch (err) {
           console.error('Error processing product document:', doc.id, err);
@@ -107,7 +108,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
           return {
             id: doc.id,
             name: data.name || '',
-            imageUrl: data.imageUrl || '',
+            imageUrl: data.imageUrl || '',  // Ensure imageUrl is never undefined
             order: data.order || 0,
           } as Category;
         } catch (err) {
@@ -276,7 +277,13 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // If imageUrl is a File, upload it first
       let imageUrl = categoryData.imageUrl;
       if (categoryData.imageUrl instanceof File) {
-        imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
+        try {
+          imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
+          console.log('Uploaded category image:', imageUrl);
+        } catch (uploadErr) {
+          console.error('Error uploading category image:', uploadErr);
+          imageUrl = '';  // Set empty string if upload fails
+        }
       }
 
       // Get the highest order value from current categories
@@ -284,7 +291,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
 
       const finalCategoryData = {
         name: categoryData.name,
-        imageUrl,
+        imageUrl: imageUrl || '',  // Ensure imageUrl is never undefined
         order: currentHighestOrder + 1,
         createdAt: new Date().toISOString()
       };
@@ -297,6 +304,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
 
       return newCategory;
     } catch (err: any) {
+      console.error('Error adding category:', err);
       setError(err.message);
       throw err;
     } finally {
@@ -311,25 +319,32 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // If imageUrl is a File, upload it first
       let imageUrl = categoryData.imageUrl;
       if (categoryData.imageUrl instanceof File) {
-        // Delete old image if it exists
-        const oldCategory = categories.find(c => c.id === id);
-        if (oldCategory?.imageUrl) {
-          await deleteImage(oldCategory.imageUrl);
+        try {
+          // Delete old image if it exists
+          const oldCategory = categories.find(c => c.id === id);
+          if (oldCategory?.imageUrl) {
+            await deleteImage(oldCategory.imageUrl);
+          }
+          
+          // Upload new image
+          imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
+          console.log('Uploaded category image:', imageUrl);
+        } catch (uploadErr) {
+          console.error('Error uploading category image:', uploadErr);
+          imageUrl = '';  // Set empty string if upload fails
         }
-        
-        // Upload new image
-        imageUrl = await uploadImage(categoryData.imageUrl, 'categories');
       }
 
       const finalCategoryData = {
         name: categoryData.name,
-        imageUrl,
+        imageUrl: imageUrl || '',  // Ensure imageUrl is never undefined
         updatedAt: new Date().toISOString()
       };
 
       await setDoc(doc(db, 'categories', id), finalCategoryData);
       await fetchCategories();
     } catch (err: any) {
+      console.error('Error updating category:', err);
       setError(err.message);
       throw err;
     } finally {

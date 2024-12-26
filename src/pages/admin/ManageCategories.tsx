@@ -36,7 +36,7 @@ export default function ManageCategories() {
     try {
       await addCategory({
         name: newCategoryName.trim(),
-        imageFile: categoryImageFile
+        imageUrl: categoryImageFile
       });
       setNewCategoryName('');
       setCategoryImageFile(null);
@@ -55,8 +55,7 @@ export default function ManageCategories() {
     try {
       await updateCategory(editingCategory.id, {
         name: editFormData.name.trim(),
-        imageUrl: editingCategory.imageUrl,
-        imageFile: editFormData.imageFile
+        imageUrl: editFormData.imageFile || editingCategory.imageUrl
       });
       setEditingCategory(null);
       setEditFormData({ name: '', imageFile: null });
