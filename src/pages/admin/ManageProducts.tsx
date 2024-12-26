@@ -28,7 +28,7 @@ export default function ManageProducts() {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
-    icon: '',
+    icon: null as File | string | null,
     vatRate: 19 as 7 | 19,
     variants: [{
       id: `${Date.now()}-0`,
@@ -52,7 +52,7 @@ export default function ManageProducts() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData({ ...formData, icon: file });
+      setFormData(prev => ({ ...prev, icon: file }));
     }
   };
 
@@ -72,23 +72,10 @@ export default function ManageProducts() {
 
     try {
       const timestamp = Date.now();
-      let iconUrl = formData.icon;
-
-      // If formData.icon is a File object, upload it first
-      if (formData.icon instanceof File) {
-        try {
-          iconUrl = await uploadImage(formData.icon, 'products');
-        } catch (err) {
-          console.error('Error uploading image:', err);
-          // Continue with empty icon if upload fails
-          iconUrl = '';
-        }
-      }
-
       const productData = {
         name: formData.name,
         category: formData.category,
-        icon: iconUrl, // Use the uploaded image URL
+        icon: formData.icon || null,
         vatRate: formData.vatRate,
         variants: formData.variants.map((variant, index) => ({
           id: variant.id || `variant-${timestamp}-${index}`,
@@ -102,16 +89,36 @@ export default function ManageProducts() {
       };
 
       if (editingProduct) {
+        // Update existing product
         await updateProduct(editingProduct.id, productData);
       } else {
-        await addProduct(productData);
+        // Add new product
+        const newProduct = await addProduct(productData);
+        if (!newProduct) {
+          throw new Error('Failed to add product');
+        }
       }
 
-      resetForm();
+      // Reset form in both cases
+      setFormData({
+        name: '',
+        category: '',
+        icon: null,
+        vatRate: 19,
+        variants: [{
+          id: `${Date.now()}-0`,
+          size: '',
+          prices: { A: 0, B: 0 },
+          inStock: true
+        }],
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       setIsAddingProduct(false);
       setEditingProduct(null);
-    } catch (err: any) {
-      console.error('Error submitting product:', err);
+    } catch (err) {
+      console.error(editingProduct ? 'Error updating product:' : 'Error adding product:', err);
     }
   };
 
@@ -201,7 +208,7 @@ export default function ManageProducts() {
     setFormData({
       name: '',
       category: '',
-      icon: '',
+      icon: null,
       vatRate: 19,
       variants: [{
         id: `${Date.now()}-0`,
@@ -758,7 +765,7 @@ export default function ManageProducts() {
                     <button
                       type="button"
                       onClick={addVariant}
-                      className="bg-white border border-blue-500 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors duration-200 flex items-center gap-1"
+                      className="bg-white border border-blue-500 text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors duration-200"
                     >
                       <Plus className="w-4 h-4" />
                       {t('admin.products.addVariant')}

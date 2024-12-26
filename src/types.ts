@@ -6,6 +6,8 @@ export interface Product {
   variants: ProductVariant[];
   order: number;
   icon?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ProductVariant {

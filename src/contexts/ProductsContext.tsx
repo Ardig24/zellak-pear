@@ -58,7 +58,6 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      
       const productsRef = collection(db, 'products');
       const productsSnapshot = await getDocs(productsRef);
       const fetchedProducts = productsSnapshot.docs.map(doc => {
@@ -68,10 +67,12 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
             id: doc.id,
             name: data.name || '',
             category: data.category || '',
+            icon: data.icon || null,  // Allow null for icon
             vatRate: data.vatRate || 19,
             variants: data.variants || [],
             order: data.order || 0,
-            icon: data.icon || '',  
+            createdAt: data.createdAt || new Date().toISOString(),
+            updatedAt: data.updatedAt
           } as Product;
         } catch (err) {
           console.error('Error processing product document:', doc.id, err);
@@ -142,6 +143,8 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         formData.append('image', file);
         formData.append('key', IMGBB_API_KEY);
 
+        console.log('Uploading image to ImgBB...', { fileName: file.name, fileSize: file.size });
+
         // Upload to ImgBB
         const response = await fetch('https://api.imgbb.com/1/upload', {
           method: 'POST',
@@ -153,7 +156,13 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         }
 
         const data = await response.json();
-        return data.data.url; // Return the direct image URL
+        console.log('ImgBB response:', data);
+        
+        // ImgBB returns different URLs, let's use display_url which is direct
+        const imageUrl = data.data.display_url;
+        console.log('Using image URL:', imageUrl);
+        
+        return imageUrl;
       } catch (error: any) {
         console.error('Error uploading image to ImgBB:', error);
         throw new Error('Failed to upload image');
@@ -187,7 +196,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addProduct = async (product: Omit<Product, 'id' | 'order'>) => {
+  const addProduct = async (productData: Omit<Product, 'id' | 'order'>) => {
     try {
       setLoading(true);
       setError(null);
@@ -195,9 +204,26 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // Get the highest order value from current products
       const currentHighestOrder = products.reduce((max, p) => Math.max(max, p.order || 0), 0);
 
+      // If icon is a File, upload it first
+      let iconUrl = productData.icon;
+      if (productData.icon instanceof File) {
+        try {
+          iconUrl = await uploadImage(productData.icon, 'products');
+          console.log('Uploaded product image:', iconUrl);
+        } catch (uploadErr) {
+          console.error('Error uploading product image:', uploadErr);
+          iconUrl = '';  // Set empty string if upload fails, just like categories
+        }
+      }
+
       const newProduct = {
-        ...product,
+        name: productData.name,
+        category: productData.category,
+        icon: iconUrl || '',  // Use empty string as default, just like categories
+        vatRate: productData.vatRate,
+        variants: productData.variants,
         order: currentHighestOrder + 1,
+        createdAt: new Date().toISOString()
       };
 
       const docRef = await addDoc(collection(db, 'products'), newProduct);
@@ -223,25 +249,35 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
       // If icon is a File, upload it first
       let iconUrl = productData.icon;
       if (productData.icon instanceof File) {
-        // Delete old image if it exists
-        const oldProduct = products.find(p => p.id === id);
-        if (oldProduct?.icon) {
-          await deleteImage(oldProduct.icon);
+        try {
+          // Delete old image if it exists
+          const oldProduct = products.find(p => p.id === id);
+          if (oldProduct?.icon) {
+            await deleteImage(oldProduct.icon);
+          }
+          
+          // Upload new image
+          iconUrl = await uploadImage(productData.icon, 'products');
+          console.log('Uploaded product image:', iconUrl);
+        } catch (uploadErr) {
+          console.error('Error uploading product image:', uploadErr);
+          iconUrl = '';  // Set empty string if upload fails, just like categories
         }
-        
-        // Upload new image
-        iconUrl = await uploadImage(productData.icon, 'products');
       }
 
       const finalProductData = {
-        ...productData,
-        icon: iconUrl,
+        name: productData.name,
+        category: productData.category,
+        icon: iconUrl || '',  // Use empty string as default, just like categories
+        vatRate: productData.vatRate,
+        variants: productData.variants,
         updatedAt: new Date().toISOString()
       };
 
       await setDoc(doc(db, 'products', id), finalProductData);
       await fetchProducts();
     } catch (err: any) {
+      console.error('Error updating product:', err);
       setError(err.message);
       throw err;
     } finally {
