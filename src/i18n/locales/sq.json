@@ -36,6 +36,8 @@
     "myOrders": "Porositë e Mia",
     "emptyCart": "Shporta juaj është e zbrazët",
     "basePrice": "Çmimi bazë",
+    "pricePerItem": "Çmimi për copë",
+    "vatWillBeAdded": "Çmimit i shtohet TVSH",
     "remove": "Hiq",
     "noItemsInCart": "Nuk ka artikuj në shportë",
     "orderSentSuccess": "Porosia u dërgua me sukses!",

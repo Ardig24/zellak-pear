@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { OrderItem } from '../types';
 import { ChevronLeft, LogOut, ShoppingCart, Send, Trash2, Search, ClipboardList, Coffee, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import Toast from '../components/Toast';
 import { useTranslation } from 'react-i18next';
+import { useDiscountRules } from '../hooks/useDiscountRules';
 
 export default function Products() {
   const { t } = useTranslation();
@@ -27,8 +28,14 @@ export default function Products() {
   
   const { products, categories } = useProducts();
   const { userData, logout } = useAuth();
+  console.log('Current user data:', userData);
   const { sendOrder } = useOrders();
   const location = useLocation();
+  const { getDiscountedPrice, loading: discountLoading, discountRules } = useDiscountRules(userData?.username || '');
+
+  useEffect(() => {
+    console.log('Current discount rules:', discountRules);
+  }, [discountRules]);
 
   const handleLogout = async () => {
     try {
@@ -133,14 +140,33 @@ export default function Products() {
   }, []);
 
   const updateQuantity = (productId: string, variantId: string, newQuantity: number) => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    const variant = product.variants.find(v => v.id === variantId);
+    if (!variant) return;
+    const basePrice = variant.prices[userData.category];
+    console.log('Product details:', {
+      productId: product.id,
+      productName: product.name,
+      basePrice,
+      username: userData?.username,
+      category: userData?.category,
+      discountRules
+    });
+    const discountedPrice = getDiscountedPrice(product.id, basePrice);
+    console.log('Price calculation result:', {
+      basePrice,
+      discountedPrice,
+      hasDiscount: basePrice !== discountedPrice
+    });
     handleQuantityChange(
       productId,
       orderItems.find(item => item.productId === productId && item.variantId === variantId)?.productName || '',
       variantId,
       orderItems.find(item => item.productId === productId && item.variantId === variantId)?.size || '',
-      orderItems.find(item => item.productId === productId && item.variantId === variantId)?.price || 0,
+      discountedPrice,
       newQuantity,
-      orderItems.find(item => item.productId === productId && item.variantId === variantId)?.vatRate || 7
+      product.vatRate
     );
   };
 
@@ -289,8 +315,8 @@ export default function Products() {
                             </button>
                             <div className="text-right mt-2">
                               <div className="text-sm text-gray-500">{t('products.pricePerItem', { price: item.price.toFixed(2) })}</div>
-                              <div className="text-sm font-medium text-blue-600 mt-1">€{(item.price * item.quantity).toFixed(2)}</div>
-                              <div className="text-xs text-gray-500">{t('products.vatWillBeAdded', { rate: item.vatRate })}</div>
+                              <div className="text-sm font-medium text-blue-600 mt-1">{item.quantity}x€{item.price.toFixed(2)} = €{(item.price * item.quantity).toFixed(2)}</div>
+                              <div className="text-xs text-gray-500">{t('products.vatWillBeAdded')} {item.vatRate}%</div>
                             </div>
                           </div>
                         </div>
@@ -535,6 +561,22 @@ export default function Products() {
                                       item => item.productId === product.id && item.variantId === safeVariantId
                                     );
                                     const currentQuantity = orderItem?.quantity || 0;
+                                    const basePrice = variant.prices[userData.category];
+                                    console.log('Product details:', {
+                                      productId: product.id,
+                                      productName: product.name,
+                                      basePrice,
+                                      username: userData?.username,
+                                      category: userData?.category,
+                                      discountRules
+                                    });
+                                    const discountedPrice = getDiscountedPrice(product.id, basePrice);
+                                    console.log('Price calculation result:', {
+                                      basePrice,
+                                      discountedPrice,
+                                      hasDiscount: basePrice !== discountedPrice
+                                    });
+                                    const showDiscount = basePrice !== discountedPrice;
 
                                     return (
                                       <div 
@@ -551,17 +593,17 @@ export default function Products() {
                                           )}
                                         </div>
                                         <div className="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
-                                          <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category].toFixed(2)}</p>
+                                          <p className="text-base font-semibold text-blue-600">€{discountedPrice.toFixed(2)}</p>
                                           <div className="flex items-center gap-2">
                                             <button
                                               onClick={() => {
                                                 const newQuantity = Math.max(0, currentQuantity - 1);
                                                 handleQuantityChange(
                                                   product.id,
-                                                  product.name,
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
                                                   safeVariantId,
-                                                  variant.size,
-                                                  variant.prices[userData.category],
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.size || '',
+                                                  discountedPrice,
                                                   newQuantity,
                                                   product.vatRate
                                                 );
@@ -581,10 +623,10 @@ export default function Products() {
                                                 const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
                                                 handleQuantityChange(
                                                   product.id,
-                                                  product.name,
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
                                                   safeVariantId,
-                                                  variant.size,
-                                                  variant.prices[userData.category],
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.size || '',
+                                                  discountedPrice,
                                                   newQuantity,
                                                   product.vatRate
                                                 );
@@ -600,10 +642,10 @@ export default function Products() {
                                                 const newQuantity = currentQuantity + 1;
                                                 handleQuantityChange(
                                                   product.id,
-                                                  product.name,
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
                                                   safeVariantId,
-                                                  variant.size,
-                                                  variant.prices[userData.category],
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.size || '',
+                                                  discountedPrice,
                                                   newQuantity,
                                                   product.vatRate
                                                 );
@@ -697,6 +739,22 @@ export default function Products() {
                               item => item.productId === product.id && item.variantId === safeVariantId
                             );
                             const currentQuantity = orderItem?.quantity || 0;
+                            const basePrice = variant.prices[userData.category];
+                            console.log('Product details:', {
+                              productId: product.id,
+                              productName: product.name,
+                              basePrice,
+                              username: userData?.username,
+                              category: userData?.category,
+                              discountRules
+                            });
+                            const discountedPrice = getDiscountedPrice(product.id, basePrice);
+                            console.log('Price calculation result:', {
+                              basePrice,
+                              discountedPrice,
+                              hasDiscount: basePrice !== discountedPrice
+                            });
+                            const showDiscount = basePrice !== discountedPrice;
 
                             return (
                               <div 
@@ -713,7 +771,7 @@ export default function Products() {
                                   )}
                                 </div>
                                 <div className="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
-                                  <p className="text-base font-semibold text-blue-600">€{variant.prices[userData.category].toFixed(2)}</p>
+                                  <p className="text-base font-semibold text-blue-600">€{discountedPrice.toFixed(2)}</p>
                                   <div className="flex items-center gap-2">
                                     <button
                                       onClick={() => {
@@ -723,7 +781,7 @@ export default function Products() {
                                           product.name,
                                           safeVariantId,
                                           variant.size,
-                                          variant.prices[userData.category],
+                                          discountedPrice,
                                           newQuantity,
                                           product.vatRate
                                         );
@@ -746,7 +804,7 @@ export default function Products() {
                                           product.name,
                                           safeVariantId,
                                           variant.size,
-                                          variant.prices[userData.category],
+                                          discountedPrice,
                                           newQuantity,
                                           product.vatRate
                                         );
@@ -765,7 +823,7 @@ export default function Products() {
                                           product.name,
                                           safeVariantId,
                                           variant.size,
-                                          variant.prices[userData.category],
+                                          discountedPrice,
                                           newQuantity,
                                           product.vatRate
                                         );
@@ -859,8 +917,8 @@ export default function Products() {
                             </div>
                             <div className="text-right flex flex-col gap-1">
                               <div className="text-sm text-gray-500">{t('products.pricePerItem', { price: item.price.toFixed(2) })}</div>
-                              <div className="text-sm font-medium text-blue-600">€{(item.price * item.quantity).toFixed(2)}</div>
-                              <div className="text-xs text-gray-500">{t('products.vatWillBeAdded', { rate: item.vatRate })}</div>
+                              <div className="text-sm font-medium text-blue-600">{item.quantity}x€{item.price.toFixed(2)} = €{(item.price * item.quantity).toFixed(2)}</div>
+                              <div className="text-xs text-gray-500">{t('products.vatWillBeAdded')} {item.vatRate}%</div>
                             </div>
                           </div>
                         </div>

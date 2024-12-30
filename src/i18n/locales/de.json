@@ -36,6 +36,8 @@
     "myOrders": "Meine Bestellungen",
     "emptyCart": "Ihr Warenkorb ist leer",
     "basePrice": "Grundpreis",
+    "pricePerItem": "Preis pro Stück",
+    "vatWillBeAdded": "zzgl. MwSt",
     "remove": "Entfernen",
     "noItemsInCart": "Keine Artikel im Warenkorb",
     "orderSentSuccess": "Bestellung erfolgreich gesendet!",

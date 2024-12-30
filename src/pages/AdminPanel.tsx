@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag as ShoppingBagIcon, Bell, Tag, Building2 } from 'lucide-react';
+import { Home as HomeIcon, Users, Coffee, LogOut, FileText, ShoppingBag as ShoppingBagIcon, Bell, Tag, Building2, Percent } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -13,6 +13,7 @@ import Reports from '../components/Reports';
 import LanguageSelector from '../components/LanguageSelector';
 import { useAuth } from '../contexts/AuthContext';
 import CompanyInfo from './admin/CompanyInfo';
+import ManageDiscounts from './admin/ManageDiscounts';
 
 export default function AdminPanel() {
   const { logout } = useAuth();
@@ -230,6 +231,18 @@ export default function AdminPanel() {
                     <Building2 className="w-5 h-5 mr-3 flex-shrink-0" />
                     <div className="break-words">{t('adminPanel.companyInfo')}</div>
                   </Link>
+                  <Link
+                    to="/admin/discounts"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
+                      location.pathname.includes('/admin/discounts')
+                        ? 'bg-blue-600/10 text-blue-600'
+                        : 'text-gray-600 hover:bg-blue-600/5 hover:text-blue-600'
+                    }`}
+                  >
+                    <Percent className="w-5 h-5 mr-3 flex-shrink-0" />
+                    <div className="break-words">{t('admin.manageDiscounts')}</div>
+                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
@@ -346,6 +359,17 @@ export default function AdminPanel() {
                 <Building2 className="w-5 h-5 mr-3 flex-shrink-0" />
                 <div className="break-words">{t('adminPanel.companyInfo')}</div>
               </Link>
+              <Link
+                to="/admin/discounts"
+                className={`flex items-start px-4 py-3 rounded-lg transition-all duration-200 ${
+                  location.pathname.includes('/admin/discounts')
+                    ? 'bg-indigo-600/10 text-indigo-600'
+                    : 'text-gray-600 hover:bg-indigo-600/5 hover:text-indigo-600'
+                }`}
+              >
+                <Percent className="w-5 h-5 mr-3 flex-shrink-0" />
+                <div className="break-words">{t('admin.manageDiscounts')}</div>
+              </Link>
             </nav>
             <div className="px-4 mt-6">
               <button
@@ -422,6 +446,7 @@ export default function AdminPanel() {
               <Route path="/orders" element={<ManageOrders />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/company-info" element={<CompanyInfo />} />
+              <Route path="/discounts" element={<ManageDiscounts />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </div>

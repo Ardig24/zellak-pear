@@ -36,6 +36,8 @@
     "myOrders": "My Orders",
     "emptyCart": "Your cart is empty",
     "basePrice": "Base Price",
+    "pricePerItem": "Price per item",
+    "vatWillBeAdded": "VAT will be added",
     "remove": "Remove",
     "noItemsInCart": "No items in cart",
     "orderSentSuccess": "Order was sent successfully!",
