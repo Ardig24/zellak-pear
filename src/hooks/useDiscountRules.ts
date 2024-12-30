@@ -6,8 +6,8 @@ interface DiscountRule {
   id: string;
   clientId: string;
   clientName: string;
-  productId: string;
-  productName: string;
+  productId: string | null;  // Can be null for global client discounts
+  productName: string | null;  // Can be null for global client discounts
   discountType: 'percentage' | 'fixed';
   discountValue: number;
   active: boolean;
@@ -67,11 +67,16 @@ export const useDiscountRules = (username: string) => {
         ruleId: r.id,
         ruleProductId: r.productId,
         ruleClientId: r.clientId,
-        matches: r.productId === productId
+        matches: r.productId === productId || r.productId === null
       }))
     });
 
-    const rule = discountRules.find(r => r.productId === productId);
+    // First check for product-specific discount
+    const productRule = discountRules.find(r => r.productId === productId);
+    // Then check for global client discount if no product-specific discount exists
+    const globalRule = !productRule ? discountRules.find(r => r.productId === null) : null;
+    
+    const rule = productRule || globalRule;
     
     if (!rule) {
       console.log('No matching discount rule found for:', {
@@ -88,7 +93,8 @@ export const useDiscountRules = (username: string) => {
       console.log('Applied percentage discount:', {
         originalPrice,
         percentage: rule.discountValue,
-        finalPrice: discounted
+        finalPrice: discounted,
+        isGlobalDiscount: rule.productId === null
       });
       return discounted;
     } else {
@@ -96,7 +102,8 @@ export const useDiscountRules = (username: string) => {
       console.log('Applied fixed discount:', {
         originalPrice,
         deduction: rule.discountValue,
-        finalPrice: discounted
+        finalPrice: discounted,
+        isGlobalDiscount: rule.productId === null
       });
       return discounted;
     }

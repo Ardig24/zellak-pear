@@ -13,6 +13,7 @@
   "auth": {
     "logout": "Dilni"
   },
+  "adminPanel.companyInfo": "Infot per kompanine",
   "products": {
     "categories": "Kategoritë",
     "backToCategories": "Kthehu te Kategoritë",
@@ -25,7 +26,7 @@
     "vat7": "TVSH 7%",
     "vat19": "TVSH 19%",
     "sendOrder": "Dërgo Porosinë",
-    "orderSuccess": "Porosia u dërgua me sukses!",
+    "orderSentSuccessfully": "Porosia u dërgua me sukses!",
     "orderError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
     "quantity": "Sasia",
     "size": "Madhësia",
@@ -39,6 +40,10 @@
     "pricePerItem": "Çmimi për copë",
     "vatWillBeAdded": "Çmimit i shtohet TVSH",
     "remove": "Hiq",
+    "deleteOrder": "Fshi Porosinë",
+    "deleteOrderConfirmation": "A doni ta fshini porosinë",
+    "cancel":"Anulo",
+    "delete":"Fshi",
     "noItemsInCart": "Nuk ka artikuj në shportë",
     "orderSentSuccess": "Porosia u dërgua me sukses!",
     "orderSendError": "Dërgimi i porosisë dështoi. Ju lutemi provoni përsëri.",
@@ -234,7 +239,31 @@
     },
     "adminPanel": {
       "companyInfo": "Informacionet e Kompanisë"
-    }
+    },
+    "manageDiscounts": "Zbritjet",
+    "addDiscountRule": "Shto Zbritje",
+    "editDiscountRule": "Ndrysho Rregullin e Zbritjes",
+    "selectClient": "Zgjidh Klientin",
+    "selectProduct": "Zgjidh Produktin",
+    "allProducts": "Të Gjitha Produktet",
+    "discountType": "Lloji i Zbritjes",
+    "percentageDiscount": "Zbritje në Përqindje",
+    "fixedDiscount": "Zbritje në Euro",
+    "discountValue": "Vlera e Zbritjes",
+    "client": "Klienti",
+    "product": "Produkti",
+    "discount": "Zbritje",
+    "status": "Statusi",
+    "actions": "Veprimet",
+    "edit": "Ndrysho",
+    "active": "Aktiv",
+    "inactive": "Joaktiv",
+    "activate": "Aktivizo",
+    "deactivate": "Çaktivizo",
+    "delete": "Fshi",
+    "cancel": "Anulo",
+    "addRule": "Shto Rregull",
+    "saveChanges": "Ruaj Ndryshimet"
   },
   "companyInfo": {
     "title": "Informacionet e Kompanisë",

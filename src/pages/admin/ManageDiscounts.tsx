@@ -9,8 +9,8 @@ interface DiscountRule {
   id: string;
   clientId: string;
   clientName: string;
-  productId: string;
-  productName: string;
+  productId: string | null;
+  productName: string | null;
   discountType: 'percentage' | 'fixed';
   discountValue: number;
   active: boolean;
@@ -24,10 +24,11 @@ export default function ManageDiscounts() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
   const [discountValue, setDiscountValue] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingRule, setEditingRule] = useState<DiscountRule | null>(null);
 
   // Fetch clients, products, and existing discount rules
   useEffect(() => {
@@ -73,10 +74,10 @@ export default function ManageDiscounts() {
 
   const handleAddRule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedClient || !selectedProduct || !discountValue) return;
+    if (!selectedClient || (!selectedProduct && selectedProduct !== null) || !discountValue) return;
 
     const client = clients.find(c => c.id === selectedClient);
-    const product = sortedProducts.find(p => p.id === selectedProduct);
+    const product = selectedProduct ? sortedProducts.find(p => p.id === selectedProduct) : null;
 
     console.log('Selected client:', {
       selectedId: selectedClient,
@@ -94,8 +95,8 @@ export default function ManageDiscounts() {
       console.log('Creating new rule with data:', {
         clientId: client?.username || selectedClient,
         clientName: client?.companyName || client?.username || 'Unknown Client',
-        productId: selectedProduct,
-        productName: product?.name || 'Unknown Product',
+        productId: selectedProduct || null,
+        productName: product?.name || null,
         discountType,
         discountValue: Number(discountValue),
         active: true
@@ -104,8 +105,8 @@ export default function ManageDiscounts() {
       const newRule = {
         clientId: client?.username || selectedClient,
         clientName: client?.companyName || client?.username || 'Unknown Client',
-        productId: selectedProduct,
-        productName: product?.name || 'Unknown Product',
+        productId: selectedProduct || null,
+        productName: product?.name || null,
         discountType,
         discountValue: Number(discountValue),
         active: true,
@@ -119,11 +120,43 @@ export default function ManageDiscounts() {
       
       // Reset form
       setSelectedClient('');
-      setSelectedProduct('');
+      setSelectedProduct(null);
       setDiscountValue('');
       setShowAddForm(false);
     } catch (error) {
       console.error('Error adding discount rule:', error);
+    }
+  };
+
+  const handleEditRule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingRule) return;
+
+    try {
+      const updatedRule = {
+        clientId: editingRule.clientId,
+        clientName: editingRule.clientName,
+        productId: selectedProduct || null,
+        productName: selectedProduct ? sortedProducts.find(p => p.id === selectedProduct)?.name || null : null,
+        discountType,
+        discountValue: Number(discountValue),
+        active: editingRule.active,
+        createdAt: editingRule.createdAt
+      };
+
+      await updateDoc(doc(db, 'discountRules', editingRule.id), updatedRule);
+      
+      setDiscountRules(prev =>
+        prev.map(rule =>
+          rule.id === editingRule.id ? { ...rule, ...updatedRule } : rule
+        )
+      );
+      
+      setEditingRule(null);
+      setSelectedProduct(null);
+      setDiscountValue('');
+    } catch (error) {
+      console.error('Error updating discount rule:', error);
     }
   };
 
@@ -151,6 +184,13 @@ export default function ManageDiscounts() {
     }
   };
 
+  const startEditing = (rule: DiscountRule) => {
+    setEditingRule(rule);
+    setSelectedProduct(rule.productId);
+    setDiscountType(rule.discountType);
+    setDiscountValue(rule.discountValue.toString());
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -160,55 +200,57 @@ export default function ManageDiscounts() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto p-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-2xl font-semibold text-gray-800">
           {t('admin.manageDiscounts')}
         </h1>
         <button
           onClick={() => setShowAddForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full sm:w-auto"
         >
           {t('admin.addDiscountRule')}
         </button>
       </div>
 
-      {/* Add New Rule Form */}
-      {showAddForm && (
+      {/* Add/Edit Rule Form */}
+      {(showAddForm || editingRule) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">{t('admin.addDiscountRule')}</h2>
-            <form onSubmit={handleAddRule} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('admin.selectClient')}
-                </label>
-                <select
-                  value={selectedClient}
-                  onChange={(e) => setSelectedClient(e.target.value)}
-                  className="w-full border rounded-lg p-2"
-                  required
-                >
-                  <option value="">{t('admin.selectClient')}</option>
-                  {clients.map(client => (
-                    <option key={client.id} value={client.id}>
-                      {client.companyName || client.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            <h2 className="text-xl font-semibold mb-4">
+              {editingRule ? t('admin.editDiscountRule') : t('admin.addDiscountRule')}
+            </h2>
+            <form onSubmit={editingRule ? handleEditRule : handleAddRule} className="space-y-4">
+              {!editingRule && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.selectClient')}
+                  </label>
+                  <select
+                    value={selectedClient}
+                    onChange={(e) => setSelectedClient(e.target.value)}
+                    className="w-full border rounded-lg p-2"
+                    required
+                  >
+                    <option value="">{t('admin.selectClient')}</option>
+                    {clients.map(client => (
+                      <option key={client.id} value={client.id}>
+                        {client.companyName || client.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {t('admin.selectProduct')}
                 </label>
                 <select
-                  value={selectedProduct}
-                  onChange={(e) => setSelectedProduct(e.target.value)}
+                  value={selectedProduct || ''}
+                  onChange={(e) => setSelectedProduct(e.target.value || null)}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required
                 >
-                  <option value="">{t('admin.selectProduct')}</option>
+                  <option value="">{t('admin.allProducts')}</option>
                   {sortedProducts.map((product) => (
                     <option key={product.id} value={product.id}>
                       {product.name}
@@ -251,7 +293,10 @@ export default function ManageDiscounts() {
               <div className="flex justify-end gap-4 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={() => {
+                    setEditingRule(null);
+                    setShowAddForm(false);
+                  }}
                   className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
                   {t('admin.cancel')}
@@ -260,7 +305,7 @@ export default function ManageDiscounts() {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  {t('admin.addRule')}
+                  {editingRule ? t('admin.saveChanges') : t('admin.addRule')}
                 </button>
               </div>
             </form>
@@ -269,45 +314,29 @@ export default function ManageDiscounts() {
       )}
 
       {/* Rules Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('admin.client')}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('admin.product')}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('admin.discount')}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('admin.status')}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('admin.actions')}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="min-w-full">
+          <div className="bg-gray-50 min-w-full">
+            <div className="grid grid-cols-12 gap-2 px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div className="col-span-3">{t('admin.client')}</div>
+              <div className="col-span-2">{t('admin.product')}</div>
+              <div className="col-span-2">{t('admin.discount')}</div>
+              <div className="col-span-2">{t('admin.status')}</div>
+              <div className="col-span-3">{t('admin.actions')}</div>
+            </div>
+          </div>
+          <div className="divide-y divide-gray-200 min-w-full">
             {discountRules.map((rule) => (
-              <tr key={rule.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{rule.clientName}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{rule.productName}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {rule.discountType === 'percentage' 
-                      ? `${rule.discountValue}%`
-                      : `€${rule.discountValue.toFixed(2)}`
-                    }
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+              <div key={rule.id} className="grid grid-cols-12 gap-2 px-4 py-3 text-sm hover:bg-gray-50">
+                <div className="col-span-3 break-words">{rule.clientName}</div>
+                <div className="col-span-2 break-words">{rule.productName || t('admin.allProducts')}</div>
+                <div className="col-span-2">
+                  {rule.discountType === 'percentage' 
+                    ? `${rule.discountValue}%`
+                    : `€${rule.discountValue.toFixed(2)}`
+                  }
+                </div>
+                <div className="col-span-2">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       rule.active
@@ -317,11 +346,17 @@ export default function ManageDiscounts() {
                   >
                     {rule.active ? t('admin.active') : t('admin.inactive')}
                   </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                </div>
+                <div className="col-span-3 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => startEditing(rule)}
+                    className="text-blue-600 hover:text-blue-900"
+                  >
+                    {t('admin.edit')}
+                  </button>
                   <button
                     onClick={() => toggleRuleStatus(rule.id, rule.active)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    className="text-indigo-600 hover:text-indigo-900"
                   >
                     {rule.active ? t('admin.deactivate') : t('admin.activate')}
                   </button>
@@ -331,11 +366,11 @@ export default function ManageDiscounts() {
                   >
                     {t('admin.delete')}
                   </button>
-                </td>
-              </tr>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   );

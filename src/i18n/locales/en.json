@@ -13,6 +13,7 @@
   "auth": {
     "logout": "Logout"
   },
+  "adminPanel.companyInfo": "Company Infos",
   "products": {
     "categories": "Menu Categories",
     "backToCategories": "Back to Categories",
@@ -25,7 +26,7 @@
     "vat7": "VAT 7%",
     "vat19": "VAT 19%",
     "sendOrder": "Send Order",
-    "orderSuccess": "Order sent successfully!",
+    "orderSentSuccessfully": "Order sent successfully!",
     "orderError": "Failed to send order. Please try again.",
     "quantity": "Quantity",
     "size": "Size",
@@ -39,6 +40,10 @@
     "pricePerItem": "Price per item",
     "vatWillBeAdded": "VAT will be added",
     "remove": "Remove",
+    "deleteOrder": "Delete Order",
+    "deleteOrderConfirmation": "Are you sure?",
+    "cancel":"Cancel",
+    "delete":"Delete",
     "noItemsInCart": "No items in cart",
     "orderSentSuccess": "Order was sent successfully!",
     "orderSendError": "Failed to send order. Please try again.",
@@ -234,7 +239,31 @@
     },
     "adminPanel": {
       "companyInfo": "Company Information"
-    }
+    },
+    "manageDiscounts": "Manage Discounts",
+    "addDiscountRule": "Add Discount Rule",
+    "editDiscountRule": "Edit Discount Rule",
+    "selectClient": "Select Client",
+    "selectProduct": "Select Product",
+    "allProducts": "All Products",
+    "discountType": "Discount Type",
+    "percentageDiscount": "Percentage Discount",
+    "fixedDiscount": "Fixed Discount",
+    "discountValue": "Discount Value",
+    "client": "Client",
+    "product": "Product",
+    "discount": "Discount",
+    "status": "Status",
+    "actions": "Actions",
+    "edit": "Edit",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "addRule": "Add Rule",
+    "saveChanges": "Save Changes"
   },
   "companyInfo": {
     "title": "Company Information",
