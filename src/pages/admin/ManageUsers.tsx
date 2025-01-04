@@ -87,6 +87,10 @@ export default function ManageUsers() {
         const usernameQuery = query(collection(db, 'usernames'), where('username', '==', formData.username.toLowerCase()));
         const usernameSnapshot = await getDocs(usernameQuery);
         
+        console.log('Checking username:', formData.username.toLowerCase());
+        console.log('Username snapshot empty:', usernameSnapshot.empty);
+        console.log('Username snapshot size:', usernameSnapshot.size);
+        
         if (!usernameSnapshot.empty) {
           throw new Error('Username already taken');
         }

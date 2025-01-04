@@ -227,11 +227,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await signOut(auth);
       setCurrentUser(null);
       setUserData(null);
-      sessionStorage.clear();
-      navigate('/login', { replace: true });
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+      // Clear cart items from localStorage
+      localStorage.removeItem('cartItems');
+      navigate('/login');
+    } catch (error: any) {
+      setError(error.message);
     }
   };
 

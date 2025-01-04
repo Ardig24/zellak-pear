@@ -33,6 +33,12 @@ export default function Products() {
   const location = useLocation();
   const { getDiscountedPrice, loading: discountLoading, discountRules } = useDiscountRules(userData?.username || '');
 
+  // Clear cart when user changes
+  useEffect(() => {
+    setOrderItems([]);
+    localStorage.removeItem('cartItems');
+  }, [userData?.username]);
+
   useEffect(() => {
     console.log('Current discount rules:', discountRules);
   }, [discountRules]);
@@ -534,26 +540,26 @@ export default function Products() {
                   {Object.entries(groupedProducts).map(([categoryName, categoryProducts]) => (
                     <div key={categoryName}>
                       <h2 className="text-xl font-semibold mb-4">{categoryName}</h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="space-y-4">
                         {categoryProducts.map((product) => (
                           <div
                             key={product.id}
                             className="glass-panel p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 backdrop-blur-md bg-white/70 border border-white/20"
                           >
-                            <div className="flex items-start space-x-4 mb-4">
+                            <div className="flex items-start space-x-4">
                               {product.icon ? (
                                 <img
                                   src={product.icon}
                                   alt={product.name}
-                                  className="w-24 h-24 object-cover rounded-lg shadow-sm"
+                                  className="w-16 h-16 object-contain rounded-lg shadow-sm flex-shrink-0"
                                 />
                               ) : (
-                                <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center">
-                                  <Coffee className="w-8 h-8 text-gray-400" />
+                                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                  <Coffee className="w-6 h-6 text-gray-400" />
                                 </div>
                               )}
-                              <div className="flex-1">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">{product.name}</h3>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">{product.name}</h3>
                                 <div className="space-y-2">
                                   {product.variants.map((variant, index) => {
                                     const safeVariantId = variant.id || `${product.id}-variant-${index}`;
@@ -562,37 +568,24 @@ export default function Products() {
                                     );
                                     const currentQuantity = orderItem?.quantity || 0;
                                     const basePrice = variant.prices[userData.category];
-                                    console.log('Product details:', {
-                                      productId: product.id,
-                                      productName: product.name,
-                                      basePrice,
-                                      username: userData?.username,
-                                      category: userData?.category,
-                                      discountRules
-                                    });
                                     const discountedPrice = getDiscountedPrice(product.id, basePrice);
-                                    console.log('Price calculation result:', {
-                                      basePrice,
-                                      discountedPrice,
-                                      hasDiscount: basePrice !== discountedPrice
-                                    });
                                     const showDiscount = basePrice !== discountedPrice;
 
                                     return (
                                       <div 
                                         key={`${product.id}-${safeVariantId}`}
-                                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white/50 p-2 rounded-lg gap-2"
+                                        className="flex items-center justify-between bg-white/50 p-2 rounded-lg"
                                       >
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                                        <div className="flex items-center gap-4">
                                           <span className="text-sm font-medium">{variant.size}</span>
-                                          <span className="text-xs text-gray-500">MwSt. {product.vatRate}%</span>
+                                          <span className="text-xs text-gray-500">{t('products.vat', { rate: product.vatRate })}</span>
                                           {variant.inStock === false && (
                                             <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
                                               {t('products.outOfStock')}
                                             </span>
                                           )}
                                         </div>
-                                        <div className="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
+                                        <div className="flex flex-row items-center justify-between w-full gap-4">
                                           <p className="text-base font-semibold text-blue-600">€{discountedPrice.toFixed(2)}</p>
                                           <div className="flex items-center gap-2">
                                             <button
@@ -600,9 +593,9 @@ export default function Products() {
                                                 const newQuantity = Math.max(0, currentQuantity - 1);
                                                 handleQuantityChange(
                                                   product.id,
-                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
+                                                  product.name,
                                                   safeVariantId,
-                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.size || '',
+                                                  variant.size,
                                                   discountedPrice,
                                                   newQuantity,
                                                   product.vatRate
@@ -623,9 +616,9 @@ export default function Products() {
                                                 const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
                                                 handleQuantityChange(
                                                   product.id,
-                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
+                                                  product.name,
                                                   safeVariantId,
-                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.size || '',
+                                                  variant.size,
                                                   discountedPrice,
                                                   newQuantity,
                                                   product.vatRate
@@ -642,9 +635,9 @@ export default function Products() {
                                                 const newQuantity = currentQuantity + 1;
                                                 handleQuantityChange(
                                                   product.id,
-                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
+                                                  product.name,
                                                   safeVariantId,
-                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.size || '',
+                                                  variant.size,
                                                   discountedPrice,
                                                   newQuantity,
                                                   product.vatRate
@@ -763,7 +756,7 @@ export default function Products() {
                               >
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
                                   <span className="text-sm font-medium">{variant.size}</span>
-                                  <span className="text-xs text-gray-500">MwSt. {product.vatRate}%</span>
+                                  <span className="text-xs text-gray-500">{t('products.vat', { rate: product.vatRate })}</span>
                                   {variant.inStock === false && (
                                     <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
                                       {t('products.outOfStock')}
