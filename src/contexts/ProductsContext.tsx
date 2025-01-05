@@ -246,14 +246,19 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       
+      // Get the existing product to preserve its order
+      const existingProduct = products.find(p => p.id === id);
+      if (!existingProduct) {
+        throw new Error('Product not found');
+      }
+      
       // If icon is a File, upload it first
       let iconUrl = productData.icon;
       if (productData.icon instanceof File) {
         try {
           // Delete old image if it exists
-          const oldProduct = products.find(p => p.id === id);
-          if (oldProduct?.icon) {
-            await deleteImage(oldProduct.icon);
+          if (existingProduct.icon) {
+            await deleteImage(existingProduct.icon);
           }
           
           // Upload new image
@@ -271,6 +276,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         icon: iconUrl || '',  // Use empty string as default, just like categories
         vatRate: productData.vatRate,
         variants: productData.variants,
+        order: existingProduct.order, // Preserve the existing order
         updatedAt: new Date().toISOString()
       };
 
