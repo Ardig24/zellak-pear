@@ -578,7 +578,7 @@ export default function Products() {
                                       >
                                         <div className="flex items-center gap-4">
                                           <span className="text-sm font-medium">{variant.size}</span>
-                                          <span className="text-xs text-gray-500">{t('products.vat', { rate: product.vatRate })} {product.vatRate}%</span>
+                                          <span className="text-xs text-gray-500">+ {t('products.vat', { rate: product.vatRate })} {product.vatRate}%</span>
                                           {variant.inStock === false && (
                                             <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
                                               {t('products.outOfStock')}
@@ -756,7 +756,7 @@ export default function Products() {
                               >
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
                                   <span className="text-sm font-medium">{variant.size}</span>
-                                  <span className="text-xs text-gray-500">{t('products.vat', { rate: product.vatRate })} {product.vatRate}%</span>
+                                  <span className="text-xs text-gray-500">+ {t('products.vat', { rate: product.vatRate })} {product.vatRate}%</span>
                                   {variant.inStock === false && (
                                     <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
                                       {t('products.outOfStock')}
