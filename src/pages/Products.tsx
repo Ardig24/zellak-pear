@@ -465,20 +465,27 @@ export default function Products() {
         </nav>
       </div>
 
-      {/* Header */}
+      {/* Back Button - Fixed */}
+      {selectedCategory && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm shadow-sm py-2">
+          <div className="max-w-7xl mx-auto px-4">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 mr-1" />
+              {t('products.backToCategories')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Header - Not Fixed */}
       <div className="glass-panel shadow-lg bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center space-x-4">
-              {selectedCategory && (
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5 mr-1" />
-                  {t('products.backToCategories')}
-                </button>
-              )}
+              {/* Removed back button from here since it's now fixed above */}
             </div>
             <div className="flex items-center gap-4">
               <div className="hidden lg:block">
@@ -529,7 +536,7 @@ export default function Products() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-24 lg:pb-6">
+      <div className="max-w-7xl mx-auto px-4 pb-24" style={{ paddingTop: selectedCategory ? '48px' : '0' }}>
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Products Section */}
           <div className="flex-1 space-y-6">
@@ -593,7 +600,7 @@ export default function Products() {
                                                 const newQuantity = Math.max(0, currentQuantity - 1);
                                                 handleQuantityChange(
                                                   product.id,
-                                                  product.name,
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
                                                   safeVariantId,
                                                   variant.size,
                                                   discountedPrice,
@@ -616,7 +623,7 @@ export default function Products() {
                                                 const newQuantity = Math.max(0, parseInt(e.target.value) || 0);
                                                 handleQuantityChange(
                                                   product.id,
-                                                  product.name,
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
                                                   safeVariantId,
                                                   variant.size,
                                                   discountedPrice,
@@ -635,7 +642,7 @@ export default function Products() {
                                                 const newQuantity = currentQuantity + 1;
                                                 handleQuantityChange(
                                                   product.id,
-                                                  product.name,
+                                                  orderItems.find(item => item.productId === product.id && item.variantId === safeVariantId)?.productName || '',
                                                   safeVariantId,
                                                   variant.size,
                                                   discountedPrice,

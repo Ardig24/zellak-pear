@@ -95,7 +95,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
           price: Number(item.price).toFixed(2),
           product_name: item.productName,
           quantity: item.quantity,
-          subtotal: (Number(item.price) * Number(item.quantity)).toFixed(2)
+          subtotal: (Number(item.price) * Number(item.quantity)).toFixed(2),
+          vat_rate: item.vatRate
         })),
         subtotal: totals.subtotal.toFixed(2),
         total_amount: total.toFixed(2),

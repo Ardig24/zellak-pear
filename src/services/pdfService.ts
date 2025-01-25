@@ -89,7 +89,7 @@ export const generateOrderPDF = async (
     doc.text(item.productName, 25, y);
     doc.text(item.quantity.toString(), 100, y);
     doc.text(`€${Number(item.price).toFixed(2)}`, 130, y);
-    doc.text('19%', 160, y);
+    doc.text(`${item.vatRate}%`, 160, y);
     y += 10;
   });
   

@@ -16,7 +16,7 @@
   "adminPanel.companyInfo": "Infot per kompanine",
   "products": {
     "categories": "Kategoritë",
-    "backToCategories": "Kthehu te Kategoritë",
+    "backToCategories": "Kthehu mbrapa te Kategoritë",
     "orderSummary": "Përmbledhja e Porosisë",
     "items": "artikuj",
     "emptyOrder": "Porosia juaj është e zbrazët",
@@ -70,7 +70,7 @@
     "searchAllProducts": "Kërko të gjitha produktet...",
     "addProduct": "Shto Produkt",
     "deleteProductTitle": "Fshi Produktin",
-    "backToCategories": "Kthehu te Kategoritë",
+    "backToCategories": "Kthehu mbrapa te Kategoritë",
     "searchProducts": "Kërko produktet në këtë kategori...",
     "categoryNamePlaceholder": "Emri i Kategorisë",
     "categoryName": "Emri i Kategorisë",
