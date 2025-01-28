@@ -76,16 +76,19 @@ const generateOrderPDF = async (
 
   // Column positions and widths
   const columns = {
-    product: { x: 25, width: 65 }, 
-    vat: { x: 95, width: 20 },     
-    quantity: { x: 115, width: 20 }, 
-    price: { x: 135, width: 25 },    
-    total: { x: 160, width: 25 }     
+    product: { x: 25, width: 55 },   // Slightly shorter product column
+    vat: { x: 85, width: 20 },       // Moved closer to product
+    quantity: { x: 105, width: 20 },  // Adjusted position
+    price: { x: 125, width: 25 },     // Adjusted position
+    total: { x: 150, width: 25 }      // Adjusted position
   };
+
+  // Table width constant
+  const tableWidth = 160;  // Slightly reduced from 170 to prevent overflow
 
   // Table Header
   doc.setFillColor(...primaryColor);
-  doc.rect(20, tableY, 170, 10, 'F');
+  doc.rect(20, tableY, tableWidth, 10, 'F');
   
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
@@ -130,7 +133,7 @@ const generateOrderPDF = async (
       
       // Redraw table header on new page
       doc.setFillColor(...primaryColor);
-      doc.rect(20, y - 15, 170, 10, 'F');
+      doc.rect(20, y - 15, tableWidth, 10, 'F');
       
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
@@ -148,7 +151,7 @@ const generateOrderPDF = async (
     // Set background for the entire group
     if (rowIndex % 2 === 0) {
       doc.setFillColor(252, 252, 252);
-      doc.rect(20, y - 5, 170, groupHeight + 5, 'F');
+      doc.rect(20, y - 5, tableWidth, groupHeight + 5, 'F');
     }
     
     // Product name (no truncation)
@@ -167,7 +170,7 @@ const generateOrderPDF = async (
         
         // Redraw header on new page
         doc.setFillColor(...primaryColor);
-        doc.rect(20, y - 15, 170, 10, 'F');
+        doc.rect(20, y - 15, tableWidth, 10, 'F');
         
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
@@ -207,7 +210,7 @@ const generateOrderPDF = async (
     if (i < entries.length - 1) {
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
-      doc.line(20, y + 2, 190, y + 2);
+      doc.line(20, y + 2, 20 + tableWidth, y + 2);
       y += productSpacing;
     }
     
