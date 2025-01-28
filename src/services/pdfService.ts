@@ -76,22 +76,20 @@ const generateOrderPDF = async (
 
   // Column positions and widths
   const columns = {
-    product: { x: 25, width: 80 },    // Even wider product column for more variant text
+    product: { x: 25, width: 80 },    // Wide product column for variant text
     vat: { x: 110, width: 15 },       // Compact VAT column
     quantity: { x: 130, width: 15 },  // Compact quantity column
-    price: { x: 150, width: 20 },     // Slightly adjusted price position
-    total: { x: 175, width: 20 }      // Adjusted total position
+    price: { x: 150, width: 20 },     // Price column
+    total: { x: 175, width: 20 }      // Total column
   };
 
-  // Table width constant - keeping within page bounds
-  const tableWidth = 185;  // Adjusted to match new layout while staying within page
+  // Calculate table width based on page constraints
   const pageWidth = doc.internal.pageSize.width;
   const minMargin = 20;    // Minimum margin to maintain
+  const desiredWidth = 185; // Desired table width
   
-  // Ensure we're not exceeding page width
-  if (20 + tableWidth > pageWidth - minMargin) {
-    tableWidth = pageWidth - (minMargin * 2); // Equal margins on both sides
-  }
+  // Calculate actual table width ensuring it fits within margins
+  const tableWidth = Math.min(desiredWidth, pageWidth - (minMargin * 2));
 
   // Table Header
   doc.setFillColor(...primaryColor);
