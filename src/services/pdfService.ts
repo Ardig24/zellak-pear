@@ -74,18 +74,27 @@ const generateOrderPDF = async (
     return truncated + '...';
   };
 
+  // Column positions and widths
+  const columns = {
+    product: { x: 25, width: 100 }, 
+    vat: { x: 130, width: 20 },     
+    quantity: { x: 150, width: 20 }, 
+    price: { x: 170, width: 25 },    
+    total: { x: 190, width: 25 }     
+  };
+
   // Table Header
   doc.setFillColor(...primaryColor);
-  doc.rect(20, tableY, 170, 10, 'F');
+  doc.rect(20, tableY, 190, 10, 'F');
   
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.text('Produkt', 25, tableY + 7);
-  doc.text('MwSt.', 95, tableY + 7);
-  doc.text('Menge', 115, tableY + 7);
-  doc.text('Preis', 135, tableY + 7);
-  doc.text('Total', 160, tableY + 7);
+  doc.text('Produkt', columns.product.x, tableY + 7);
+  doc.text('MwSt.', columns.vat.x, tableY + 7);
+  doc.text('Menge', columns.quantity.x, tableY + 7);
+  doc.text('Preis', columns.price.x, tableY + 7);
+  doc.text('Total', columns.total.x, tableY + 7);
   
   // Table Content
   doc.setTextColor(...darkText);
@@ -94,10 +103,9 @@ const generateOrderPDF = async (
   const pageHeight = doc.internal.pageSize.height;
   const margin = 20;
   const variantRowHeight = 10;
-  const productSpacing = 8; // Additional spacing between products
+  const productSpacing = 8; 
   const footerHeight = 30;
-  const productColumnWidth = 80; // Increased width for product text
-  
+
   // Group items by product name
   const groupedItems = orderItems.reduce((groups, item) => {
     if (!groups[item.productName]) {
@@ -115,23 +123,23 @@ const generateOrderPDF = async (
     const [productName, items] = entries[i];
     
     // Check if we need a new page for the product group
-    const groupHeight = (variantRowHeight * items.length) + productSpacing; // Added spacing to group height
+    const groupHeight = (variantRowHeight * items.length) + productSpacing;
     if (y + groupHeight > pageHeight - footerHeight - margin) {
       doc.addPage();
       y = margin + 15;
       
       // Redraw table header on new page
       doc.setFillColor(...primaryColor);
-      doc.rect(20, y - 15, 170, 10, 'F');
+      doc.rect(20, y - 15, 190, 10, 'F');
       
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text('Produkt', 25, y - 8);
-      doc.text('MwSt.', 95, y - 8);
-      doc.text('Menge', 115, y - 8);
-      doc.text('Preis', 135, y - 8);
-      doc.text('Total', 160, y - 8);
+      doc.text('Produkt', columns.product.x, y - 8);
+      doc.text('MwSt.', columns.vat.x, y - 8);
+      doc.text('Menge', columns.quantity.x, y - 8);
+      doc.text('Preis', columns.price.x, y - 8);
+      doc.text('Total', columns.total.x, y - 8);
       
       doc.setTextColor(...darkText);
       doc.setFont('helvetica', 'normal');
@@ -140,14 +148,13 @@ const generateOrderPDF = async (
     // Set background for the entire group
     if (rowIndex % 2 === 0) {
       doc.setFillColor(252, 252, 252);
-      doc.rect(20, y - 5, 170, groupHeight + 5, 'F');
+      doc.rect(20, y - 5, 190, groupHeight + 5, 'F');
     }
     
-    // Product name with truncation
+    // Product name (no truncation)
     doc.setFontSize(10);
     doc.setTextColor(...darkText);
-    const truncatedProductName = truncateText(productName, productColumnWidth);
-    doc.text(truncatedProductName, 25, y);
+    doc.text(productName, columns.product.x, y);
     
     // Add each variant
     items.forEach((item, index) => {
@@ -160,27 +167,27 @@ const generateOrderPDF = async (
         
         // Redraw header on new page
         doc.setFillColor(...primaryColor);
-        doc.rect(20, y - 15, 170, 10, 'F');
+        doc.rect(20, y - 15, 190, 10, 'F');
         
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.text('Produkt', 25, y - 8);
-        doc.text('MwSt.', 95, y - 8);
-        doc.text('Menge', 115, y - 8);
-        doc.text('Preis', 135, y - 8);
-        doc.text('Total', 160, y - 8);
+        doc.text('Produkt', columns.product.x, y - 8);
+        doc.text('MwSt.', columns.vat.x, y - 8);
+        doc.text('Menge', columns.quantity.x, y - 8);
+        doc.text('Preis', columns.price.x, y - 8);
+        doc.text('Total', columns.total.x, y - 8);
         
         doc.setTextColor(...darkText);
         doc.setFont('helvetica', 'normal');
       }
       
-      // Variant details with truncation (removed % symbol)
+      // Variant details with truncation
       doc.setFontSize(8);
       doc.setTextColor(...grayText);
-      const variantText = item.size.replace(/^%\s*/, ''); // Remove leading % if present
-      const truncatedVariant = truncateText(`└ ${variantText}`, productColumnWidth);
-      doc.text(truncatedVariant, 30, variantY);
+      const variantText = item.size.replace(/^%\s*/, '');
+      const truncatedVariant = truncateText(`└ ${variantText}`, columns.product.width - 10); 
+      doc.text(truncatedVariant, columns.product.x + 5, variantY);
       
       // Reset style for other columns
       doc.setFontSize(10);
@@ -188,20 +195,20 @@ const generateOrderPDF = async (
       
       const total = Number(item.price) * item.quantity;
       
-      doc.text(`${item.vatRate}%`, 95, variantY);
-      doc.text(item.quantity.toString(), 115, variantY);
-      doc.text(`€${Number(item.price).toFixed(2)}`, 135, variantY);
-      doc.text(`€${total.toFixed(2)}`, 160, variantY);
+      doc.text(`${item.vatRate}%`, columns.vat.x, variantY);
+      doc.text(item.quantity.toString(), columns.quantity.x, variantY);
+      doc.text(`€${Number(item.price).toFixed(2)}`, columns.price.x, variantY);
+      doc.text(`€${total.toFixed(2)}`, columns.total.x, variantY);
     });
     
     y += groupHeight;
     
     // Add separator line between products (except for the last product)
     if (i < entries.length - 1) {
-      doc.setDrawColor(0, 0, 0); // Black color for separator
+      doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
-      doc.line(20, y + 2, 190, y + 2); // Moved line down by adjusting y position
-      y += productSpacing; // Add extra spacing after the line
+      doc.line(20, y + 2, 210, y + 2);
+      y += productSpacing;
     }
     
     rowIndex++;
