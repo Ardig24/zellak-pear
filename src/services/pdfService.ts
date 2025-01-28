@@ -94,8 +94,9 @@ const generateOrderPDF = async (
   const pageHeight = doc.internal.pageSize.height;
   const margin = 20;
   const variantRowHeight = 10;
+  const productSpacing = 8; // Additional spacing between products
   const footerHeight = 30;
-  const productColumnWidth = 65; // Width in points for product column
+  const productColumnWidth = 80; // Increased width for product text
   
   // Group items by product name
   const groupedItems = orderItems.reduce((groups, item) => {
@@ -114,7 +115,7 @@ const generateOrderPDF = async (
     const [productName, items] = entries[i];
     
     // Check if we need a new page for the product group
-    const groupHeight = variantRowHeight * (items.length + 0.5);
+    const groupHeight = (variantRowHeight * items.length) + productSpacing; // Added spacing to group height
     if (y + groupHeight > pageHeight - footerHeight - margin) {
       doc.addPage();
       y = margin + 15;
@@ -139,7 +140,7 @@ const generateOrderPDF = async (
     // Set background for the entire group
     if (rowIndex % 2 === 0) {
       doc.setFillColor(252, 252, 252);
-      doc.rect(20, y - 5, 170, groupHeight, 'F');
+      doc.rect(20, y - 5, 170, groupHeight + 5, 'F');
     }
     
     // Product name with truncation
@@ -150,7 +151,7 @@ const generateOrderPDF = async (
     
     // Add each variant
     items.forEach((item, index) => {
-      const variantY = y + (index + 1) * variantRowHeight;
+      const variantY = y + ((index + 1) * variantRowHeight);
       
       // Check if variant needs a new page
       if (variantY > pageHeight - footerHeight - margin) {
@@ -174,10 +175,11 @@ const generateOrderPDF = async (
         doc.setFont('helvetica', 'normal');
       }
       
-      // Variant details with truncation
+      // Variant details with truncation (removed % symbol)
       doc.setFontSize(8);
       doc.setTextColor(...grayText);
-      const truncatedVariant = truncateText(`└ ${item.size}`, productColumnWidth);
+      const variantText = item.size.replace(/^%\s*/, ''); // Remove leading % if present
+      const truncatedVariant = truncateText(`└ ${variantText}`, productColumnWidth);
       doc.text(truncatedVariant, 30, variantY);
       
       // Reset style for other columns
@@ -196,9 +198,10 @@ const generateOrderPDF = async (
     
     // Add separator line between products (except for the last product)
     if (i < entries.length - 1) {
-      doc.setDrawColor(230, 230, 230); // Light gray color for separator
-      doc.setLineWidth(0.1);
-      doc.line(20, y - 2, 190, y - 2);
+      doc.setDrawColor(0, 0, 0); // Black color for separator
+      doc.setLineWidth(0.2);
+      doc.line(20, y + 2, 190, y + 2); // Moved line down by adjusting y position
+      y += productSpacing; // Add extra spacing after the line
     }
     
     rowIndex++;
