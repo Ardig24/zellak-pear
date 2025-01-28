@@ -76,15 +76,22 @@ const generateOrderPDF = async (
 
   // Column positions and widths
   const columns = {
-    product: { x: 25, width: 55 },   // Slightly shorter product column
-    vat: { x: 85, width: 20 },       // Moved closer to product
-    quantity: { x: 105, width: 20 },  // Adjusted position
-    price: { x: 125, width: 25 },     // Adjusted position
-    total: { x: 150, width: 25 }      // Adjusted position
+    product: { x: 25, width: 80 },    // Even wider product column for more variant text
+    vat: { x: 110, width: 15 },       // Compact VAT column
+    quantity: { x: 130, width: 15 },  // Compact quantity column
+    price: { x: 150, width: 20 },     // Slightly adjusted price position
+    total: { x: 175, width: 20 }      // Adjusted total position
   };
 
-  // Table width constant
-  const tableWidth = 160;  // Slightly reduced from 170 to prevent overflow
+  // Table width constant - keeping within page bounds
+  const tableWidth = 185;  // Adjusted to match new layout while staying within page
+  const pageWidth = doc.internal.pageSize.width;
+  const minMargin = 20;    // Minimum margin to maintain
+  
+  // Ensure we're not exceeding page width
+  if (20 + tableWidth > pageWidth - minMargin) {
+    tableWidth = pageWidth - (minMargin * 2); // Equal margins on both sides
+  }
 
   // Table Header
   doc.setFillColor(...primaryColor);
@@ -189,7 +196,8 @@ const generateOrderPDF = async (
       doc.setFontSize(8);
       doc.setTextColor(...grayText);
       const variantText = item.size.replace(/^%\s*/, '');
-      const truncatedVariant = truncateText(`└ ${variantText}`, columns.product.width - 2); 
+      // Maximum space for variant text while maintaining alignment
+      const truncatedVariant = truncateText(`└ ${variantText}`, columns.product.width);
       doc.text(truncatedVariant, columns.product.x + 5, variantY);
       
       // Reset style for other columns
