@@ -70,34 +70,74 @@ export const generateOrderPDF = async (
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.text('Produkt', 25, tableY + 7);
-  doc.text('Menge', 100, tableY + 7);
-  doc.text('Preis', 130, tableY + 7);
-  doc.text('MwSt.', 160, tableY + 7);
+  doc.text('MwSt.', 95, tableY + 7);
+  doc.text('Menge', 115, tableY + 7);
+  doc.text('Preis', 135, tableY + 7);
+  doc.text('Total', 160, tableY + 7);
   
   // Table Content
   doc.setTextColor(...darkText);
   doc.setFont('helvetica', 'normal');
   let y = tableY + 15;
+  const pageHeight = doc.internal.pageSize.height;
+  const margin = 20;
+  const rowHeight = 10;
+  const footerHeight = 30;
   
   // Alternate row colors
   orderItems.forEach((item, index) => {
+    // Check if we need a new page
+    if (y > pageHeight - footerHeight - margin) {
+      doc.addPage();
+      // Reset Y position and redraw header
+      y = margin + 15;
+      
+      // Redraw table header on new page
+      doc.setFillColor(...primaryColor);
+      doc.rect(20, y - 15, 170, 10, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Produkt', 25, y - 8);
+      doc.text('MwSt.', 95, y - 8);
+      doc.text('Menge', 115, y - 8);
+      doc.text('Preis', 135, y - 8);
+      doc.text('Total', 160, y - 8);
+      
+      doc.setTextColor(...darkText);
+      doc.setFont('helvetica', 'normal');
+    }
+
     if (index % 2 === 0) {
       doc.setFillColor(252, 252, 252);
       doc.rect(20, y - 5, 170, 10, 'F');
     }
     
-    doc.text(item.productName, 25, y);
-    doc.text(item.quantity.toString(), 100, y);
-    doc.text(`€${Number(item.price).toFixed(2)}`, 130, y);
-    doc.text(`${item.vatRate}%`, 160, y);
-    y += 10;
+    // Combine product name with size information
+    const productDisplay = `${item.productName} ${item.size}`;
+    const total = Number(item.price) * item.quantity;
+    
+    doc.text(productDisplay, 25, y);
+    doc.text(`${item.vatRate}%`, 95, y);
+    doc.text(item.quantity.toString(), 115, y);
+    doc.text(`€${Number(item.price).toFixed(2)}`, 135, y);
+    doc.text(`€${total.toFixed(2)}`, 160, y);
+    
+    y += rowHeight;
   });
-  
-  // Totals Section
+
+  // Add totals section at current Y position
   y += 10;
   doc.setDrawColor(...primaryColor);
   doc.setLineWidth(0.5);
   doc.line(110, y, 190, y);
+
+  // Check if totals section needs a new page
+  if (y > pageHeight - footerHeight - margin - 40) {
+    doc.addPage();
+    y = margin + 15;
+  }
   
   // Subtotals
   y += 10;
@@ -127,12 +167,22 @@ export const generateOrderPDF = async (
   doc.text('Gesamtsumme:', 130, y + 4);
   doc.text(`€${total.toFixed(2)}`, 170, y + 4, { align: 'right' });
   
-  // Footer
-  const footerY = 270;
+  // Footer - Add at the bottom of the current page
+  y = pageHeight - margin;
   doc.setTextColor(...grayText);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text('Vielen Dank für Ihren Auftrag!', 105, footerY, { align: 'center' });
+  doc.text('Vielen Dank für Ihren Auftrag!', 105, y - 10, { align: 'center' });
+  
+  // Add page numbers if there are multiple pages
+  const pageCount = doc.internal.getNumberOfPages();
+  if (pageCount > 1) {
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.text(`Seite ${i} von ${pageCount}`, 105, pageHeight - 5, { align: 'center' });
+    }
+  }
   
   // Return base64 string
   return doc.output('datauristring').split(',')[1];
