@@ -76,16 +76,16 @@ const generateOrderPDF = async (
 
   // Column positions and widths
   const columns = {
-    product: { x: 25, width: 100 }, 
-    vat: { x: 130, width: 20 },     
-    quantity: { x: 150, width: 20 }, 
-    price: { x: 170, width: 25 },    
-    total: { x: 190, width: 25 }     
+    product: { x: 25, width: 65 }, 
+    vat: { x: 95, width: 20 },     
+    quantity: { x: 115, width: 20 }, 
+    price: { x: 135, width: 25 },    
+    total: { x: 160, width: 25 }     
   };
 
   // Table Header
   doc.setFillColor(...primaryColor);
-  doc.rect(20, tableY, 190, 10, 'F');
+  doc.rect(20, tableY, 170, 10, 'F');
   
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
@@ -130,7 +130,7 @@ const generateOrderPDF = async (
       
       // Redraw table header on new page
       doc.setFillColor(...primaryColor);
-      doc.rect(20, y - 15, 190, 10, 'F');
+      doc.rect(20, y - 15, 170, 10, 'F');
       
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
@@ -148,7 +148,7 @@ const generateOrderPDF = async (
     // Set background for the entire group
     if (rowIndex % 2 === 0) {
       doc.setFillColor(252, 252, 252);
-      doc.rect(20, y - 5, 190, groupHeight + 5, 'F');
+      doc.rect(20, y - 5, 170, groupHeight + 5, 'F');
     }
     
     // Product name (no truncation)
@@ -167,7 +167,7 @@ const generateOrderPDF = async (
         
         // Redraw header on new page
         doc.setFillColor(...primaryColor);
-        doc.rect(20, y - 15, 190, 10, 'F');
+        doc.rect(20, y - 15, 170, 10, 'F');
         
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
@@ -186,7 +186,7 @@ const generateOrderPDF = async (
       doc.setFontSize(8);
       doc.setTextColor(...grayText);
       const variantText = item.size.replace(/^%\s*/, '');
-      const truncatedVariant = truncateText(`└ ${variantText}`, columns.product.width - 10); 
+      const truncatedVariant = truncateText(`└ ${variantText}`, columns.product.width - 2); 
       doc.text(truncatedVariant, columns.product.x + 5, variantY);
       
       // Reset style for other columns
@@ -207,7 +207,7 @@ const generateOrderPDF = async (
     if (i < entries.length - 1) {
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
-      doc.line(20, y + 2, 210, y + 2);
+      doc.line(20, y + 2, 190, y + 2);
       y += productSpacing;
     }
     
