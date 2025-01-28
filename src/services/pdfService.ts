@@ -16,6 +16,9 @@ const generateOrderPDF = async (
   const grayText = [102, 102, 102];   // #666666
   const darkText = [51, 51, 51];      // #333333
   
+  // Helper functions
+  const formatPrice = (price: number) => `€ ${price.toFixed(2)}`;
+
   // Header section
   doc.setFillColor(...headerColor);
   doc.rect(0, 0, 220, 40, 'F');
@@ -201,9 +204,6 @@ const generateOrderPDF = async (
       doc.setTextColor(...darkText);
       
       const total = Number(item.price) * item.quantity;
-      
-      // Format price with space between € and number
-      const formatPrice = (price: number) => `€ ${price.toFixed(2)}`;
       
       doc.text(`${item.vatRate}%`, columns.vat.x, variantY);
       doc.text(item.quantity.toString(), columns.quantity.x, variantY);
