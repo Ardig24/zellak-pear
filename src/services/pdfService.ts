@@ -190,13 +190,11 @@ const generateOrderPDF = async (
         doc.setFont('helvetica', 'normal');
       }
       
-      // Variant details with truncation
+      // Variant details without truncation
       doc.setFontSize(8);
       doc.setTextColor(...grayText);
-      const variantText = item.size.replace(/^%\s*/, '');
-      // Maximum space for variant text while maintaining alignment
-      const truncatedVariant = truncateText(`└ ${variantText}`, columns.product.width);
-      doc.text(truncatedVariant, columns.product.x + 5, variantY);
+      const variantText = item.size.replace(/^%\s*/, '').trim(); // Remove % and trim whitespace
+      doc.text(`└ ${variantText}`, columns.product.x + 5, variantY);
       
       // Reset style for other columns
       doc.setFontSize(10);
