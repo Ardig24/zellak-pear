@@ -191,8 +191,8 @@ const generateOrderPDF = async (
       }
       
       // Variant details without truncation
-      doc.setFontSize(8);
-      doc.setTextColor(...grayText);
+      doc.setFontSize(10); 
+      doc.setTextColor(...darkText); 
       const variantText = item.size.replace(/^%\s*/, '').trim(); // Remove % and trim whitespace
       doc.text(`${variantText}`, columns.product.x + 5, variantY);
       
