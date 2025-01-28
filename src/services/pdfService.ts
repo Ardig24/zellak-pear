@@ -31,18 +31,19 @@ const generateOrderPDF = async (
   doc.setFontSize(12);
   doc.text(`Bestellung #${orderId}`, 20, 35);
   
-  // Reset text color for body
-  doc.setTextColor(...darkText);
-  
-  // Date on the right
+  // Date on the right (now in white)
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
   const today = new Date().toLocaleDateString('de-DE', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
   doc.text(today, 170, 35, { align: 'right' });
+  
+  // Reset text color for body
+  doc.setTextColor(...darkText);
   
   // Customer Info Box
   const customerY = 50;
@@ -239,31 +240,33 @@ const generateOrderPDF = async (
   // Subtotals
   y += 10;
   doc.setTextColor(...grayText);
-  doc.text('Zwischensumme:', 130, y);
+  doc.text('Zwischensumme:', 110, y);
   doc.setTextColor(...darkText);
   doc.text(formatPrice(totals.subtotal), 170, y, { align: 'right' });
   
   y += 8;
   doc.setTextColor(...grayText);
-  doc.text('MwSt. 7%:', 130, y);
+  doc.text('MwSt. 7%:', 110, y);
   doc.setTextColor(...darkText);
   doc.text(formatPrice(totals.vat7Total), 170, y, { align: 'right' });
   
   y += 8;
   doc.setTextColor(...grayText);
-  doc.text('MwSt. 19%:', 130, y);
+  doc.text('MwSt. 19%:', 110, y);
   doc.setTextColor(...darkText);
   doc.text(formatPrice(totals.vat19Total), 170, y, { align: 'right' });
   
-  // Total with larger font
+  // Total with larger font and wider box
   y += 10;
+  const totalBoxWidth = 100; // Increased from 80
+  const totalBoxX = 90;      // Moved left to accommodate wider box
   doc.setFillColor(...headerColor);
-  doc.rect(110, y - 5, 80, 15, 'F');
+  doc.rect(totalBoxX, y - 5, totalBoxWidth, 15, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(12); // Increased from 10 to 12
-  doc.text('Gesamtsumme:', 130, y + 4);
-  doc.text(formatPrice(total), 170, y + 4, { align: 'right' });
+  doc.setFontSize(12);
+  doc.text('Gesamtsumme:', totalBoxX + 20, y + 4);
+  doc.text(formatPrice(total), totalBoxX + totalBoxWidth - 10, y + 4, { align: 'right' });
   
   // Footer - Add at the bottom of the current page
   y = pageHeight - margin;
