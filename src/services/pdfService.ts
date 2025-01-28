@@ -12,12 +12,12 @@ const generateOrderPDF = async (
   const doc = new jsPDF();
   
   // Colors
-  const primaryColor = [66, 133, 244];  // #4285f4
-  const grayText = [102, 102, 102];     // #666666
-  const darkText = [51, 51, 51];        // #333333
+  const headerColor = [0, 0, 0];      // Changed to black
+  const grayText = [102, 102, 102];   // #666666
+  const darkText = [51, 51, 51];      // #333333
   
   // Header section
-  doc.setFillColor(...primaryColor);
+  doc.setFillColor(...headerColor);
   doc.rect(0, 0, 220, 40, 'F');
   
   // Header text
@@ -92,7 +92,7 @@ const generateOrderPDF = async (
   const tableWidth = Math.min(desiredWidth, pageWidth - (minMargin * 2));
 
   // Table Header
-  doc.setFillColor(...primaryColor);
+  doc.setFillColor(...headerColor);
   doc.rect(20, tableY, tableWidth, 10, 'F');
   
   doc.setTextColor(255, 255, 255);
@@ -137,7 +137,7 @@ const generateOrderPDF = async (
       y = margin + 15;
       
       // Redraw table header on new page
-      doc.setFillColor(...primaryColor);
+      doc.setFillColor(...headerColor);
       doc.rect(20, y - 15, tableWidth, 10, 'F');
       
       doc.setTextColor(255, 255, 255);
@@ -174,7 +174,7 @@ const generateOrderPDF = async (
         y = margin + 15;
         
         // Redraw header on new page
-        doc.setFillColor(...primaryColor);
+        doc.setFillColor(...headerColor);
         doc.rect(20, y - 15, tableWidth, 10, 'F');
         
         doc.setTextColor(255, 255, 255);
@@ -202,10 +202,13 @@ const generateOrderPDF = async (
       
       const total = Number(item.price) * item.quantity;
       
+      // Format price with space between € and number
+      const formatPrice = (price: number) => `€ ${price.toFixed(2)}`;
+      
       doc.text(`${item.vatRate}%`, columns.vat.x, variantY);
       doc.text(item.quantity.toString(), columns.quantity.x, variantY);
-      doc.text(`€${Number(item.price).toFixed(2)}`, columns.price.x, variantY);
-      doc.text(`€${total.toFixed(2)}`, columns.total.x, variantY);
+      doc.text(formatPrice(Number(item.price)), columns.price.x, variantY);
+      doc.text(formatPrice(total), columns.total.x, variantY);
     });
     
     y += groupHeight;
@@ -223,7 +226,7 @@ const generateOrderPDF = async (
 
   // Add totals section at current Y position
   y += 10;
-  doc.setDrawColor(...primaryColor);
+  doc.setDrawColor(...headerColor);
   doc.setLineWidth(0.5);
   doc.line(110, y, 190, y);
 
@@ -238,28 +241,29 @@ const generateOrderPDF = async (
   doc.setTextColor(...grayText);
   doc.text('Zwischensumme:', 130, y);
   doc.setTextColor(...darkText);
-  doc.text(`€${totals.subtotal.toFixed(2)}`, 170, y, { align: 'right' });
+  doc.text(formatPrice(totals.subtotal), 170, y, { align: 'right' });
   
   y += 8;
   doc.setTextColor(...grayText);
   doc.text('MwSt. 7%:', 130, y);
   doc.setTextColor(...darkText);
-  doc.text(`€${totals.vat7Total.toFixed(2)}`, 170, y, { align: 'right' });
+  doc.text(formatPrice(totals.vat7Total), 170, y, { align: 'right' });
   
   y += 8;
   doc.setTextColor(...grayText);
   doc.text('MwSt. 19%:', 130, y);
   doc.setTextColor(...darkText);
-  doc.text(`€${totals.vat19Total.toFixed(2)}`, 170, y, { align: 'right' });
+  doc.text(formatPrice(totals.vat19Total), 170, y, { align: 'right' });
   
-  // Total
+  // Total with larger font
   y += 10;
-  doc.setFillColor(...primaryColor);
+  doc.setFillColor(...headerColor);
   doc.rect(110, y - 5, 80, 15, 'F');
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12); // Increased from 10 to 12
   doc.text('Gesamtsumme:', 130, y + 4);
-  doc.text(`€${total.toFixed(2)}`, 170, y + 4, { align: 'right' });
+  doc.text(formatPrice(total), 170, y + 4, { align: 'right' });
   
   // Footer - Add at the bottom of the current page
   y = pageHeight - margin;
