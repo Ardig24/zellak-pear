@@ -102,7 +102,7 @@ const generateOrderPDF = async (
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.text('Produkt', columns.product.x, tableY + 7);
-  doc.setFontSize(11); // Slightly bigger quantity text (was 12 before)
+  doc.setFontSize(14); // Slightly bigger quantity text (was 12 before)
   doc.text('Menge', columns.quantity.x, tableY + 7);
   doc.setFontSize(10); // Reset size
   doc.text('Preis', columns.price.x, tableY + 7);
