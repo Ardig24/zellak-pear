@@ -81,10 +81,10 @@ const generateOrderPDF = async (
   // Column positions and widths
   const columns = {
     product: { x: 25, width: 80 },    // Wide product column for variant text
-    vat: { x: 110, width: 15 },       // Compact VAT column
-    quantity: { x: 130, width: 15 },  // Compact quantity column
-    price: { x: 150, width: 20 },     // Price column
-    total: { x: 175, width: 20 }      // Total column
+    quantity: { x: 110, width: 20 },  // Slightly wider quantity column
+    price: { x: 135, width: 20 },     // Price column
+    total: { x: 160, width: 20 },     // Total column
+    vat: { x: 185, width: 15 }        // VAT moved to end
   };
 
   // Calculate table width based on page constraints
@@ -101,12 +101,14 @@ const generateOrderPDF = async (
   
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
   doc.text('Produkt', columns.product.x, tableY + 7);
-  doc.text('MwSt.', columns.vat.x, tableY + 7);
+  doc.setFontSize(12); // Bigger quantity text
   doc.text('Menge', columns.quantity.x, tableY + 7);
+  doc.setFontSize(10); // Reset size
   doc.text('Preis', columns.price.x, tableY + 7);
   doc.text('Total', columns.total.x, tableY + 7);
+  doc.setFontSize(8);  // Smaller VAT text
+  doc.text('MwSt.', columns.vat.x, tableY + 7);
   
   // Table Content
   doc.setTextColor(...darkText);
@@ -146,12 +148,14 @@ const generateOrderPDF = async (
       
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
       doc.text('Produkt', columns.product.x, y - 8);
-      doc.text('MwSt.', columns.vat.x, y - 8);
+      doc.setFontSize(12); // Bigger quantity text
       doc.text('Menge', columns.quantity.x, y - 8);
+      doc.setFontSize(10); // Reset size
       doc.text('Preis', columns.price.x, y - 8);
       doc.text('Total', columns.total.x, y - 8);
+      doc.setFontSize(8);  // Smaller VAT text
+      doc.text('MwSt.', columns.vat.x, y - 8);
       
       doc.setTextColor(...darkText);
       doc.setFont('helvetica', 'normal');
@@ -183,12 +187,14 @@ const generateOrderPDF = async (
         
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
         doc.text('Produkt', columns.product.x, y - 8);
-        doc.text('MwSt.', columns.vat.x, y - 8);
+        doc.setFontSize(12); // Bigger quantity text
         doc.text('Menge', columns.quantity.x, y - 8);
+        doc.setFontSize(10); // Reset size
         doc.text('Preis', columns.price.x, y - 8);
         doc.text('Total', columns.total.x, y - 8);
+        doc.setFontSize(8);  // Smaller VAT text
+        doc.text('MwSt.', columns.vat.x, y - 8);
         
         doc.setTextColor(...darkText);
         doc.setFont('helvetica', 'normal');
@@ -201,15 +207,13 @@ const generateOrderPDF = async (
       doc.text(`${variantText}`, columns.product.x + 5, variantY);
       
       // Reset style for other columns
-      doc.setFontSize(10);
-      doc.setTextColor(...darkText);
-      
-      const total = Number(item.price) * item.quantity;
-      
+      doc.setFontSize(8);  // Small VAT text
       doc.text(`${item.vatRate}%`, columns.vat.x, variantY);
+      doc.setFontSize(12); // Bigger quantity text
       doc.text(item.quantity.toString(), columns.quantity.x, variantY);
+      doc.setFontSize(10); // Reset size for other columns
       doc.text(formatPrice(Number(item.price)), columns.price.x, variantY);
-      doc.text(formatPrice(total), columns.total.x, variantY);
+      doc.text(formatPrice(Number(item.price) * item.quantity), columns.total.x, variantY);
     });
     
     y += groupHeight;
