@@ -80,11 +80,11 @@ const generateOrderPDF = async (
 
   // Column positions and widths
   const columns = {
-    product: { x: 25, width: 80 },    // Wide product column for variant text
-    quantity: { x: 110, width: 20 },  // Slightly wider quantity column
-    price: { x: 135, width: 20 },     // Price column
-    total: { x: 160, width: 20 },     // Total column
-    vat: { x: 185, width: 15 }        // VAT moved to end
+    product: { x: 25, width: 78 },     // -2 width
+    quantity: { x: 108, width: 20 },   // -2 x position
+    price: { x: 133, width: 20 },      // -2 x position
+    total: { x: 158, width: 20 },      // -2 x position
+    vat: { x: 183, width: 15 }         // -2 x position
   };
 
   // Calculate table width based on page constraints
@@ -102,7 +102,7 @@ const generateOrderPDF = async (
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.text('Produkt', columns.product.x, tableY + 7);
-  doc.setFontSize(12); // Bigger quantity text
+  doc.setFontSize(11); // Slightly bigger quantity text (was 12 before)
   doc.text('Menge', columns.quantity.x, tableY + 7);
   doc.setFontSize(10); // Reset size
   doc.text('Preis', columns.price.x, tableY + 7);
@@ -149,7 +149,7 @@ const generateOrderPDF = async (
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.text('Produkt', columns.product.x, y - 8);
-      doc.setFontSize(12); // Bigger quantity text
+      doc.setFontSize(11); // Slightly bigger quantity text (was 12 before)
       doc.text('Menge', columns.quantity.x, y - 8);
       doc.setFontSize(10); // Reset size
       doc.text('Preis', columns.price.x, y - 8);
@@ -188,7 +188,7 @@ const generateOrderPDF = async (
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.text('Produkt', columns.product.x, y - 8);
-        doc.setFontSize(12); // Bigger quantity text
+        doc.setFontSize(11); // Slightly bigger quantity text (was 12 before)
         doc.text('Menge', columns.quantity.x, y - 8);
         doc.setFontSize(10); // Reset size
         doc.text('Preis', columns.price.x, y - 8);
@@ -209,7 +209,7 @@ const generateOrderPDF = async (
       // Reset style for other columns
       doc.setFontSize(8);  // Small VAT text
       doc.text(`${item.vatRate}%`, columns.vat.x, variantY);
-      doc.setFontSize(12); // Bigger quantity text
+      doc.setFontSize(11); // Slightly bigger quantity text (was 12 before)
       doc.text(item.quantity.toString(), columns.quantity.x, variantY);
       doc.setFontSize(10); // Reset size for other columns
       doc.text(formatPrice(Number(item.price)), columns.price.x, variantY);
