@@ -31,7 +31,10 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="card w-full max-w-[90%] sm:max-w-md bg-white/30 backdrop-blur-md shadow-2xl border border-white/50 p-6 sm:p-8">
+      <div className="card w-full max-w-[90%] sm:max-w-md bg-white/30 backdrop-blur-md shadow-2xl border border-white/50 px-6 pt-32 pb-10 sm:px-8 sm:pt-40 sm:pb-14 relative">
+        <div className="absolute top-0 left-0 right-0 flex justify-center" style={{transform: 'translateY(-20%)'}}>
+          <img src="/logo-login.png?v=1" alt="Zellak Logo" className="h-256 w-auto" />
+        </div>
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">
             {t('login.title')}
