@@ -31,8 +31,8 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="card w-full max-w-[90%] sm:max-w-md bg-white/30 backdrop-blur-md shadow-2xl border border-white/50 px-6 pt-32 pb-10 sm:px-8 sm:pt-40 sm:pb-14 relative mt-16 sm:mt-0">
-        <div className="absolute top-0 left-0 right-0 flex justify-center z-10" style={{transform: 'translateY(-20%)'}}>
+      <div className="card w-full max-w-[90%] sm:max-w-md bg-white/30 backdrop-blur-md shadow-2xl border border-white/50 px-6 pt-32 pb-10 sm:px-8 sm:pt-40 sm:pb-14 relative login-card">
+        <div className="absolute top-0 left-0 right-0 flex justify-center z-10 login-logo-container" style={{transform: 'translateY(-20%)'}}>
 
           <img src="/logo-login.png?v=1" alt="Zellak Logo" className="h-256 w-auto" />
         </div>
